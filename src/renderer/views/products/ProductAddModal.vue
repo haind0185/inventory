@@ -35,7 +35,7 @@
             <div class="flex">
                 <fieldset class="w-full form-input">
                     <legend>{{ $t("attr.product.remark") }}</legend>
-                    <textarea class="w-full form-control min-h-12"></textarea v-model="payload.remark">
+                    <textarea class="w-full form-control min-h-12" v-model="payload.remark"></textarea>
                 </fieldset>
             </div>
 
