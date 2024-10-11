@@ -3,7 +3,7 @@ import { join } from 'path';
 import server from '../backend/index';
 // const log = require('electron-log');
 // const { autoUpdater } = require('electron-updater');
-const { updateElectronApp } = require('update-electron-app');
+const { updateElectronApp, UpdateSourceType } = require('update-electron-app');
 
 // ------------------------------------auto-update------------------------------------
 // autoUpdater.logger = log;
@@ -76,9 +76,13 @@ const createWindow = () => {
     // auto-update
     // autoUpdater.checkForUpdatesAndNotify();
     updateElectronApp({
-        repo: 'haind0185/inventory',
+        updateSource: {
+            type: UpdateSourceType.StaticStorage,
+            baseUrl: `https://github.com/haind0185/inventory/releases/download/1_0_0/RELEASES`
+        },
+        // updateInterval: '1 hour',
         logger: require('electron-log')
-    });
+    })
 
 };
 
