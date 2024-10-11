@@ -1,6 +1,6 @@
 {
     "name": "inventory",
-    "productName": "Inventory",
+    "productName": "inventory",
     "version": "1.0.1",
     "description": "Inventory app by haind0185.",
     "main": ".vite/build/main.js",
