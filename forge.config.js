@@ -21,13 +21,13 @@ module.exports = {
     ],
     publishers: [
         {
-            "name": "@electron-forge/publisher-github",
-            "config": {
-                "repository": {
-                    "owner": "haind0185",
-                    "name": "inventory"
+            name: '@electron-forge/publisher-github',
+            config: {
+                repository: {
+                    owner: 'haind0185',
+                    name: 'inventory'
                 },
-                "prerelease": false
+                prerelease: false
             }
         }
     ],

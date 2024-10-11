@@ -6,13 +6,6 @@
     "main": ".vite/build/main.js",
     "build": {
         "appId": "haind0185.inventory.app",
-        "publish": [
-            {
-                "provider": "github",
-                "owner": "haind0185",
-                "repo": "inventory"
-            }
-        ],
         "win": {
             "target": [
                 "nsis",
@@ -24,15 +17,6 @@
                 "owner": "haind0185",
                 "repo": "inventory"
             }
-        },
-        "nsis": {
-            "installerIcon": "",
-            "uninstallerIcon": "",
-            "uninstallDisplayName": "Uninstaller - inventory",
-            "license": "./LICENSE",
-            "oneClick": false,
-            "allowToChangeInstallationDirectory": true,
-            "perMachine": true
         },
         "files": [
             "app-update.yml"
@@ -79,6 +63,7 @@
         "sequelize": "^6.37.4",
         "sqlite3": "^5.1.7",
         "tailwindcss": "^3.4.13",
+        "update-electron-app": "^3.0.0",
         "vue": "^3.2.47",
         "vue-cookies": "^1.8.4",
         "vue-i18n": "^10.0.4",

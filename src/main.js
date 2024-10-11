@@ -1,44 +1,44 @@
 import { app, BrowserWindow } from 'electron';
 import { join } from 'path';
-import path from 'path'
 import server from '../backend/index';
-const log = require('electron-log');
-const { autoUpdater } = require('electron-updater');
+// const log = require('electron-log');
+// const { autoUpdater } = require('electron-updater');
+const { updateElectronApp } = require('update-electron-app');
 
 // ------------------------------------auto-update------------------------------------
-autoUpdater.logger = log;
-autoUpdater.logger.transports.file.level = 'info';
-autoUpdater.updateConfigPath = path.resolve(__dirname, '../../app-update.yml');
+// autoUpdater.logger = log;
+// autoUpdater.logger.transports.file.level = 'info';
+// autoUpdater.updateConfigPath = path.resolve(__dirname, '../../app-update.yml');
 
-// Check for updates and download
-autoUpdater.on('checking-for-update', () => {
-    log.info('Hai: checking for update.');
-});
+// // Check for updates and download
+// autoUpdater.on('checking-for-update', () => {
+//     log.info('Hai: checking for update.');
+// });
 
-autoUpdater.on('update-available', (info) => {
-    log.info('Hai: update available.');
-});
+// autoUpdater.on('update-available', (info) => {
+//     log.info('Hai: update available.');
+// });
 
-autoUpdater.on('update-not-available', (info) => {
-    log.info('Hai: update not available.');
-});
+// autoUpdater.on('update-not-available', (info) => {
+//     log.info('Hai: update not available.');
+// });
 
-autoUpdater.on('error', (err) => {
-    log.error('Hai: error in auto-updater. ' + err);
-});
+// autoUpdater.on('error', (err) => {
+//     log.error('Hai: error in auto-updater. ' + err);
+// });
 
-autoUpdater.on('download-progress', (progressObj) => {
-    let log_message = "Download speed: " + progressObj.bytesPerSecond;
-    log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
-    log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
-    log.info(log_message);
-});
+// autoUpdater.on('download-progress', (progressObj) => {
+//     let log_message = "Download speed: " + progressObj.bytesPerSecond;
+//     log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+//     log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+//     log.info(log_message);
+// });
 
-autoUpdater.on('update-downloaded', (info) => {
-    log.info('Hai: Update downloaded. Quitting and installing...');
-    // Force update installation
-    autoUpdater.quitAndInstall();
-});
+// autoUpdater.on('update-downloaded', (info) => {
+//     log.info('Hai: Update downloaded. Quitting and installing...');
+//     // Force update installation
+//     autoUpdater.quitAndInstall();
+// });
 // ------------------------------------auto-update------------------------------------
 
 // setup server
@@ -74,7 +74,11 @@ const createWindow = () => {
     // mainWindow.webContents.openDevTools();
 
     // auto-update
-    autoUpdater.checkForUpdatesAndNotify();
+    // autoUpdater.checkForUpdatesAndNotify();
+    updateElectronApp({
+        repo: 'haind0185/inventory',
+        logger: require('electron-log')
+    });
 
 };
 
