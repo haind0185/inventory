@@ -1,7 +1,7 @@
 {
     "name": "inventory",
     "productName": "inventory",
-    "version": "1.0.3",
+    "version": "1.0.0",
     "description": "Inventory app by haind0185.",
     "main": ".vite/build/main.js",
     "build": {
@@ -12,6 +12,30 @@
                 "owner": "haind0185",
                 "repo": "inventory"
             }
+        ],
+        "win": {
+            "target": [
+                "nsis",
+                "zip"
+            ],
+            "verifyUpdateCodeSignature": false,
+            "publish": {
+                "provider": "github",
+                "owner": "haind0185",
+                "repo": "inventory"
+            }
+        },
+        "nsis": {
+            "installerIcon": "",
+            "uninstallerIcon": "",
+            "uninstallDisplayName": "Uninstaller - inventory",
+            "license": "./LICENSE",
+            "oneClick": false,
+            "allowToChangeInstallationDirectory": true,
+            "perMachine": true
+        },
+        "files": [
+            "app-update.yml"
         ]
     },
     "scripts": {
@@ -44,6 +68,7 @@
         "autoprefixer": "^10.4.20",
         "axios": "^1.7.7",
         "cors": "^2.8.5",
+        "electron-log": "^5.2.0",
         "electron-squirrel-startup": "^1.0.0",
         "electron-updater": "^6.3.9",
         "express": "^4.21.0",
