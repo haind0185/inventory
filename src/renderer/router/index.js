@@ -55,8 +55,6 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-    console.log(from)
-    console.log(to)
     next()
 })
 
