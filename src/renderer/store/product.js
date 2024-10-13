@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { initPinia } from '@/store/setup'
 import api from '@/api'
+import { store } from '.'
 
 const initSearch = {
     name: null,
@@ -23,11 +24,14 @@ const createStore = defineStore('product', {
     },
     actions: {
         async index(params) {
+            store.setLoading(true)
             return await api.get(`/products`, { params: params })
                 .then((res) => {
+                    store.setLoading(false)
                     return res.data
                 })
                 .catch((error) => {
+                    store.setLoading(false)
                     return false
                 })
         },

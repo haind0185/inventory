@@ -19,13 +19,20 @@ const ProductController = {
         try {
             console.log(req.body)
 
+            const { code, name, unit1, unit2, specific } = req.body;
+
+            const specificRule = Joi.number()
+            if(unit2) {
+                specificRule.allow(null)
+            }
+            specificRule.min(1)
+
             const schema = Joi.object({
-                name  : Joi.string().required().min(2).max(200),
-                unit  : Joi.string().required().max(50),
-                SKU   : Joi.string().allow(null, '').max(50),
-                price : Joi.number().allow(0),
-                expire: Joi.number().allow(0, null),
-                remark: Joi.string().allow(null, '').max(1000),
+                code    : Joi.string().required().min(1).max(200),
+                name    : Joi.string().required().min(1).max(200),
+                unit1   : Joi.string().required().max(50),
+                unit2   : Joi.string().allow(null, ''),
+                specific: specificRule,
             }).unknown();
 
             const validation = schema.validate(req.body);
@@ -34,15 +41,12 @@ const ProductController = {
                 return res.json(error(validation.error.details[0].message))
             }
 
-            const { name, unit, SKU, price, expire, remark } = req.body;
-
             const product = await Product.create({
-                name  : name,
-                unit  : unit,
-                SKU   : SKU,
-                price : price,
-                expire: expire,
-                remark: remark,
+                code    : code,
+                name    : name,
+                unit1   : unit1,
+                unit2   : unit2,
+                specific: specific,
             });
             
             return res.json(success(product));

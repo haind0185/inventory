@@ -4,12 +4,12 @@
             <div class="flex flex-col flex-1">
                 <div class="flex w-full gap-3">
                     <fieldset class="form-input w-[30%]">
-                        <legend>{{ $t("attr.product.name") }}</legend>
+                        <legend>{{ $t("attr.product.code") }}</legend>
                         <input type="text" class="w-full form-control">
                     </fieldset>
     
                     <fieldset class="form-input w-[30%]">
-                        <legend>{{ $t("attr.product.SKU") }}</legend>
+                        <legend>{{ $t("attr.product.name") }}</legend>
                         <input type="text" class="w-full form-control">
                     </fieldset>
                 </div>
@@ -32,22 +32,20 @@
             <table class="view-scroll t-border">
                 <thead>
                     <tr>
+                        <th>{{ $t("attr.product.code") }}</th>
                         <th>{{ $t("attr.product.name") }}</th>
-                        <th>{{ $t("attr.product.SKU") }}</th>
-                        <th>{{ $t("attr.product.unit") }}</th>
-                        <th>{{ $t("attr.product.price") }}</th>
-                        <th>{{ $t("attr.product.expire") }}</th>
-                        <th>{{ $t("attr.product.remark") }}</th>
+                        <th>{{ $t("attr.product.unit1") }}</th>
+                        <th>{{ $t("attr.product.unit2") }}</th>
+                        <th>{{ $t("attr.product.specific") }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="item in items">
-                        <td>{{ item.name }}</td>
-                        <td class="text-center">{{ item.SKU }}</td>
-                        <td class="text-center">{{ item.unit }}</td>
-                        <td class="text-right">{{ number(item.price, 2) }}</td>
-                        <td class="text-center">{{ item.expire }}</td>
-                        <td>{{ item.remark }}</td>
+                        <td class="text-center">{{ item.code }}</td>
+                        <td class="text-left">{{ item.name }}</td>
+                        <td class="text-center">{{ item.unit1 }}</td>
+                        <td class="text-center">{{ item.unit2 }}</td>
+                        <td class="text-center">{{ item.specific }}</td>
                     </tr>
                 </tbody>
             </table>

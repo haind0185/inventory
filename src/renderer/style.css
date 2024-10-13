@@ -276,7 +276,15 @@ table.t-border tbody tr.selected {
 }
 
 .vs__actions {
+    /* display: none !important; */
+    padding: 0 2px; 
+}
+.vs__open-indicator {
     display: none !important;
+}
+
+.vs__clear {
+    margin: 0;
 }
 
 .vs__dropdown-menu {

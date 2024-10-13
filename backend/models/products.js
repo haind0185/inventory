@@ -2,35 +2,26 @@ import sequelize from './index';
 const { DataTypes } = require('sequelize');
 
 const Product = sequelize.define('Product', {
+    code: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
     name: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    image: {
-        type: DataTypes.STRING,
-        defaultValue: null,
-    },
-    unit: {
+    unit1: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    SKU: {
+    unit2: {
         type: DataTypes.STRING,
-        defaultValue: null,
+        allowNull: true,
     },
-    price: {
-        type: DataTypes.DOUBLE,
-        allowNull: false,
-        defaultValue: 0,
-    },
-    expire: {
+    specific: {
         type: DataTypes.INTEGER,
-        defaultValue: null
+        allowNull: true,
     },
-    remark: {
-        type: DataTypes.TEXT,
-        defaultValue: null
-    }
 });
 
 export default Product;
