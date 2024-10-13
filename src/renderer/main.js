@@ -14,6 +14,7 @@ import './style.css'
 
 import Modal from '@/views/component/layout/Modal.vue'
 import Confirm from '@/views/component/Confirm.vue'
+import Sort from '@/views/component/Sort.vue'
 import vSelect from 'vue-select'
 
 
@@ -33,6 +34,7 @@ app.use(VueCookies, { expire: '7d' })
 // add component
 app.component('Modal', Modal)
     .component('Confirm', Confirm)
+    .component('ThSort', Sort)
     .component('select2', vSelect)
 
 app.mount('#app')

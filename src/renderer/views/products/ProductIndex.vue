@@ -5,18 +5,18 @@
                 <div class="flex w-full gap-3">
                     <fieldset class="form-input w-[30%]">
                         <legend>{{ $t("attr.product.code") }}</legend>
-                        <input type="text" class="w-full form-control">
+                        <input type="text" class="w-full form-control" v-model="search.code">
                     </fieldset>
     
                     <fieldset class="form-input w-[30%]">
                         <legend>{{ $t("attr.product.name") }}</legend>
-                        <input type="text" class="w-full form-control">
+                        <input type="text" class="w-full form-control" v-model="search.name">
                     </fieldset>
                 </div>
             </div>
-            <div class="w-[6rem] flex flex-col gap-3">
+            <div class="flex items-end gap-3">
                 <button type="submit" class="btn w-[6rem]">{{ $t("button.search") }}</button>
-                <button type="button" class="btn silver w-[6rem]">{{ $t("button.clear") }}</button>
+                <button type="button" class="btn silver w-[6rem]" @click="clear()">{{ $t("button.clear") }}</button>
             </div>
         </form>
 
@@ -32,8 +32,12 @@
             <table class="view-scroll t-border">
                 <thead>
                     <tr>
-                        <th>{{ $t("attr.product.code") }}</th>
-                        <th>{{ $t("attr.product.name") }}</th>
+                        <th>
+                            <th-sort @sort="sort()" :search="search" :field="'code'">{{ $t("attr.product.code") }}</th-sort>
+                        </th>
+                        <th>
+                            <th-sort @sort="sort()" :search="search" :field="'name'">{{ $t("attr.product.name") }}</th-sort>
+                        </th>
                         <th>{{ $t("attr.product.unit1") }}</th>
                         <th>{{ $t("attr.product.unit2") }}</th>
                         <th>{{ $t("attr.product.specific") }}</th>
@@ -65,6 +69,7 @@ import { productStore } from '@/store/product';
 import ProductAddModal from './ProductAddModal.vue'
 
 const showAdd = ref(false)
+const search = computed(() => productStore.search)
 const items = ref([])
 
 const onShowAdd = () => {
@@ -83,13 +88,24 @@ const onSaveAdd = (event) => {
     }
 }
 
+const clear = async () => {
+    productStore.resetSearch()
+    index()
+    console.log(search.value)
+}
 const index = async () => {
-    await productStore.index({}).then((res) => {
-        console.log(res)
+    await productStore.index(search.value).then((res) => {
         if(res && res.code == 200) {
             items.value = res.data
         }
     })
+}
+
+const sort = async () => {
+    if (items.value.length > 0) {
+        // search.value.page = 1
+        await index()
+    }
 }
 
 onMounted(async () => {

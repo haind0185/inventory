@@ -4,16 +4,16 @@ import api from '@/api'
 import { store } from '.'
 
 const initSearch = {
+    code: null,
     name: null,
-    SKU: null,
+    sort: null,
+    sort_by: null,
 }
 
 const createStore = defineStore('product', {
     state: () => {
         return {
             search: {
-                sort: null,
-                sort_by: 'asc',
                 ...initSearch
             },
 

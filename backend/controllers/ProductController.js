@@ -1,14 +1,37 @@
 import Product from '../models/Products';
 import { error, success } from './http';
+const { Op } = require("sequelize");
 const Joi = require('joi');
 
 const ProductController = {
 
     index: async (req, res) => {
         try {
-            console.log(req.body)
+            console.log(req.query)
+
+            // where
+            const where = {}
+
+            if(req.query.code) {
+                where.code = { [Op.like]: `%${req.query.code}%` }
+            }
+
+            if(req.query.name) {
+                where.name = { [Op.like]: `%${req.query.name}%` }
+            }
+
+            // order
+            const order_list = ['code', 'name']
+            let order = []
+            if(order_list.includes(req.query.sort)) {
+                let sort_by = req.query.sort_by == 'desc' ? 'desc' : 'asc'
+                order = [[req.query.sort, sort_by]]
+            }
             
-            const products = await Product.findAll();
+            const products = await Product.findAll({
+                where: where,
+                order: order,
+            });
             return res.json(success(products));
         } catch (err) {
             return res.json(error(err.message, 501));
