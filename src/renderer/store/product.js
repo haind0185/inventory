@@ -8,6 +8,7 @@ const initSearch = {
     name: null,
     sort: null,
     sort_by: null,
+    page: 1
 }
 
 const createStore = defineStore('product', {

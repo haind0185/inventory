@@ -1,7 +1,7 @@
 import moment from 'moment'
 
 const functions = {
-    number: (value, decimals, currency ) => {
+    format_number: (value, decimals, currency ) => {
         value = parseFloat(value)
         if (!isFinite(value) || (!value && value !== 0)) return ''
         currency = currency != null ? currency : ''

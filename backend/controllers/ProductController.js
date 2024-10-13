@@ -27,12 +27,35 @@ const ProductController = {
                 let sort_by = req.query.sort_by == 'desc' ? 'desc' : 'asc'
                 order = [[req.query.sort, sort_by]]
             }
+
+            // page
+            const limit = 50
+            let offset = req.query.page ? ((req.query.page - 1) * limit) : 0
             
-            const products = await Product.findAll({
+            const total = await Product.count({
                 where: where,
-                order: order,
-            });
-            return res.json(success(products));
+            })
+
+            let products = []
+            if(total > 0) {
+                products = await Product.findAll({
+                    where: where,
+                    order: order,
+                    limit: limit,
+                    offset: offset
+                });
+            }
+
+            let page = parseInt(req.query.page ?? 0)
+
+            return res.json(success({
+                items: products,
+                total: total,
+                page: page,
+                page_count: Math.ceil(total / limit),
+                firstItem: products.length ? (((page - 1) * limit) + 1) : 0,
+                lastItem: products.length ? ((page * limit) <= total ? (page * limit) : total) : 0,
+            }));
         } catch (err) {
             return res.json(error(err.message, 501));
         }
