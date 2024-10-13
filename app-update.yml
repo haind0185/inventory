@@ -1,4 +1,4 @@
 provider: github
 owner: haind0185
 repo: inventory
-vPrefixedTag: true
+vPrefixedTag: false

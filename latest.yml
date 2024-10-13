@@ -1,0 +1,5 @@
+url: https://github.com/haind0185/inventory/releases/download/1.0.0/inventory-1.0.0.Setup.exe
+version: 1.0.1
+files:
+  - name: inventory-1.0.0.Setup.exe
+  - sha256: 164E3CA41945172DF5390779779DAF61538FD6C2

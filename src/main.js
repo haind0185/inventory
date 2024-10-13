@@ -1,44 +1,27 @@
 import { app, BrowserWindow } from 'electron';
 import { join } from 'path';
 import server from '../backend/index';
+// import path from 'path';
 // const log = require('electron-log');
 // const { autoUpdater } = require('electron-updater');
-const { updateElectronApp, UpdateSourceType } = require('update-electron-app');
+// const { updateElectronApp, UpdateSourceType } = require('update-electron-app')
 
 // ------------------------------------auto-update------------------------------------
 // autoUpdater.logger = log;
 // autoUpdater.logger.transports.file.level = 'info';
-// autoUpdater.updateConfigPath = path.resolve(__dirname, '../../app-update.yml');
-
-// // Check for updates and download
-// autoUpdater.on('checking-for-update', () => {
-//     log.info('Hai: checking for update.');
-// });
-
-// autoUpdater.on('update-available', (info) => {
-//     log.info('Hai: update available.');
-// });
-
-// autoUpdater.on('update-not-available', (info) => {
-//     log.info('Hai: update not available.');
-// });
-
-// autoUpdater.on('error', (err) => {
-//     log.error('Hai: error in auto-updater. ' + err);
-// });
-
+// autoUpdater.updateConfigPath = path.resolve(__dirname, '../../latest.yml');
 // autoUpdater.on('download-progress', (progressObj) => {
 //     let log_message = "Download speed: " + progressObj.bytesPerSecond;
 //     log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
 //     log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+
 //     log.info(log_message);
 // });
-
 // autoUpdater.on('update-downloaded', (info) => {
 //     log.info('Hai: Update downloaded. Quitting and installing...');
-//     // Force update installation
 //     autoUpdater.quitAndInstall();
 // });
+
 // ------------------------------------auto-update------------------------------------
 
 // setup server
@@ -73,17 +56,16 @@ const createWindow = () => {
     // Open the DevTools.
     // mainWindow.webContents.openDevTools();
 
-    // auto-update
     // autoUpdater.checkForUpdatesAndNotify();
-    updateElectronApp({
-        updateSource: {
-            type: UpdateSourceType.StaticStorage,
-            baseUrl: `https://github.com/haind0185/inventory/releases/download/1_0_0/RELEASES`
-        },
-        // updateInterval: '1 hour',
-        logger: require('electron-log')
-    })
-
+    // updateElectronApp({
+    //     updateSource: {
+    //         host: 'https://github.com',
+    //         type: UpdateSourceType.ElectronPublicUpdateService,
+    //         repo: 'haind0185/inventory'
+    //     },
+    //     updateInterval: '1 hour',
+    //     logger: require('electron-log')
+    // })
 };
 
 // This method will be called when Electron has finished
