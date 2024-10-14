@@ -4,6 +4,7 @@
 import { createApp } from 'vue'
 import VueCookies from 'vue-cookies'
 import 'vue-select/dist/vue-select.css'
+// import { ipcRenderer } from 'electron'
 
 import i18n from "@/i18n"
 import helpers from '@/helper'
@@ -18,7 +19,7 @@ import Sort from '@/views/component/Sort.vue'
 import Pagination from '@/views/component/Pagination.vue'
 import vSelect from 'vue-select'
 
-
+// ipcRenderer.send('restart-server');
 
 /**
  * Vue install

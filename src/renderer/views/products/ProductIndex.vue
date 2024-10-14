@@ -4,13 +4,13 @@
             <div class="flex flex-col flex-1">
                 <div class="flex w-full gap-3">
                     <fieldset class="form-input w-[30%]">
-                        <legend>{{ $t("attr.product.code") }}</legend>
-                        <input type="text" class="w-full form-control" v-model="search.code">
+                        <legend>{{ $t("attr.product.ProductCode") }}</legend>
+                        <input type="text" class="w-full form-control" v-model="search.ProductCode">
                     </fieldset>
     
                     <fieldset class="form-input w-[30%]">
-                        <legend>{{ $t("attr.product.name") }}</legend>
-                        <input type="text" class="w-full form-control" v-model="search.name">
+                        <legend>{{ $t("attr.product.ProductName") }}</legend>
+                        <input type="text" class="w-full form-control" v-model="search.ProductName">
                     </fieldset>
                 </div>
             </div>
@@ -27,7 +27,6 @@
             </div>
             <div class="flex justify-center w-[20%] items-center">
                 <span v-if="products.total">
-                    <!-- {{ number(products.firstItem) }}-{{ number(products.lastItem) }}/{{ number(products.total) }} -->
                     {{ format_number(products.firstItem) }}-{{ format_number(products.lastItem) }}/{{  format_number(products.total) }}
                 </span>
             </div>
@@ -41,23 +40,23 @@
                 <thead>
                     <tr>
                         <th>
-                            <th-sort @sort="sort()" :search="search" :field="'code'">{{ $t("attr.product.code") }}</th-sort>
+                            <th-sort @sort="sort()" :search="search" :field="'ProductCode'">{{ $t("attr.product.ProductCode") }}</th-sort>
                         </th>
                         <th>
-                            <th-sort @sort="sort()" :search="search" :field="'name'">{{ $t("attr.product.name") }}</th-sort>
+                            <th-sort @sort="sort()" :search="search" :field="'ProductName'">{{ $t("attr.product.ProductName") }}</th-sort>
                         </th>
-                        <th>{{ $t("attr.product.unit1") }}</th>
-                        <th>{{ $t("attr.product.unit2") }}</th>
-                        <th>{{ $t("attr.product.specific") }}</th>
+                        <th>{{ $t("attr.product.LargeUnit") }}</th>
+                        <th>{{ $t("attr.product.SmallUnit") }}</th>
+                        <th>{{ $t("attr.product.ConversionRate") }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="item in products.items">
-                        <td class="text-center">{{ item.code }}</td>
-                        <td class="text-left">{{ item.name }}</td>
-                        <td class="text-center">{{ item.unit1 }}</td>
-                        <td class="text-center">{{ item.unit2 }}</td>
-                        <td class="text-center">{{ item.specific }}</td>
+                        <td class="text-center">{{ item.ProductCode }}</td>
+                        <td class="text-left">{{ item.ProductName }}</td>
+                        <td class="text-center">{{ item.LargeUnit }}</td>
+                        <td class="text-center">{{ item.SmallUnit }}</td>
+                        <td class="text-center">{{ item.ConversionRate }}</td>
                     </tr>
                 </tbody>
             </table>

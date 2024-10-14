@@ -4,11 +4,11 @@ const messages = {
     vi: {
         attr: {
             product: {
-                code: "Mã mặt hàng",
-                name: "Tên mặt hàng",
-                unit1: "Đơn vị 1",
-                unit2: "Đơn vị 2",
-                specific: "Quy cách",
+                ProductCode: "Mã mặt hàng",
+                ProductName: "Tên mặt hàng",
+                LargeUnit: "Đơn vị 1",
+                SmallUnit: "Đơn vị 2",
+                ConversionRate: "Quy cách",
             }
         },
         button: {

@@ -1,4 +1,4 @@
-import Product from '../models/Products';
+import Product from '../models/Product';
 import { error, success } from './http';
 const { Op } = require("sequelize");
 const Joi = require('joi');
@@ -12,16 +12,16 @@ const ProductController = {
             // where
             const where = {}
 
-            if(req.query.code) {
-                where.code = { [Op.like]: `%${req.query.code}%` }
+            if(req.query.ProductCode) {
+                where.ProductCode = { [Op.like]: `%${req.query.ProductCode}%` }
             }
 
-            if(req.query.name) {
-                where.name = { [Op.like]: `%${req.query.name}%` }
+            if(req.query.ProductName) {
+                where.ProductName = { [Op.like]: `%${req.query.ProductName}%` }
             }
 
             // order
-            const order_list = ['code', 'name']
+            const order_list = ['ProductCode', 'ProductName']
             let order = []
             if(order_list.includes(req.query.sort)) {
                 let sort_by = req.query.sort_by == 'desc' ? 'desc' : 'asc'
@@ -65,20 +65,18 @@ const ProductController = {
         try {
             console.log(req.body)
 
-            const { code, name, unit1, unit2, specific } = req.body;
-
-            const specificRule = Joi.number()
-            if(unit2) {
-                specificRule.allow(null)
-            }
-            specificRule.min(1)
+            const { ProductCode, ProductName, LargeUnit, SmallUnit, ConversionRate } = req.body;
 
             const schema = Joi.object({
-                code    : Joi.string().required().min(1).max(200),
-                name    : Joi.string().required().min(1).max(200),
-                unit1   : Joi.string().required().max(50),
-                unit2   : Joi.string().allow(null, ''),
-                specific: specificRule,
+                ProductCode   : Joi.string().required().min(1).max(200),
+                ProductName   : Joi.string().required().min(1).max(200),
+                LargeUnit     : Joi.string().required().max(50),
+                SmallUnit     : Joi.string().allow(null, ''),
+                ConversionRate: Joi.when('SmallUnit', {
+                    is: Joi.string(),
+                    then: Joi.number().min(1).required(),
+                    otherwise: Joi.number().allow(null).min(1),
+                }),
             }).unknown();
 
             const validation = schema.validate(req.body);
@@ -87,12 +85,22 @@ const ProductController = {
                 return res.json(error(validation.error.details[0].message))
             }
 
+            const existsProduct = await Product.findOne({
+                where: {
+                    ProductCode: ProductCode
+                }
+            })
+
+            if(existsProduct) {
+                return res.json(error('Mã mặt hàng đã tồn tại.'));
+            }
+
             const product = await Product.create({
-                code    : code,
-                name    : name,
-                unit1   : unit1,
-                unit2   : unit2,
-                specific: specific,
+                ProductCode   : ProductCode,
+                ProductName   : ProductName,
+                LargeUnit     : LargeUnit,
+                SmallUnit     : SmallUnit,
+                ConversionRate: ConversionRate,
             });
             
             return res.json(success(product));

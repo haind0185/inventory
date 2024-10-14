@@ -2,23 +2,24 @@ import sequelize from './index';
 const { DataTypes } = require('sequelize');
 
 const Product = sequelize.define('Product', {
-    code: {
+    ProductCode: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+    },
+    ProductName: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    name: {
+    LargeUnit: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    unit1: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    unit2: {
+    SmallUnit: {
         type: DataTypes.STRING,
         allowNull: true,
     },
-    specific: {
+    ConversionRate: {
         type: DataTypes.INTEGER,
         allowNull: true,
     },
