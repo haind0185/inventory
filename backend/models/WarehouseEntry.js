@@ -8,7 +8,7 @@ const WarehouseEntry = sequelize.define('WarehouseEntry', {
         unique: true,
     },
     EntryDate: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
         allowNull: false,
     },
     ProductCode: {
@@ -24,7 +24,7 @@ const WarehouseEntry = sequelize.define('WarehouseEntry', {
         allowNull: false,
     },
     ExpiryDate: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
         allowNull: false,
     },
 });

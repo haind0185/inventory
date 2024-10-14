@@ -4,14 +4,14 @@ import api from '@/api'
 import { store } from '.'
 
 const initSearch = {
-    ProductCode: null,
-    ProductName: null,
+    EntryCode: null,
+    EntryDate: null,
     sort: null,
     sort_by: null,
     page: 1
 }
 
-const createStore = defineStore('product', {
+const createStore = defineStore('entry', {
     state: () => {
         return {
             search: {
@@ -26,7 +26,7 @@ const createStore = defineStore('product', {
     actions: {
         async index(params) {
             store.setLoading(true)
-            return await api.get(`/products`, { params: params })
+            return await api.get(`/entries`, { params: params })
                 .then((res) => {
                     store.setLoading(false)
                     return res.data
@@ -38,7 +38,7 @@ const createStore = defineStore('product', {
         },
         async store(payload) {
             store.setLoading(true)
-            return await api.post(`/products`, payload)
+            return await api.post(`/entries`, payload)
                 .then((res) => {
                     store.setLoading(false)
                     return res.data
@@ -60,7 +60,7 @@ const createStore = defineStore('product', {
     },
 })
 
-export const productStore = createStore(initPinia)
-export const useProductStore = () => {
-    return productStore
+export const entryStore = createStore(initPinia)
+export const useEntryStore = () => {
+    return entryStore
 }

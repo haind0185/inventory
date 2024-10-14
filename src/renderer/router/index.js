@@ -20,14 +20,14 @@ const routes = [
                 component: () => import("@/views/products/ProductIndex.vue"),
             },
             {
-                path: '/import',
-                name: 'Import',
-                component: () => import("@/views/import/ImportIndex.vue"),
+                path: '/entry',
+                name: 'Entry',
+                component: () => import("@/views/entry/EntryIndex.vue"),
             },
             {
-                path: '/export',
-                name: 'Export',
-                component: () => import("@/views/export/exportIndex.vue"),
+                path: '/exit',
+                name: 'Exit',
+                component: () => import("@/views/exit/ExitIndex.vue"),
             },
             {
                 path: '/errors',

@@ -16,6 +16,7 @@ import Modal from '@/views/component/layout/Modal.vue'
 import Confirm from '@/views/component/Confirm.vue'
 import Sort from '@/views/component/Sort.vue'
 import Pagination from '@/views/component/Pagination.vue'
+import Date from '@/views/component/Date.vue'
 import vSelect from 'vue-select'
 
 /**
@@ -35,6 +36,7 @@ app.component('Modal', Modal)
     .component('Confirm', Confirm)
     .component('ThSort', Sort)
     .component('Pagination', Pagination)
+    .component('Date', Date)
     .component('select2', vSelect)
 
 app.mount('#app')

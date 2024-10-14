@@ -69,6 +69,12 @@ const functions = {
         const result = moment(date).format(format)
         return result === 'Invalid date' ? replace : result
     },
+    date: (date, replace = null, format = 'DD-MM-YYYY') => {
+        if (!date) return replace
+        if (typeof date !== 'object') date = new Date(date)
+        const result = moment(date).format(format)
+        return result === 'Invalid date' ? replace : result
+    },
     mapPayload: (object_1, object_2) => {
         for (const key in { ...object_1 }) {
             if (Object.hasOwn(object_2, key)) {

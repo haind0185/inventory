@@ -25,16 +25,16 @@ const route = useRoute()
 
 const menus = ref([
     {
+        name: 'Entry',
+        label: 'Nhập kho'
+    },
+    {
+        name: 'Exit',
+        label: 'Xuất kho'
+    },
+    {
         name: 'Products',
-        label: 'Products'
-    },
-    {
-        name: 'Import',
-        label: 'Import'
-    },
-    {
-        name: 'Export',
-        label: 'Export'
+        label: 'Mặt hàng'
     },
 ])
 

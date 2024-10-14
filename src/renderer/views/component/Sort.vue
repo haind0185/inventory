@@ -29,6 +29,7 @@ const submit = (by) => {
     display: flex;
     gap: 4px;
     height: 100%;
+    align-items: center;
  }
  .sort-icon {
     cursor: pointer;

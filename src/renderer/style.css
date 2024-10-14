@@ -7,9 +7,9 @@
     --bg-side-bar: #21263c;
     --bg-logo: #181c2e;
     --border-table: 1px solid var(--border-color);
-    --border-color: rgba(180,220,220,1);
-    --table-hover-color: rgba(234,244,255,0.4);
-    --table-selected-color: rgba(234,244,255,1);
+    --border-color: rgba(180, 220, 220, 1);
+    --table-hover-color: rgba(234, 244, 255, 0.4);
+    --table-selected-color: rgba(234, 244, 255, 1);
 }
 
 body {
@@ -244,9 +244,8 @@ table.t-border tbody tr.selected {
 .form-control.v-select {
     padding: 0 4px;
 }
-.v-select {
 
-}
+.v-select {}
 
 .vs__search {
     padding: 0 4px !important;
@@ -277,8 +276,9 @@ table.t-border tbody tr.selected {
 
 .vs__actions {
     /* display: none !important; */
-    padding: 0 2px; 
+    padding: 0 2px;
 }
+
 .vs__open-indicator {
     display: none !important;
 }

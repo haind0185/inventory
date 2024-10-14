@@ -9,7 +9,15 @@ const messages = {
                 LargeUnit: "Đơn vị 1",
                 SmallUnit: "Đơn vị 2",
                 ConversionRate: "Quy cách",
-            }
+            },
+            entry: {
+                EntryCode: "Mã nhập hàng",
+                EntryDate: "Ngày nhập hàng",
+                ProductCode: "Mã mặt hàng",
+                LargeUnitQty: "S.Lượng(đv1)",
+                SmallUnitQty: "S.Lượng(đv2)",
+                ExpiryDate: "Hạn sử dụng",
+            },
         },
         ctr: {
             product: {
@@ -27,7 +35,8 @@ const messages = {
             confirm: "Xác nhận"
         },
         modal: {
-            add_product: "Thêm mặt hàng"
+            add_product: "Thêm mặt hàng",
+            add_entry: "Nhập kho",
         },
         title: {
             notify: "Thông báo",

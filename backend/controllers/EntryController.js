@@ -19,6 +19,10 @@ const EntryController = {
                 where.EntryCode = { [Op.like]: `%${req.query.EntryCode}%` }
             }
 
+            if(req.query.EntryDate) {
+                where.EntryDate = { [Op.eq]: `${req.query.EntryDate}` }
+            }
+
             if(req.query.ProductCode) {
                 where.ProductCode = { [Op.like]: `%${req.query.ProductCode}%` }
             }
