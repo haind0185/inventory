@@ -11,6 +11,11 @@ const messages = {
                 ConversionRate: "Quy cách",
             }
         },
+        ctr: {
+            product: {
+                code_exists: "Mã sản phẫm đã tồn tại"
+            }
+        },
         button: {
             search: "Tìm",
             clear: "Làm mới",

@@ -4,6 +4,24 @@
     "version": "1.0.0",
     "description": "Inventory app by haind0185.",
     "main": ".vite/build/main.js",
+    "build": {
+        "appId": "haind0185.inventory.app",
+        "win": {
+            "target": [
+                "nsis",
+                "zip"
+            ],
+            "verifyUpdateCodeSignature": false,
+            "publish": {
+                "provider": "github",
+                "owner": "haind0185",
+                "repo": "inventory"
+            }
+        },
+        "files": [
+            "app-update.yml"
+        ]
+    },
     "scripts": {
         "start": "electron-forge start",
         "package": "electron-forge package",
@@ -17,19 +35,6 @@
         "email": "haind1508@gmail.com"
     },
     "license": "MIT",
-    "build": {
-        "appId": "haind0185.inventory.app",
-        "publisherName": "haind0185",
-        "publish": [
-            {
-                "provider": "github",
-                "owner": "haind0185",
-                "repo": "inventory",
-                "releaseType": "release"
-            }
-        ],
-        "updaterCacheDirName": "app-cache"
-    },
     "devDependencies": {
         "@electron-forge/cli": "^6.1.1",
         "@electron-forge/maker-deb": "^6.1.1",
@@ -40,7 +45,6 @@
         "@electron-forge/publisher-github": "^7.5.0",
         "@vitejs/plugin-vue": "^4.2.1",
         "electron": "24.2.0",
-        "nodemon": "^3.1.7",
         "vite": "^4.3.5"
     },
     "dependencies": {

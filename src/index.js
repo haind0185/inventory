@@ -2,30 +2,6 @@ import { app, BrowserWindow, globalShortcut } from 'electron';
 import { join } from 'path';
 import server from '../backend/index';
 
-const startServer = () => {
-    const port = 5000
-    return server.listen(port, () => {
-        console.log(`Express server is running at http://localhost:${port}`);
-    });
-}
-
-var  sv = startServer()
-
-const restartServer = () => {
-    if (sv) {
-        sv.close(() => {
-            console.log('Server stopped. Restarting...');
-            sv = startServer()
-        });
-    } else {
-        sv = startServer()
-    }
-}
-
-if (require('electron-squirrel-startup')) {
-    app.quit();
-}
-
 const createWindow = () => {
     const mainWindow = new BrowserWindow({
         width: 1280,
@@ -40,10 +16,6 @@ const createWindow = () => {
     } else {
         mainWindow.loadFile(join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
     }
-
-    globalShortcut.register('CommandOrControl+E', () => {
-        restartServer()
-    })
 };
 
 app.on('ready', createWindow);

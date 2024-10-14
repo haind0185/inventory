@@ -1,5 +1,6 @@
 import Product from '../models/Product';
-import { error, success } from './http';
+import { error, success } from './common/http';
+import { t } from '../../src/renderer/i18n'
 const { Op } = require("sequelize");
 const Joi = require('joi');
 
@@ -9,7 +10,9 @@ const ProductController = {
         try {
             console.log(req.query)
 
-            // where
+            /**
+             * set condition
+             */
             const where = {}
 
             if(req.query.ProductCode) {
@@ -20,7 +23,9 @@ const ProductController = {
                 where.ProductName = { [Op.like]: `%${req.query.ProductName}%` }
             }
 
-            // order
+            /**
+             * order
+             */
             const order_list = ['ProductCode', 'ProductName']
             let order = []
             if(order_list.includes(req.query.sort)) {
@@ -28,10 +33,15 @@ const ProductController = {
                 order = [[req.query.sort, sort_by]]
             }
 
-            // page
+            /**
+             * page and limit a page
+             */
             const limit = 50
             let offset = req.query.page ? ((req.query.page - 1) * limit) : 0
             
+            /**
+             * call select action
+             */
             const total = await Product.count({
                 where: where,
             })
@@ -64,9 +74,11 @@ const ProductController = {
     store: async (req, res) => {
         try {
             console.log(req.body)
-
             const { ProductCode, ProductName, LargeUnit, SmallUnit, ConversionRate } = req.body;
 
+            /**
+             * validation
+             */
             const schema = Joi.object({
                 ProductCode   : Joi.string().required().min(1).max(200),
                 ProductName   : Joi.string().required().min(1).max(200),
@@ -85,16 +97,21 @@ const ProductController = {
                 return res.json(error(validation.error.details[0].message))
             }
 
+            /**
+             * check exists code
+             */
             const existsProduct = await Product.findOne({
                 where: {
                     ProductCode: ProductCode
                 }
             })
-
             if(existsProduct) {
-                return res.json(error('Mã mặt hàng đã tồn tại.'));
+                return res.json(error(t('ctr.product.code_exists')));
             }
 
+            /**
+             * call create action
+             */
             const product = await Product.create({
                 ProductCode   : ProductCode,
                 ProductName   : ProductName,
