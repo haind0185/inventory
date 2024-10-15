@@ -43,7 +43,7 @@
                             <th-sort @sort="sort()" :search="search" :field="'EntryDate'">{{ $t("attr.entry.EntryCode") }}<br>{{  $t("attr.entry.EntryDate") }}</th-sort>
                         </th>
                         <th>
-                            <th-sort @sort="sort()" :search="search" :field="'ProductCode'">{{ $t("attr.entry.ProductCode") }}</th-sort>
+                            <th-sort @sort="sort()" :search="search" :field="'ProductCode'">{{ $t("attr.entry.ProductNameLabel") }}</th-sort>
                         </th>
                         <th>{{ $t("attr.entry.LargeUnitQty") }}</th>
                         <th>{{ $t("attr.entry.SmallUnitQty") }}</th>
@@ -53,7 +53,7 @@
                 <tbody>
                     <tr v-for="item in entries.items">
                         <td class="text-center">{{ item.EntryCode }}<br>{{ item.EntryDate }}</td>
-                        <td class="text-left">{{ item.ProductCode }}</td>
+                        <td class="text-left">{{ item.Product?.ProductNameLabel }}</td>
                         <td class="text-center">{{ item.LargeUnitQty }}</td>
                         <td class="text-center">{{ item.SmallUnitQty }}</td>
                         <td class="text-center">{{ item.ExpiryDate }}</td>
@@ -98,7 +98,6 @@ const onSaveAdd = (event) => {
 const clear = async () => {
     entryStore.resetSearch()
     await index()
-    console.log(search.value)
 }
 const index = async () => {
     await entryStore.index(search.value).then((res) => {

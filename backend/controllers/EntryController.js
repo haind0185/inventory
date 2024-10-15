@@ -1,4 +1,5 @@
 import WarehouseEntry from '../models/WarehouseEntry';
+import Product from '../models/Product';
 import { error, success } from './common/http';
 import { t } from '../../src/renderer/i18n'
 const { Op } = require("sequelize");
@@ -56,7 +57,10 @@ const EntryController = {
                     where: where,
                     order: order,
                     limit: limit,
-                    offset: offset
+                    offset: offset,
+                    include: [
+                        { model:  Product }
+                    ]
                 });
             }
 
@@ -75,60 +79,72 @@ const EntryController = {
         }
     },
 
-    // store: async (req, res) => {
-    //     try {
-    //         console.log(req.body)
-    //         const { ProductCode, ProductName, LargeUnit, SmallUnit, ConversionRate } = req.body;
+    store: async (req, res) => {
+        try {
+            console.log(req.body)
+            const { entries, EntryCode, EntryDate } = req.body;
 
-    //         /**
-    //          * validation
-    //          */
-    //         const schema = Joi.object({
-    //             ProductCode   : Joi.string().required().min(1).max(200),
-    //             ProductName   : Joi.string().required().min(1).max(200),
-    //             LargeUnit     : Joi.string().required().max(50),
-    //             SmallUnit     : Joi.string().allow(null, ''),
-    //             ConversionRate: Joi.when('SmallUnit', {
-    //                 is: Joi.string(),
-    //                 then: Joi.number().min(1).required(),
-    //                 otherwise: Joi.number().allow(null).min(1),
-    //             }),
-    //         }).unknown();
+            /**
+             * validation
+             */
+            const schema = Joi.object({
+                ProductCode : Joi.string().required(),
+                LargeUnitQty: Joi.number().required().min(0),
+                SmallUnitQty: Joi.number().required().min(0),
+                ExpiryDate  : Joi.string().required(),
+            }).unknown();
 
-    //         const validation = schema.validate(req.body);
+            if(entries.length <= 0) {
+                return res.json(error(t('ctr.entry.no_entry')));
+            }
 
-    //         if (validation.error) {
-    //             return res.json(error(validation.error.details[0].message))
-    //         }
+            entries.forEach((entry, index) => {
+                let validation = schema.validate(entry);
+                if (validation.error) {
+                    return res.json(error(`[${index+1}]${validation.error.details[0].message}`))
+                }
+            });
 
-    //         /**
-    //          * check exists code
-    //          */
-    //         const existsProduct = await Product.findOne({
-    //             where: {
-    //                 ProductCode: ProductCode
-    //             }
-    //         })
-    //         if(existsProduct) {
-    //             return res.json(error(t('ctr.product.code_exists')));
-    //         }
+            /**
+             * check exists code
+             */
+            const entrySchema = Joi.object({
+                EntryCode: Joi.string().required(),
+                EntryDate: Joi.string().required(),
+            })
+            let validation = entrySchema.validate({EntryCode: EntryCode, EntryDate: EntryDate});
+            if (validation.error) {
+                return res.json(error(validation.error.details[0].message))
+            }
 
-    //         /**
-    //          * call create action
-    //          */
-    //         const product = await Product.create({
-    //             ProductCode   : ProductCode,
-    //             ProductName   : ProductName,
-    //             LargeUnit     : LargeUnit,
-    //             SmallUnit     : SmallUnit,
-    //             ConversionRate: ConversionRate,
-    //         });
-            
-    //         return res.json(success(product));
-    //     } catch (err) {
-    //         return res.json(error(err.message, 501));
-    //     }
-    // }
+            const existsEntry = await WarehouseEntry.findOne({
+                where: {
+                    EntryCode: EntryCode
+                }
+            })
+            if(existsEntry) {
+                return res.json(error(t('ctr.entry.code_exists')));
+            }
+
+            /**
+             * call create action
+             */
+            entries.forEach(async (entry, index) => {
+                await WarehouseEntry.create({
+                    EntryCode: EntryCode,
+                    EntryDate: EntryDate,
+                    ProductCode: entry.ProductCode,
+                    LargeUnitQty: entry.LargeUnitQty,
+                    SmallUnitQty: entry.SmallUnitQty,
+                    ExpiryDate: entry.ExpiryDate,
+                });
+            })
+
+            return res.json(success());
+        } catch (err) {
+            return res.json(error(err.message, 501));
+        }
+    }
 };
 
 export default EntryController;

@@ -7,6 +7,8 @@ router.get('/', ProductController.index);
 
 router.post('/', ProductController.store);
 
+router.get('/list', ProductController.list);
+
 const ProductRouter = router;
 
 export default ProductRouter;

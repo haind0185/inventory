@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get('/', EntryController.index);
 
-// router.post('/', EntryController.store);
+router.post('/', EntryController.store);
 
 const EntryRouter = router;
 

@@ -23,6 +23,12 @@ const Product = sequelize.define('Product', {
         type: DataTypes.INTEGER,
         allowNull: true,
     },
+}, {
+    getterMethods: {
+        ProductNameLabel() {
+            return `[${this.ProductCode}] ${this.ProductName} [${this.LargeUnit}]`+(this.SmallUnit ? `[${this.SmallUnit}]` : '');
+        }
+    }
 });
 
 export default Product;

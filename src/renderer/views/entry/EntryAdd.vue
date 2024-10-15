@@ -1,6 +1,6 @@
 <template>
     <Modal :show="show" :title="title" maxWidth="max-w-5xl" @close="onClose()" class="">
-        <form class="flex flex-col justify-between h-full gap-1 p-2 min-h-96" @submit.prevent="onSave()">
+        <form class="flex flex-col justify-between h-full gap-1 p-2" style="min-height: 500px;" @submit.prevent="onSave()">
             <div class="flex-col gap-1 d-flex">
                 <div class="flex gap-3 w-[50%] mx-auto">
                     <fieldset class="w-1/2 form-input required">
@@ -12,42 +12,47 @@
                         <date class="w-full from-control" v-model="payload.EntryDate" required></date>
                     </fieldset>
                 </div>
+                <div class="flex justify-end gap-2">
+                    <button type="button" class="btn green" @click="addItem()">{{ t('button.add_item') }}</button>
+                </div>
                 <div>
                     <div class="flex gap-3 p-1 entry-item">
-                        <div class="w-[1rem]"></div>
-                        <fieldset class="w-[50%] form-input required">
+                        <div class="w-[2rem]">{{ ' ' }}</div>
+                        <fieldset class="flex-1 form-input required">
                             <legend>{{ $t("attr.entry.ProductCode") }}</legend>
                         </fieldset>
-                        <fieldset class="w-[10%] form-input required">
+                        <fieldset class="w-[10rem] form-input">
                             <legend>{{ $t("attr.entry.LargeUnitQty") }}</legend>
                         </fieldset>
-                        <fieldset class="w-[10%] form-input required">
+                        <fieldset class="w-[10rem] form-input">
                             <legend>{{ $t("attr.entry.SmallUnitQty") }}</legend>
                         </fieldset>
-                        <fieldset class="w-[20%] form-input required">
+                        <fieldset class="w-[8rem] form-input required">
                             <legend>{{ $t("attr.entry.ExpiryDate") }}</legend>
                         </fieldset>
                     </div>
                 </div>
                 <div class="entry">
                     <template v-for="(entry, index) in entries">
-                        <div class="flex gap-3 p-1 entry-item">
-                            <div class="flex items-end text-sm" style="margin-bottom: 2px;">{{ index+1  }}</div>
-                            <fieldset class="w-[50%] form-input required">
-                                <!-- <legend>{{ $t("attr.entry.ProductCode") }}</legend> -->
-                                <input type="text" class="w-full text-center form-control" required v-model="entry.ProductCode">
+                        <div class="flex w-full gap-3 p-1 entry-item">
+                            <div class="flex items-end text-sm w-[2rem]" style="margin-bottom: 2px;">{{ index+1  }}</div>
+                            <fieldset class="flex-1 form-input required">
+                                <select2 class="form-control" required :options="product_list" v-model="entry.ProductCode" label="ProductNameLabel" :reduce="item => item.ProductCode" :update:modelValue="changeProduct(entry)">
+                                    <template #search="{attributes, events}">
+                                        <input class="vs__search" :required="entry.ProductCode == null || entry.ProductCode == ''" v-bind="attributes" v-on="events" />
+                                    </template>
+                                </select2>
                             </fieldset>
-                            <fieldset class="w-[10%] form-input required">
-                                <!-- <legend>{{ $t("attr.entry.LargeUnitQty") }}</legend> -->
-                                <input type="text" class="w-full text-center form-control" required v-model="entry.LargeUnitQty">
+                            <fieldset class="w-[10rem] form-input flex items-center">
+                                <input type="number" class="w-[7rem] text-center form-control" v-model="entry.LargeUnitQty" min="0">
+                                <span class="w-[3rem] text-sm pl-1">{{ getLargeUnit(entry.ProductCode) }}</span>
                             </fieldset>
-                            <fieldset class="w-[10%] form-input required">
-                                <!-- <legend>{{ $t("attr.entry.SmallUnitQty") }}</legend> -->
-                                <input type="text" class="w-full text-center form-control" required v-model="entry.SmallUnitQty">
+                            <fieldset class="w-[10rem] form-input flex items-center">
+                                <input type="number" class="w-[7rem] text-center form-control" v-model="entry.SmallUnitQty" min="0" :disabled="smallUnitDisable(entry.ProductCode)">
+                                <span class="w-[3rem] text-sm pl-1">{{ getSmallUnit(entry.ProductCode) }}</span>
                             </fieldset>
-                            <fieldset class="w-[20%] form-input required">
-                                <!-- <legend>{{ $t("attr.entry.ExpiryDate") }}</legend> -->
-                                <input type="text" class="w-full text-center form-control" required v-model="entry.ExpiryDate">
+                            <fieldset class="w-[8rem] form-input required">
+                                <date class="w-full from-control" v-model="entry.ExpiryDate" required></date>
                             </fieldset>
                         </div>
                     </template>
@@ -77,69 +82,113 @@
 import { onMounted, ref, watch } from 'vue'
 import { t } from '@/i18n'
 import { productStore } from '@/store/product';
-import { UNIT } from '@/constant';
+import { entryStore } from '@/store/entry';
+import { helper } from '@/helper'
 
+const title = t("modal.add_entry")
 const props = defineProps(['show'])
 const emit = defineEmits(['close', 'save'])
-const title = t("modal.add_entry")
 
 const payload = ref({
     EntryCode: null,
     EntryDate: null,
 })
+
 const entryInit = {
     ProductCode: null,
-    LargeUnitQty: null,
-    SmallUnitQty: null,
+    LargeUnitQty: 0,
+    SmallUnitQty: 0,
     ExpiryDate: null,
 }
 const entries = ref([
     {...entryInit},
-    {...entryInit},
-    {...entryInit},
-    {...entryInit},
-    {...entryInit},
-    {...entryInit},
-    {...entryInit},
-    {...entryInit},
-    {...entryInit},
 ])
 const confirm = ref(null)
 const reload = ref(false)
-const optionsList = ref(UNIT)
+const product_list = ref([])
+var pro_list = []
 
 const onClose = () => {
     emit('close', reload.value)
 }
 
 const onSave = async () => {
-    console.log(entries)
-    // const res = await productStore.store(payload.value).then((res) => {
-    //     if(res && res.code == 200) {
-    //         reload.value = true
-    //         return true
-    //     }
-    //     return false
-    // })
-    // if(res) {
-    //     await confirm.value.show({
-    //         title: t("title.notify"),
-    //         message: t("msg.save_ok"),
-    //         cancelButton: t("button.back"),
-    //         type: 1
-    //     })
-    //     emit('save', reload.value)
-    // }
+    payload.value.entries = entries.value
+    console.log(payload.value)
+    const res = await entryStore.store(payload.value).then((res) => {
+        if(res && res.code == 200) {
+            reload.value = true
+            return true
+        }
+        return false
+    })
+    if(res) {
+        await confirm.value.show({
+            title: t("title.notify"),
+            message: t("msg.save_ok"),
+            cancelButton: t("button.back"),
+            type: 1
+        })
+        emit('save', reload.value)
+    }
 
 }
 
-watch(
-    payload,
-    async () => {
-        if (!payload.value.SmallUnit) {
-            payload.value.ConversionRate = null
+const list = async () => {
+    await productStore.list().then((res) => {
+        if(res && res.code == 200) {
+            product_list.value = res.data.items
+            pro_list = helper.deepClone(product_list.value)
         }
-    },
-    { deep: true }
-)
+    })
+}
+
+const getLargeUnit = (ProductCode) => {
+    let product = pro_list.find(item => {
+        return item.ProductCode == ProductCode
+    })
+    if(product) {
+        return product.LargeUnit
+    }
+    return ''
+}
+
+const getSmallUnit = (ProductCode) => {
+    let product = pro_list.find(item => {
+        return item.ProductCode == ProductCode
+    })
+    if(product) {
+        return product.SmallUnit
+    }
+    return ''
+}
+
+const smallUnitDisable = (ProductCode) => {
+    let product = pro_list.find(item => {
+        return item.ProductCode == ProductCode
+    })
+    if(!product?.SmallUnit) {
+        return true
+    }
+    return false
+}
+
+const changeProduct = (entry) => {
+    let product = pro_list.find(item => {
+        return item.ProductCode == entry.ProductCode
+    })
+    if(!product?.SmallUnit) {
+        entry.SmallUnitQty = 0
+    }
+}
+
+const addItem = () => {
+    entries.value.push({...entryInit})
+}
+
+onMounted(async () => {
+    await list()
+})
+
+
 </script>

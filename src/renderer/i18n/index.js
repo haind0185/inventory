@@ -14,6 +14,7 @@ const messages = {
                 EntryCode: "Mã nhập hàng",
                 EntryDate: "Ngày nhập hàng",
                 ProductCode: "Mã mặt hàng",
+                ProductNameLabel: "Mặt hàng",
                 LargeUnitQty: "S.Lượng(đv1)",
                 SmallUnitQty: "S.Lượng(đv2)",
                 ExpiryDate: "Hạn sử dụng",
@@ -21,7 +22,11 @@ const messages = {
         },
         ctr: {
             product: {
-                code_exists: "Mã sản phẫm đã tồn tại"
+                code_exists: "Mã sản phẫm đã tồn tại",
+            },
+            entry: {
+                code_exists: "Mã nhập kho đã tồn tại",
+                no_entry: "Thêm mặt hàng để nhập kho",
             }
         },
         button: {
@@ -32,7 +37,8 @@ const messages = {
             back: "Quay lại",
             refresh: "Tải lại",
             add: "Thêm mới",
-            confirm: "Xác nhận"
+            confirm: "Xác nhận",
+            add_item: "Thêm",
         },
         modal: {
             add_product: "Thêm mặt hàng",

@@ -1,11 +1,11 @@
 import sequelize from './index';
+import Product from './Product';
 const { DataTypes } = require('sequelize');
 
 const WarehouseEntry = sequelize.define('WarehouseEntry', {
     EntryCode: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
     },
     EntryDate: {
         type: DataTypes.DATEONLY,
@@ -14,6 +14,10 @@ const WarehouseEntry = sequelize.define('WarehouseEntry', {
     ProductCode: {
         type: DataTypes.STRING,
         allowNull: false,
+        references: {
+            model: Product,
+            key: 'ProductCode',
+        },
     },
     LargeUnitQty: {
         type: DataTypes.FLOAT,
@@ -28,5 +32,8 @@ const WarehouseEntry = sequelize.define('WarehouseEntry', {
         allowNull: false,
     },
 });
+
+Product.hasMany(WarehouseEntry, { foreignKey: 'ProductCode' });
+WarehouseEntry.belongsTo(Product, { foreignKey: 'ProductCode' });
 
 export default WarehouseEntry;

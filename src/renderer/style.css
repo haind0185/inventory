@@ -134,6 +134,10 @@ ul li[active="true"] {
     box-shadow: 0 0 0 .05rem #0d6efd40;
 }
 
+.form-control[disabled] {
+    background: #e3e3e3;
+}
+
 fieldset.form-input {
     margin-top: 4px;
 }
@@ -294,4 +298,10 @@ table.t-border tbody tr.selected {
 
 .vs__dropdown-menu li {
     font-size: 14px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
