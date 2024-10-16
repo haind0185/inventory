@@ -1,4 +1,5 @@
 import WarehouseEntry from '../models/WarehouseEntry';
+import Entry from '../models/Entry';
 import Product from '../models/Product';
 import { error, success } from './common/http';
 import { t } from '../../src/renderer/i18n'
@@ -59,7 +60,7 @@ const EntryController = {
                     limit: limit,
                     offset: offset,
                     include: [
-                        { model:  Product }
+                        { association: 'entries', include: [{ association: 'product' }] }
                     ]
                 });
             }
@@ -81,70 +82,78 @@ const EntryController = {
 
     store: async (req, res) => {
         try {
-            console.log(req.body)
-            const { entries, EntryCode, EntryDate } = req.body;
+            const { EntryCode, EntryDate, entries } = req.body;
 
             /**
              * validation
              */
+            // WarehouseEntry
+            const entrySchema = Joi.object({
+                EntryCode: Joi.string().required(),
+                EntryDate: Joi.string().required(),
+            }).unknown()
+            let validation = entrySchema.validate({EntryCode: EntryCode, EntryDate: EntryDate});
+            if (validation.error) {
+                return res.json(error(validation.error.details[0].message))
+            }
+
+            // Entry
             const schema = Joi.object({
                 ProductCode : Joi.string().required(),
                 LargeUnitQty: Joi.number().required().min(0),
                 SmallUnitQty: Joi.number().required().min(0),
                 ExpiryDate  : Joi.string().required(),
             }).unknown();
-
             if(entries.length <= 0) {
                 return res.json(error(t('ctr.entry.no_entry')));
             }
-
             entries.forEach((entry, index) => {
                 let validation = schema.validate(entry);
                 if (validation.error) {
-                    return res.json(error(`[${index+1}]${validation.error.details[0].message}`))
+                    return res.json(error(`[${index+1}] ${validation.error.details[0].message}`))
                 }
             });
 
             /**
              * check exists code
              */
-            const entrySchema = Joi.object({
-                EntryCode: Joi.string().required(),
-                EntryDate: Joi.string().required(),
-            })
-            let validation = entrySchema.validate({EntryCode: EntryCode, EntryDate: EntryDate});
-            if (validation.error) {
-                return res.json(error(validation.error.details[0].message))
-            }
-
-            const existsEntry = await WarehouseEntry.findOne({
+            const exists_warehouse_entry = await WarehouseEntry.findOne({
                 where: {
                     EntryCode: EntryCode
                 }
             })
-            if(existsEntry) {
+            if(exists_warehouse_entry) {
                 return res.json(error(t('ctr.entry.code_exists')));
             }
 
             /**
              * call create action
              */
-            entries.forEach(async (entry, index) => {
-                await WarehouseEntry.create({
-                    EntryCode: EntryCode,
-                    EntryDate: EntryDate,
-                    ProductCode: entry.ProductCode,
-                    LargeUnitQty: entry.LargeUnitQty,
-                    SmallUnitQty: entry.SmallUnitQty,
-                    ExpiryDate: entry.ExpiryDate,
-                });
+
+            const create = async (EntryCode, entries) => {
+                for (const entry of entries) {
+                    await Entry.create({
+                        EntryCode: EntryCode,
+                        ProductCode: entry.ProductCode,
+                        LargeUnitQty: entry.LargeUnitQty,
+                        SmallUnitQty: entry.SmallUnitQty,
+                        ExpiryDate: entry.ExpiryDate,
+                    });
+                }
+            }
+
+            await WarehouseEntry.create({
+                EntryCode: EntryCode,
+                EntryDate: EntryDate,
+            }).then(async (WarehouseEntry) => {
+                return await create(WarehouseEntry.EntryCode, entries)
             })
 
             return res.json(success());
         } catch (err) {
             return res.json(error(err.message, 501));
         }
-    }
+    },
 };
 
 export default EntryController;

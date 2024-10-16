@@ -164,24 +164,12 @@ const ProductController = {
             if(total > 0) {
                 products = await Product.findAll({
                     order: order,
+                    attributes: { include: ['ProductNameLabel'] }
                 });
             }
 
-            let items = []
-            console.log(products)
-            products.forEach((item, index) => {
-                items.push({
-                    ProductCode     : item.ProductCode,
-                    LargeUnit       : item.LargeUnit,
-                    SmallUnit       : item.SmallUnit,
-                    ConversionRate  : item.ConversionRate,
-                    ProductName     : item.ProductName,
-                    ProductNameLabel: item.ProductNameLabel
-                })
-            })
-
             return res.json(success({
-                items: items,
+                items: products,
             }));
         } catch (err) {
             return res.json(error(err.message, 501));
