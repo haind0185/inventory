@@ -81,6 +81,7 @@ const EntryController = {
     },
 
     store: async (req, res) => {
+        const transaction = await sequelize.transaction();
         try {
             const { EntryCode, EntryDate, entries } = req.body;
 
@@ -138,19 +139,21 @@ const EntryController = {
                         LargeUnitQty: entry.LargeUnitQty,
                         SmallUnitQty: entry.SmallUnitQty,
                         ExpiryDate: entry.ExpiryDate,
-                    });
+                    }, {transaction: transaction});
                 }
             }
 
             await WarehouseEntry.create({
                 EntryCode: EntryCode,
                 EntryDate: EntryDate,
-            }).then(async (WarehouseEntry) => {
+            }, {transaction: transaction}).then(async (WarehouseEntry) => {
                 return await create(WarehouseEntry.EntryCode, entries)
             })
 
+            await transaction.commit();
             return res.json(success());
         } catch (err) {
+            await transaction.rollback();
             return res.json(error(err.message, 501));
         }
     },

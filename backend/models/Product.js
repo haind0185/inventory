@@ -37,10 +37,4 @@ const Product = sequelize.define('Product', {
     }
 });
 
-Product.afterCreate(async (product, options) => {
-    console.log(options.transaction)
-    throw new Error("Khong cho luu");
-    
-})
-
 export default Product;
