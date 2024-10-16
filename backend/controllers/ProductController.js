@@ -1,6 +1,7 @@
 import Product from '../models/Product';
 import { error, success } from './common/http';
 import { t } from '../../src/renderer/i18n'
+import sequelize from '../models/index';
 const { Op } = require("sequelize");
 const Joi = require('joi');
 
@@ -72,9 +73,10 @@ const ProductController = {
     },
 
     store: async (req, res) => {
+        const transaction = await sequelize.transaction();
         try {
             console.log(req.body)
-            const { ProductCode, ProductName, LargeUnit, SmallUnit, ConversionRate } = req.body;
+            const { ProductCode, ProductName, LargeUnit, SmallUnit, ConversionRate, Expire } = req.body;
 
             /**
              * validation
@@ -85,10 +87,11 @@ const ProductController = {
                 LargeUnit     : Joi.string().required().max(50),
                 SmallUnit     : Joi.string().allow(null, ''),
                 ConversionRate: Joi.when('SmallUnit', {
-                    is: Joi.string(),
-                    then: Joi.number().min(1).required(),
+                    is       : Joi.string(),
+                    then     : Joi.number().min(1).required(),
                     otherwise: Joi.number().allow(null).min(1),
                 }),
+                Expire: Joi.number().required().min(0),
             }).unknown();
 
             const validation = schema.validate(req.body);
@@ -104,7 +107,7 @@ const ProductController = {
                 where: {
                     ProductCode: ProductCode
                 }
-            })
+            }, {transaction: transaction})
             if(existsProduct) {
                 return res.json(error(t('ctr.product.code_exists')));
             }
@@ -118,10 +121,13 @@ const ProductController = {
                 LargeUnit     : LargeUnit,
                 SmallUnit     : SmallUnit,
                 ConversionRate: ConversionRate,
-            });
+                Expire        : Expire,
+            }, {transaction: transaction});
             
+            await transaction.commit();
             return res.json(success(product));
         } catch (err) {
+            await transaction.rollback();
             return res.json(error(err.message, 501));
         }
     },

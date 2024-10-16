@@ -3,13 +3,17 @@
         <form class="flex flex-col justify-between h-full gap-1 p-2" @submit.prevent="onSave()">
             <div class="flex-col gap-1 d-flex">
                 <div class="flex gap-3">
-                    <fieldset class="w-1/3 form-input required">
+                    <fieldset class="w-[20%] form-input required">
                         <legend>{{ $t("attr.product.ProductCode") }}</legend>
                         <input type="text" class="w-full text-center form-control" required v-model="payload.ProductCode">
                     </fieldset>
-                    <fieldset class="w-2/3 form-input required">
+                    <fieldset class="w-[60%] form-input required">
                         <legend>{{ $t("attr.product.ProductName") }}</legend>
                         <input type="text" class="w-full form-control" required v-model="payload.ProductName">
+                    </fieldset>
+                    <fieldset class="w-[20%] form-input required">
+                        <legend>{{ $t("attr.product.Expire") }}</legend>
+                        <input type="number" class="w-full text-center form-control" required v-model="payload.Expire">
                     </fieldset>
                 </div>
                 <div class="flex gap-3">
@@ -59,6 +63,7 @@ const payload = ref({
     LargeUnit: UNIT[0],
     SmallUnit: null,
     ConversionRate: null,
+    Expire: null,
 })
 const confirm = ref(null)
 const reload = ref(false)

@@ -23,6 +23,10 @@ const Product = sequelize.define('Product', {
         type: DataTypes.INTEGER,
         allowNull: true,
     },
+    Expire: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
 
     // get attribute
     ProductNameLabel: {
@@ -32,5 +36,11 @@ const Product = sequelize.define('Product', {
         }
     }
 });
+
+Product.afterCreate(async (product, options) => {
+    console.log(options.transaction)
+    throw new Error("Khong cho luu");
+    
+})
 
 export default Product;

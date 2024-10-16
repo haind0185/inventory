@@ -42,12 +42,13 @@
                         <th>
                             <th-sort @sort="sort()" :search="search" :field="'ProductCode'">{{ $t("attr.product.ProductCode") }}</th-sort>
                         </th>
-                        <th>
+                        <th class="w-[45%]">
                             <th-sort @sort="sort()" :search="search" :field="'ProductName'">{{ $t("attr.product.ProductName") }}</th-sort>
                         </th>
                         <th>{{ $t("attr.product.LargeUnit") }}</th>
                         <th>{{ $t("attr.product.SmallUnit") }}</th>
                         <th>{{ $t("attr.product.ConversionRate") }}</th>
+                        <th>{{ $t("attr.product.Expire") }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -57,6 +58,7 @@
                         <td class="text-center">{{ item.LargeUnit }}</td>
                         <td class="text-center">{{ item.SmallUnit }}</td>
                         <td class="text-center">{{ item.ConversionRate }}</td>
+                        <td class="text-center">{{ item.Expire }}</td>
                     </tr>
                 </tbody>
             </table>

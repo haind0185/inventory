@@ -51,13 +51,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="item in entries.items">
-                        <td class="text-center">{{ item.EntryCode }}<br>{{ item.EntryDate }}</td>
-                        <td class="text-left">{{ item.Product?.ProductNameLabel }}</td>
-                        <td class="text-center">{{ item.LargeUnitQty }}</td>
-                        <td class="text-center">{{ item.SmallUnitQty }}</td>
-                        <td class="text-center">{{ item.ExpiryDate }}</td>
-                    </tr>
+                    <template v-for="item in entries.items">
+                        <tr v-for="(entry, index) in item.entries">
+                            <td class="text-center" :rowspan="item.entries.length" v-if="index == 0">{{ item.EntryCode }}<br>{{ item.EntryDate }}</td>
+                            <td class="text-left" :class="{'row-left': index >= 1}">{{ entry.product.ProductNameLabel }}</td>
+                            <td class="text-center">{{ entry.LargeUnitQty }}</td>
+                            <td class="text-center">{{ entry.SmallUnitQty }}</td>
+                            <td class="text-center">{{ entry.ExpiryDate }}</td>
+                        </tr>
+                    </template>
                 </tbody>
             </table>
         </div>
