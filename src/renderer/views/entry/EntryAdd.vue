@@ -2,15 +2,19 @@
     <Modal :show="show" :title="title" maxWidth="max-w-5xl" @close="onClose()" class="">
         <form class="flex flex-col justify-between h-full gap-1 p-2" style="min-height: 500px;" @submit.prevent="onSave()">
             <div class="flex-col gap-1 d-flex">
-                <div class="flex gap-3 w-[50%] mx-auto">
-                    <fieldset class="w-1/2 form-input required">
+                <div class="flex gap-3 w-[60%] mx-auto">
+                    <fieldset class="w-1/3 form-input required">
                         <legend>{{ $t("attr.entry.EntryCode") }}</legend>
                         <input type="text" class="w-full text-center form-control" required v-model="payload.EntryCode">
                     </fieldset>
-                    <fieldset class="w-1/2 form-input required">
+                    <fieldset class="w-1/3 form-input required">
                         <legend>{{ $t("attr.entry.EntryDate") }}</legend>
                         <date class="w-full from-control" v-model="payload.EntryDate" required></date>
                     </fieldset>
+                    <label class="flex items-center w-1/3 gap-1">
+                        <input type="checkbox" v-model="payload.EntryType" >
+                        {{ $t("attr.entry.EntryType") }}
+                    </label>
                 </div>
                 <div class="flex justify-end gap-2">
                     <button type="button" class="btn green" @click="addItem()">{{ t('button.add_item') }}</button>
@@ -92,6 +96,7 @@ const emit = defineEmits(['close', 'save'])
 const payload = ref({
     EntryCode: null,
     EntryDate: null,
+    EntryType: false,
 })
 
 const entryInit = {

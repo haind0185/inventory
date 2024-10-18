@@ -11,6 +11,10 @@ const WarehouseEntry = sequelize.define('WarehouseEntry', {
         type: DataTypes.DATEONLY,
         allowNull: false,
     },
+    EntryType: {
+        type: DataTypes.BOOLEAN,
+        default: false
+    }
 });
 
 export default WarehouseEntry;

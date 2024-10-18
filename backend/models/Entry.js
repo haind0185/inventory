@@ -1,6 +1,7 @@
 import sequelize from './index';
 import Product from './Product';
 import WarehouseEntry from './WarehouseEntry';
+import Inventory from './Inventory';
 const { DataTypes } = require('sequelize');
 
 const Entry = sequelize.define('Entry', {
@@ -39,5 +40,29 @@ Entry.belongsTo(Product, { foreignKey: 'ProductCode', targetKey: 'ProductCode', 
 
 WarehouseEntry.hasMany(Entry, { foreignKey: 'EntryCode', sourceKey: 'EntryCode', as: 'entries' });
 Entry.belongsTo(WarehouseEntry, { foreignKey: 'EntryCode', targetKey: 'EntryCode', as: 'warehouseEntry' });
+
+Entry.afterCreate(async (entry, options) => {
+    const transaction = options.transaction
+
+    let inventory = await Inventory.findOne({
+        where: {
+            ProductCode: entry.ProductCode,
+            ExpiryDate: entry.ExpiryDate,
+        }
+    }, {transaction: transaction})
+
+    if(inventory) {
+        inventory.LargeUnitQty += entry.LargeUnitQty
+        inventory.SmallUnitQty += entry.SmallUnitQty
+        await inventory.save({transaction: transaction})
+    } else {
+        await Inventory.create({
+            ProductCode : entry.ProductCode,
+            ExpiryDate  : entry.ExpiryDate,
+            LargeUnitQty: entry.LargeUnitQty,
+            SmallUnitQty: entry.SmallUnitQty,
+        }, {transaction: transaction})
+    }
+})
 
 export default Entry;

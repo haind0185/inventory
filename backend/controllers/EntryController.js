@@ -3,6 +3,7 @@ import Entry from '../models/Entry';
 import Product from '../models/Product';
 import { error, success } from './common/http';
 import { t } from '../../src/renderer/i18n'
+import sequelize from '../models/index';
 const { Op } = require("sequelize");
 const Joi = require('joi');
 
@@ -83,7 +84,7 @@ const EntryController = {
     store: async (req, res) => {
         const transaction = await sequelize.transaction();
         try {
-            const { EntryCode, EntryDate, entries } = req.body;
+            const { EntryCode, EntryDate, EntryType, entries } = req.body;
 
             /**
              * validation
@@ -92,8 +93,9 @@ const EntryController = {
             const entrySchema = Joi.object({
                 EntryCode: Joi.string().required(),
                 EntryDate: Joi.string().required(),
+                EntryType: Joi.boolean().required(),
             }).unknown()
-            let validation = entrySchema.validate({EntryCode: EntryCode, EntryDate: EntryDate});
+            let validation = entrySchema.validate({EntryCode: EntryCode, EntryDate: EntryDate, EntryType: EntryType});
             if (validation.error) {
                 return res.json(error(validation.error.details[0].message))
             }
@@ -146,6 +148,7 @@ const EntryController = {
             await WarehouseEntry.create({
                 EntryCode: EntryCode,
                 EntryDate: EntryDate,
+                EntryType: EntryType,
             }, {transaction: transaction}).then(async (WarehouseEntry) => {
                 return await create(WarehouseEntry.EntryCode, entries)
             })

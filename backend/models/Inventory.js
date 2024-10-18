@@ -26,10 +26,7 @@ const Inventory = sequelize.define('Inventory', {
     },
 });
 
-Product.hasMany(Entry, { foreignKey: 'ProductCode', sourceKey: 'ProductCode', as: 'inventories' });
+Product.hasMany(Inventory, { foreignKey: 'ProductCode', sourceKey: 'ProductCode', as: 'inventories' });
 Inventory.belongsTo(Product, { foreignKey: 'ProductCode', targetKey: 'ProductCode', as: 'product' });
-
-WarehouseEntry.hasMany(Entry, { foreignKey: 'EntryCode', sourceKey: 'EntryCode', as: 'inventories' });
-Inventory.belongsTo(WarehouseEntry, { foreignKey: 'EntryCode', targetKey: 'EntryCode', as: 'warehouseEntry' });
 
 export default Inventory;

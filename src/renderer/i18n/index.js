@@ -14,6 +14,7 @@ const messages = {
             entry: {
                 EntryCode: "Mã nhập hàng",
                 EntryDate: "Ngày nhập hàng",
+                EntryType: "Điều chỉnh",
                 ProductCode: "Mã mặt hàng",
                 ProductNameLabel: "Mặt hàng",
                 LargeUnitQty: "S.Lượng(đv1)",
