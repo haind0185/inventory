@@ -11,10 +11,13 @@
                         <legend>{{ $t("attr.entry.EntryDate") }}</legend>
                         <date class="w-full from-control" v-model="payload.EntryDate" required></date>
                     </fieldset>
-                    <label class="flex items-center w-1/3 gap-1">
-                        <input type="checkbox" v-model="payload.EntryType" >
-                        {{ $t("attr.entry.EntryType") }}
-                    </label>
+                    <div class="w-1/3 mt-2">
+                        <div class="h-[21px]"></div>
+                        <label class="flex items-center gap-1 text-sm">
+                            <input type="checkbox" v-model="payload.EntryType" >
+                            {{ $t("attr.entry.EntryType") }}
+                        </label>
+                    </div>
                 </div>
                 <div class="flex justify-end gap-2">
                     <button type="button" class="btn green" @click="addItem()">{{ t('button.add_item') }}</button>
