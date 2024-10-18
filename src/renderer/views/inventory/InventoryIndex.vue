@@ -39,25 +39,25 @@
             <table class="view-scroll t-border">
                 <thead>
                     <tr>
-                        <th>
+                        <th class="w-[9rem]">
                             <th-sort @sort="sort()" :search="search" :field="'ProductCode'">{{ $t("attr.inventory.ProductCode") }}</th-sort>
                         </th>
-                        <th class="w-[30%]">
+                        <th class="">
                             <th-sort @sort="sort()" :search="search" :field="'ProductName'">{{ $t("attr.inventory.ProductName") }}</th-sort>
                         </th>
-                        <th>
+                        <th class="w-[9rem]">
                             <th-sort @sort="sort()" :search="search" :field="'ExpiryDate'">{{ $t("attr.inventory.ExpiryDate") }}</th-sort>
                         </th>
-                        <th>
+                        <th class="w-[9rem]">
                             <th-sort @sort="sort()" :search="search" :field="'LargeUnitQty'">{{ $t("attr.inventory.LargeUnitQty") }}</th-sort>
                         </th>
-                        <th>
+                        <th class="w-[9rem]">
                             <th-sort @sort="sort()" :search="search" :field="'SmallUnitQty'">{{ $t("attr.inventory.SmallUnitQty") }}</th-sort>
                         </th>
-                        <th>
+                        <th class="w-[9rem]">
                             <th-sort @sort="sort()" :search="search" :field="'ExpireCount'">{{ $t("attr.inventory.ExpireCount") }}</th-sort>
                         </th>
-                        <th>
+                        <th class="w-[12rem]">
                             <th-sort @sort="sort()" :search="search" :field="'ExpirePercent'">{{ $t("attr.inventory.ExpirePercent") }}</th-sort>
                         </th>
                     </tr>
@@ -70,13 +70,58 @@
                         <td class="text-center">{{ `${item.LargeUnitQty} ${item.product?.LargeUnit}` }}</td>
                         <td class="text-center">{{ item.product?.SmallUnit ? `${item.SmallUnitQty} ${item.product?.SmallUnit}` : '' }}</td>
                         <td class="text-center">{{ item.ExpireCount }}</td>
-                        <td class="text-center">{{ item.ExpirePercent }}</td>
+                        <!-- <td class="text-center">{{ item.ExpirePercent }}</td> -->
+                        <td class="text-center">
+                            <div class="progress-bar">
+                                <span>{{ `${item.ExpirePercent}%` }}</span>
+                                <div class="progress-fill" :class="{'low': item.ExpirePercent <= 20, 'medium': item.ExpirePercent > 20 && item.ExpirePercent < 50, 'hight': item.ExpirePercent >= 50}" :style="{width: item.ExpirePercent+'%'}"></div>
+                            </div>
+                        </td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
 </template>
+
+<style scoped>
+.progress-bar {
+    width: 100%;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 0px 0;
+    position: relative;
+}
+
+.progress-fill {
+    height: 16px;
+    width: 0;
+    transition: width 0.3s ease;
+    position: relative;
+}
+
+.progress-fill.low {
+    background-color: #ff4d4d;
+}
+
+.progress-fill.medium {
+    background-color: #ffcc00;
+}
+
+.progress-fill.high {
+    background-color: #4caf50;
+}
+
+.progress-bar span {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: black;
+    font-size: 12px;
+}
+</style>
 
 <script setup>
 import { onMounted, onBeforeMount, computed, watch, ref } from 'vue'
