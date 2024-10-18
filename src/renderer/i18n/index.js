@@ -21,6 +21,15 @@ const messages = {
                 SmallUnitQty: "S.Lượng(đv2)",
                 ExpiryDate: "Hạn sử dụng",
             },
+            inventory: {
+                ProductCode: "Mã mặt hàng",
+                ProductName: "Tên mặt hàng",
+                ExpiryDate: "Hạn sử dụng",
+                ExpireCount: "Số ngày HSD",
+                ExpirePercent: "Phần trăm HSD",
+                LargeUnitQty: "S.Lượng(đv1)",
+                SmallUnitQty: "S.Lượng(đv2)",
+            },
         },
         ctr: {
             product: {

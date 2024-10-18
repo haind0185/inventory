@@ -1,6 +1,7 @@
 import sequelize from './models/index';
 import ProductRoutes from './routes/ProductRoutes';
 import EntryRoutes from './routes/EntryRoutes';
+import InventoryRoutes from './routes/InventoryRoutes';
 
 const express = require('express');
 const cors = require('cors');
@@ -16,6 +17,7 @@ server.use(express.json());  // For parsing application/json
  */
 server.use('/products', ProductRoutes);
 server.use('/entries', EntryRoutes);
+server.use('/inventory', InventoryRoutes);
 
 sequelize.sync({ force: false }).then(() => {
 });

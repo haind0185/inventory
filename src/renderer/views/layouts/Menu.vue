@@ -25,6 +25,10 @@ const route = useRoute()
 
 const menus = ref([
     {
+        name: 'Inventory',
+        label: 'Kho'
+    },
+    {
         name: 'Entry',
         label: 'Nhập kho'
     },
