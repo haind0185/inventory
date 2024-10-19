@@ -12,9 +12,9 @@ const searchInit = {
 }
 const entryInit = {
     ProductCode: null,
+    ExpiryDate: null,
     LargeUnitQty: 0,
     SmallUnitQty: 0,
-    ExpiryDate: null,
 }
 const payloadInit = {
     EntryCode: null,
@@ -82,7 +82,7 @@ const createStore = defineStore('entry', {
         },
         reset() {
             this.entries = [{...entryInit}]
-            this.payload = {}
+            this.payload = {...payloadInit}
         },
         setProducts(products) {
             this.products = products

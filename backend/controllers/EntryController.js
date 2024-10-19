@@ -103,9 +103,9 @@ const EntryController = {
             // Entry
             const schema = Joi.object({
                 ProductCode : Joi.string().required(),
+                ExpiryDate  : Joi.string().required(),
                 LargeUnitQty: Joi.number().required().min(0),
                 SmallUnitQty: Joi.number().required().min(0),
-                ExpiryDate  : Joi.string().required(),
             }).unknown();
             if(entries.length <= 0) {
                 return res.json(error(t('ctr.entry.no_entry')));
@@ -138,9 +138,9 @@ const EntryController = {
                     await Entry.create({
                         EntryCode: EntryCode,
                         ProductCode: entry.ProductCode,
+                        ExpiryDate: entry.ExpiryDate,
                         LargeUnitQty: entry.LargeUnitQty,
                         SmallUnitQty: entry.SmallUnitQty,
-                        ExpiryDate: entry.ExpiryDate,
                     }, {transaction: transaction});
                 }
             }

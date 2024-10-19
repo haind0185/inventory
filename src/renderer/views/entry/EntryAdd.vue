@@ -28,14 +28,14 @@
                         <fieldset class="flex-1 form-input required">
                             <legend>{{ $t("attr.entry.ProductCode") }}</legend>
                         </fieldset>
+                        <fieldset class="w-[8rem] form-input required">
+                            <legend>{{ $t("attr.entry.ExpiryDate") }}</legend>
+                        </fieldset>
                         <fieldset class="w-[10rem] form-input">
                             <legend>{{ $t("attr.entry.LargeUnitQty") }}</legend>
                         </fieldset>
                         <fieldset class="w-[10rem] form-input">
                             <legend>{{ $t("attr.entry.SmallUnitQty") }}</legend>
-                        </fieldset>
-                        <fieldset class="w-[8rem] form-input required">
-                            <legend>{{ $t("attr.entry.ExpiryDate") }}</legend>
                         </fieldset>
                     </div>
                 </div>
@@ -53,6 +53,9 @@
                                     </template>
                                 </select2>
                             </fieldset>
+                            <fieldset class="w-[8rem] form-input required">
+                                <date class="w-full from-control" v-model="entry.ExpiryDate" required></date>
+                            </fieldset>
                             <fieldset class="w-[10rem] form-input flex items-center">
                                 <input type="number" class="w-[7rem] text-center form-control" v-model="entry.LargeUnitQty" min="0">
                                 <span class="w-[3rem] text-sm pl-1">{{ getLargeUnit(entry.ProductCode) }}</span>
@@ -60,9 +63,6 @@
                             <fieldset class="w-[10rem] form-input flex items-center">
                                 <input type="number" class="w-[7rem] text-center form-control" v-model="entry.SmallUnitQty" min="0" :disabled="smallUnitDisable(entry.ProductCode)">
                                 <span class="w-[3rem] text-sm pl-1">{{ getSmallUnit(entry.ProductCode) }}</span>
-                            </fieldset>
-                            <fieldset class="w-[8rem] form-input required">
-                                <date class="w-full from-control" v-model="entry.ExpiryDate" required></date>
                             </fieldset>
                         </div>
                     </template>

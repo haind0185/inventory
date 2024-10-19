@@ -59,6 +59,13 @@ const Inventory = sequelize.define('Inventory', {
             return 0
         }
     },
+}, {
+    indexes: [
+        {
+          unique: true,
+          fields: ['ProductCode', 'ExpiryDate'],
+        },
+    ],
 });
 
 Product.hasMany(Inventory, { foreignKey: 'ProductCode', sourceKey: 'ProductCode', as: 'inventories' });

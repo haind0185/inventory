@@ -2,6 +2,8 @@ import sequelize from './index';
 import Product from './Product';
 import WarehouseEntry from './WarehouseEntry';
 import Inventory from './Inventory';
+import { t } from '../../src/renderer/i18n'
+import { error } from '../controllers/common/http';
 const { DataTypes } = require('sequelize');
 
 const Entry = sequelize.define('Entry', {
@@ -21,16 +23,16 @@ const Entry = sequelize.define('Entry', {
             key: 'ProductCode',
         },
     },
+    ExpiryDate: {
+        type: DataTypes.DATEONLY,
+        allowNull: false,
+    },
     LargeUnitQty: {
         type: DataTypes.FLOAT,
         allowNull: false,
     },
     SmallUnitQty: {
         type: DataTypes.FLOAT,
-        allowNull: false,
-    },
-    ExpiryDate: {
-        type: DataTypes.DATEONLY,
         allowNull: false,
     },
 });
@@ -51,18 +53,40 @@ Entry.afterCreate(async (entry, options) => {
         }
     }, {transaction: transaction})
 
-    if(inventory) {
-        inventory.LargeUnitQty += entry.LargeUnitQty
-        inventory.SmallUnitQty += entry.SmallUnitQty
-        await inventory.save({transaction: transaction})
-    } else {
-        await Inventory.create({
-            ProductCode : entry.ProductCode,
-            ExpiryDate  : entry.ExpiryDate,
-            LargeUnitQty: entry.LargeUnitQty,
-            SmallUnitQty: entry.SmallUnitQty,
-        }, {transaction: transaction})
+    let LargeUnitQty = (inventory?.LargeUnitQty ?? 0) + entry.LargeUnitQty
+    let SmallUnitQty = (inventory?.SmallUnitQty ?? 0) + entry.SmallUnitQty
+
+    if(SmallUnitQty > 0) {
+        let product = await Product.findOne({
+            where: {
+                ProductCode: entry.ProductCode
+            }
+        }, {transaction: transaction});
+
+        if(!product) {
+            throw new Error(t('ctr.product.code_not_exists'));
+        }
+
+        if(!product.SmallUnit || product.ConversionRate <= 0) {
+            throw new Error(t('ctr.product.not_have_conversion_rate'));
+        }
+
+        if(SmallUnitQty > product.ConversionRate) {
+            LargeUnitQty += Math.floor(SmallUnitQty / product.ConversionRate)
+            SmallUnitQty = SmallUnitQty % product.ConversionRate
+        }
     }
+
+    await Inventory.upsert({
+        ProductCode : entry.ProductCode,
+        ExpiryDate  : entry.ExpiryDate,
+        LargeUnitQty: LargeUnitQty,
+        SmallUnitQty: SmallUnitQty,
+    }, {transaction: transaction, conflictFields: ['ProductCode', 'ExpiryDate']}).then((res) => {
+        console.log(res)
+    }).catch((error) => {
+        console.log(error)
+    })
 })
 
 export default Entry;
