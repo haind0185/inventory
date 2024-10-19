@@ -31,7 +31,7 @@
                 </span>
             </div>
             <div class="flex justify-end w-[40%] gap-3">
-                <button type="button" class="btn green w-[6rem]" @click="onShowAdd()">{{ $t("button.add") }}</button>
+                <!-- <button type="button" class="btn green w-[6rem]" @click="onShowAdd()">{{ $t("button.add") }}</button> -->
             </div>
         </div>
 

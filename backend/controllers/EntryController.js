@@ -134,15 +134,16 @@ const EntryController = {
              */
 
             const create = async (EntryCode, entries) => {
-                for (const entry of entries) {
-                    await Entry.create({
-                        EntryCode: EntryCode,
-                        ProductCode: entry.ProductCode,
-                        ExpiryDate: entry.ExpiryDate,
+                entries = entries.map(entry => {
+                    return {
+                        EntryCode   : EntryCode,
+                        ProductCode : entry.ProductCode,
+                        ExpiryDate  : entry.ExpiryDate,
                         LargeUnitQty: entry.LargeUnitQty,
                         SmallUnitQty: entry.SmallUnitQty,
-                    }, {transaction: transaction});
-                }
+                    }
+                })
+                await Entry.bulkCreate(entries, {transaction: transaction});
             }
 
             await WarehouseEntry.create({
