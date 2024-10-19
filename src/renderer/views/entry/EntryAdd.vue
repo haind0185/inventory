@@ -125,7 +125,6 @@ const onClose = () => {
 
 const onSave = async () => {
     payload.value.entries = entries.value
-    console.log(payload.value)
     const res = await entryStore.store(payload.value).then((res) => {
         if(res && res.code == 200) {
             reload.value = true
