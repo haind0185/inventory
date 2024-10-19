@@ -32,7 +32,7 @@ const Product = sequelize.define('Product', {
     ProductNameLabel: {
         type: DataTypes.VIRTUAL,
         get() {
-            return `[${this.ProductCode}] ${this.ProductName} [${this.LargeUnit}]` + (this.SmallUnit ? `[${this.SmallUnit}]` : '');
+            return `[${this.ProductCode}] ${this.ProductName} [${this.LargeUnit}]` + (this.SmallUnit ? `[${this.SmallUnit}]` : '') + `[${this.Expire} ngày]`;
         }
     }
 });

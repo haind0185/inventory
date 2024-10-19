@@ -19,6 +19,13 @@ const InventoryController = {
              * set condition
              */
             const where = {}
+            const productWhere = {}
+            if(req.query.ProductCode) {
+                where.ProductCode = { [Op.like]: `%${req.query.ProductCode}%` }
+            }
+            if(req.query.ProductName) {
+                productWhere.ProductName = { [Op.like]: `%${req.query.ProductName}%` }
+            }
 
             /**
              * order
@@ -47,11 +54,14 @@ const InventoryController = {
              */
             const total = await Inventory.count({
                 where: where,
+                include: [
+                    { association: 'product', where: productWhere }
+                ]
             })
 
-            let entries = []
+            let inventories = []
             if(total > 0) {
-                entries = await Inventory.findAll({
+                inventories = await Inventory.findAll({
                     attributes: {
                         include: [
                             [sequelize.literal("(julianday(`Inventory`.`ExpiryDate`) - julianday(date('now')))"), 'ExpireCount'],
@@ -63,7 +73,7 @@ const InventoryController = {
                     limit: limit,
                     offset: offset,
                     include: [
-                        { association: 'product' }
+                        { association: 'product', where: productWhere }
                     ]
                 });
             }
@@ -71,12 +81,12 @@ const InventoryController = {
             let page = parseInt(req.query.page ?? 0)
 
             return res.json(success({
-                items: entries,
+                items: inventories,
                 total: total,
                 page: page,
                 page_count: Math.ceil(total / limit),
-                firstItem: entries.length ? (((page - 1) * limit) + 1) : 0,
-                lastItem: entries.length ? ((page * limit) <= total ? (page * limit) : total) : 0,
+                firstItem: inventories.length ? (((page - 1) * limit) + 1) : 0,
+                lastItem: inventories.length ? ((page * limit) <= total ? (page * limit) : total) : 0,
             }));
         } catch (err) {
             return res.json(error(err.message, 501));

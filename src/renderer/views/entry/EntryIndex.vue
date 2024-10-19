@@ -75,13 +75,15 @@
 <script setup>
 import { onMounted, onBeforeMount, computed, watch, ref } from 'vue'
 import { entryStore } from '@/store/entry';
+import { productStore } from '@/store/product';
 import EntryAdd from './EntryAdd.vue';
 
 const showAdd = ref(false)
 const search = computed(() => entryStore.search)
 const entries = ref({})
 
-const onShowAdd = () => {
+const onShowAdd = async () => {
+    await list()
     showAdd.value = true
 }
 const onCloseAdd = (event) => {
@@ -119,6 +121,15 @@ const sort = async () => {
 const pagination = (page) => {
     search.value.page = page
     index()
+}
+
+const list = async () => {
+    await productStore.list().then((res) => {
+        if(res && res.code == 200) {
+            entryStore.setProducts(res.data.items)
+            return true
+        }
+    })
 }
 
 onMounted(async () => {

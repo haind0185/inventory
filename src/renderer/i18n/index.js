@@ -21,6 +21,16 @@ const messages = {
                 SmallUnitQty: "S.Lượng(đv2)",
                 ExpiryDate: "Hạn sử dụng",
             },
+            exit: {
+                ExitCode: "Mã xuất kho",
+                ExitDate: "Ngày xuất kho",
+                ExitType: "Điều chỉnh",
+                ProductCode: "Mã mặt hàng",
+                ExpiryDate: "Hạn sử dụng",
+                ProductNameLabel: "Mặt hàng",
+                LargeUnitQty: "S.Lượng(đv1)",
+                SmallUnitQty: "S.Lượng(đv2)",
+            },
             inventory: {
                 ProductCode: "Mã mặt hàng",
                 ProductName: "Tên mặt hàng",
@@ -38,6 +48,12 @@ const messages = {
             entry: {
                 code_exists: "Mã nhập kho đã tồn tại",
                 no_entry: "Thêm mặt hàng để nhập kho",
+            },
+            exit: {
+                code_exists: "Mã xuất kho đã tồn tại",
+                no_exit: "Thêm mặt hàng để xuất kho",
+                code_not_exists: "Mặt hàng không có trong kho",
+                many_qty: "Mặt hàng này không đủ số lượng",
             }
         },
         button: {

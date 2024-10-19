@@ -3,21 +3,38 @@ import { initPinia } from '@/store/setup'
 import api from '@/api'
 import { store } from '.'
 
-const initSearch = {
+const searchInit = {
     EntryCode: null,
     EntryDate: null,
     sort: null,
     sort_by: null,
     page: 1
 }
+const entryInit = {
+    ProductCode: null,
+    LargeUnitQty: 0,
+    SmallUnitQty: 0,
+    ExpiryDate: null,
+}
+const payloadInit = {
+    EntryCode: null,
+    EntryDate: null,
+    EntryType: false,
+}
 
 const createStore = defineStore('entry', {
     state: () => {
         return {
             search: {
-                ...initSearch
+                ...searchInit
             },
-
+            payload: {
+                ...payloadInit
+            },
+            entries: [
+                {...entryInit}
+            ],
+            products: []
         }
     },
     getters: {
@@ -55,8 +72,26 @@ const createStore = defineStore('entry', {
             this.search.sort_by = 'asc'
         },
         resetSearch() {
-            this.search = {...this.search, ...initSearch}
+            this.search = {...this.search, ...searchInit}
         },
+        add() {
+            this.entries.push({...entryInit})
+        },
+        delete(index) {
+            this.entries = this.entries.filter((item, i) => i != index)
+        },
+        reset() {
+            this.entries = [{...entryInit}]
+            this.payload = {}
+        },
+        setProducts(products) {
+            this.products = products
+        },
+        getProduct(ProductCode) {
+            return this.products.find(item => {
+                return item.ProductCode == ProductCode
+            })
+        }
     },
 })
 

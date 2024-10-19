@@ -47,7 +47,7 @@
                                 {{ index+1  }}
                             </div>
                             <fieldset class="flex-1 form-input required">
-                                <select2 class="form-control" required :options="product_list" v-model="entry.ProductCode" label="ProductNameLabel" :reduce="item => item.ProductCode" :update:modelValue="changeProduct(entry)">
+                                <select2 class="form-control" required :options="products" v-model="entry.ProductCode" label="ProductNameLabel" :reduce="item => item.ProductCode" :option:selected="changeProduct(entry)">
                                     <template #search="{attributes, events}">
                                         <input class="vs__search" :required="entry.ProductCode == null || entry.ProductCode == ''" v-bind="attributes" v-on="events" />
                                     </template>
@@ -89,40 +89,74 @@
 </style>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, onBeforeMount, ref, watch } from 'vue'
 import { t } from '@/i18n'
 import { productStore } from '@/store/product';
 import { entryStore } from '@/store/entry';
 import { helper } from '@/helper'
+import { computed } from 'vue';
 
 const title = t("modal.add_entry")
 const props = defineProps(['show'])
 const emit = defineEmits(['close', 'save'])
 
-const payload = ref({
-    EntryCode: null,
-    EntryDate: null,
-    EntryType: false,
-})
+const payload = computed(() => entryStore.payload)
 
-const entryInit = {
-    ProductCode: null,
-    LargeUnitQty: 0,
-    SmallUnitQty: 0,
-    ExpiryDate: null,
-}
-const entries = ref([
-    {...entryInit},
-])
+const entries = computed(() => entryStore.entries)
+const products = ref(entryStore.products)
 const confirm = ref(null)
 const reload = ref(false)
-const product_list = ref([])
-var pro_list = []
 
 const onClose = () => {
     emit('close', reload.value)
 }
 
+const getLargeUnit = (ProductCode) => {
+    let product = entryStore.getProduct(ProductCode)
+    if(product) {
+        return product.LargeUnit
+    }
+    return ''
+}
+
+const getSmallUnit = (ProductCode) => {
+    let product = entryStore.getProduct(ProductCode)
+    if(product) {
+        return product.SmallUnit
+    }
+    return ''
+}
+
+const smallUnitDisable = (ProductCode) => {
+    let product = entryStore.getProduct(ProductCode)
+    if(!product || !product.SmallUnit) {
+        return true
+    }
+    return false
+}
+
+const changeProduct = (entry) => {
+    let product = entryStore.getProduct(entry.ProductCode)
+
+    if(!product || !product.SmallUnit) {
+        entry.SmallUnitQty = 0
+    }
+}
+
+const addItem = () => {
+    entryStore.add()
+}
+
+const deleteItem = (index) => {
+    entryStore.delete(index)
+}
+
+onBeforeMount(async () => {
+})
+
+/**
+ * Call API
+ */
 const onSave = async () => {
     payload.value.entries = entries.value
     const res = await entryStore.store(payload.value).then((res) => {
@@ -139,70 +173,10 @@ const onSave = async () => {
             cancelButton: t("button.back"),
             type: 1
         })
+        entryStore.reset()
         emit('save', reload.value)
     }
 
 }
-
-const list = async () => {
-    await productStore.list().then((res) => {
-        if(res && res.code == 200) {
-            product_list.value = res.data.items
-            pro_list = helper.deepClone(product_list.value)
-        }
-    })
-}
-
-const getLargeUnit = (ProductCode) => {
-    let product = pro_list.find(item => {
-        return item.ProductCode == ProductCode
-    })
-    if(product) {
-        return product.LargeUnit
-    }
-    return ''
-}
-
-const getSmallUnit = (ProductCode) => {
-    let product = pro_list.find(item => {
-        return item.ProductCode == ProductCode
-    })
-    if(product) {
-        return product.SmallUnit
-    }
-    return ''
-}
-
-const smallUnitDisable = (ProductCode) => {
-    let product = pro_list.find(item => {
-        return item.ProductCode == ProductCode
-    })
-    if(!product?.SmallUnit) {
-        return true
-    }
-    return false
-}
-
-const changeProduct = (entry) => {
-    let product = pro_list.find(item => {
-        return item.ProductCode == entry.ProductCode
-    })
-    if(!product?.SmallUnit) {
-        entry.SmallUnitQty = 0
-    }
-}
-
-const addItem = () => {
-    entries.value.push({...entryInit})
-}
-
-const deleteItem = (index) => {
-    entries.value = entries.value.filter((item, i) => i != index)
-}
-
-onMounted(async () => {
-    await list()
-})
-
 
 </script>
