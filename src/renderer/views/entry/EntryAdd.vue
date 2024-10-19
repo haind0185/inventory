@@ -42,7 +42,10 @@
                 <div class="entry">
                     <template v-for="(entry, index) in entries">
                         <div class="flex w-full gap-3 p-1 entry-item">
-                            <div class="flex items-end text-sm w-[2rem]" style="margin-bottom: 2px;">{{ index+1  }}</div>
+                            <div class="flex items-center text-sm w-[2rem] gap-2" style="margin-bottom: -3px;">
+                                <span class="close-item" @click="deleteItem(index)" v-if="entries.length > 1">✕</span>
+                                {{ index+1  }}
+                            </div>
                             <fieldset class="flex-1 form-input required">
                                 <select2 class="form-control" required :options="product_list" v-model="entry.ProductCode" label="ProductNameLabel" :reduce="item => item.ProductCode" :update:modelValue="changeProduct(entry)">
                                     <template #search="{attributes, events}">
@@ -192,6 +195,10 @@ const changeProduct = (entry) => {
 
 const addItem = () => {
     entries.value.push({...entryInit})
+}
+
+const deleteItem = (index) => {
+    entries.value = entries.value.filter((item, i) => i != index)
 }
 
 onMounted(async () => {

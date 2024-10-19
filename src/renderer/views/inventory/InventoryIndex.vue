@@ -72,10 +72,7 @@
                         <td class="text-center">{{ item.ExpireCount }}</td>
                         <!-- <td class="text-center">{{ item.ExpirePercent }}</td> -->
                         <td class="text-center">
-                            <div class="progress-bar">
-                                <span>{{ `${item.ExpirePercent}%` }}</span>
-                                <div class="progress-fill" :class="{'low': item.ExpirePercent <= 20, 'medium': item.ExpirePercent > 20 && item.ExpirePercent < 50, 'hight': item.ExpirePercent >= 50}" :style="{width: item.ExpirePercent+'%'}"></div>
-                            </div>
+                            <progress-bar :value="item.ExpirePercent"></progress-bar>
                         </td>
                     </tr>
                 </tbody>
@@ -84,48 +81,10 @@
     </div>
 </template>
 
-<style scoped>
-.progress-bar {
-    width: 100%;
-    background-color: #e0e0e0;
-    border-radius: 4px;
-    overflow: hidden;
-    margin: 0px 0;
-    position: relative;
-}
-
-.progress-fill {
-    height: 16px;
-    width: 0;
-    transition: width 0.3s ease;
-    position: relative;
-}
-
-.progress-fill.low {
-    background-color: #ff4d4d;
-}
-
-.progress-fill.medium {
-    background-color: #ffcc00;
-}
-
-.progress-fill.high {
-    background-color: #4caf50;
-}
-
-.progress-bar span {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    color: black;
-    font-size: 12px;
-}
-</style>
-
 <script setup>
 import { onMounted, onBeforeMount, computed, watch, ref } from 'vue'
 import { inventoryStore } from '@/store/inventory';
+import ProgressBar from '../component/ProgressBar.vue';
 
 const showAdd = ref(false)
 const search = computed(() => inventoryStore.search)
@@ -172,7 +131,7 @@ const pagination = (page) => {
     index()
 }
 
-onMounted(async () => {
+onBeforeMount(async () => {
     await index()
 })
 </script>
