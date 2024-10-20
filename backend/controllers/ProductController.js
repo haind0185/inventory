@@ -2,6 +2,8 @@ import Product from '../models/Product';
 import { error, success } from './common/http';
 import { t } from '../../src/renderer/i18n'
 import sequelize from '../models/index';
+const xlsx = require('xlsx');
+const path = require('path');
 const { Op } = require("sequelize");
 const Joi = require('joi');
 
@@ -16,11 +18,11 @@ const ProductController = {
              */
             const where = {}
 
-            if(req.query.ProductCode) {
+            if (req.query.ProductCode) {
                 where.ProductCode = { [Op.like]: `%${req.query.ProductCode}%` }
             }
 
-            if(req.query.ProductName) {
+            if (req.query.ProductName) {
                 where.ProductName = { [Op.like]: `%${req.query.ProductName}%` }
             }
 
@@ -29,7 +31,7 @@ const ProductController = {
              */
             const order_list = ['ProductCode', 'ProductName']
             let order = []
-            if(order_list.includes(req.query.sort)) {
+            if (order_list.includes(req.query.sort)) {
                 let sort_by = req.query.sort_by == 'desc' ? 'desc' : 'asc'
                 order = [[req.query.sort, sort_by]]
             }
@@ -39,7 +41,7 @@ const ProductController = {
              */
             const limit = 50
             let offset = req.query.page ? ((req.query.page - 1) * limit) : 0
-            
+
             /**
              * call select action
              */
@@ -48,7 +50,7 @@ const ProductController = {
             })
 
             let products = []
-            if(total > 0) {
+            if (total > 0) {
                 products = await Product.findAll({
                     where: where,
                     order: order,
@@ -82,13 +84,13 @@ const ProductController = {
              * validation
              */
             const schema = Joi.object({
-                ProductCode   : Joi.string().required().min(1).max(200),
-                ProductName   : Joi.string().required().min(1).max(200),
-                LargeUnit     : Joi.string().required().max(50),
-                SmallUnit     : Joi.string().allow(null, ''),
+                ProductCode: Joi.string().required().min(1).max(200),
+                ProductName: Joi.string().required().min(1).max(200),
+                LargeUnit: Joi.string().required().max(50),
+                SmallUnit: Joi.string().allow(null, ''),
                 ConversionRate: Joi.when('SmallUnit', {
-                    is       : Joi.string(),
-                    then     : Joi.number().min(1).required(),
+                    is: Joi.string(),
+                    then: Joi.number().min(1).required(),
                     otherwise: Joi.number().allow(null).min(1),
                 }),
                 Expire: Joi.number().required().min(0),
@@ -107,8 +109,8 @@ const ProductController = {
                 where: {
                     ProductCode: ProductCode
                 }
-            }, {transaction: transaction})
-            if(existsProduct) {
+            }, { transaction: transaction })
+            if (existsProduct) {
                 return res.json(error(t('ctr.product.code_exists')));
             }
 
@@ -116,16 +118,57 @@ const ProductController = {
              * call create action
              */
             const product = await Product.create({
-                ProductCode   : ProductCode,
-                ProductName   : ProductName,
-                LargeUnit     : LargeUnit,
-                SmallUnit     : SmallUnit,
+                ProductCode: ProductCode,
+                ProductName: ProductName,
+                LargeUnit: LargeUnit,
+                SmallUnit: SmallUnit,
                 ConversionRate: ConversionRate,
-                Expire        : Expire,
-            }, {transaction: transaction});
-            
+                Expire: Expire,
+            }, { transaction: transaction });
+
             await transaction.commit();
             return res.json(success(product));
+        } catch (err) {
+            await transaction.rollback();
+            return res.json(error(err.message, 501));
+        }
+    },
+
+    import: async (req, res) => {
+        const transaction = await sequelize.transaction();
+        try {
+            if (!req.file) {
+                throw new Error("Không tìm thấy file");
+            }
+    
+            const filePath = path.join(__dirname, '../../' + req.file.path);
+            const workbook = xlsx.readFile(filePath);
+    
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const data = xlsx.utils.sheet_to_json(worksheet);
+
+            const schema = Joi.object({
+                ProductCode: Joi.string().required().min(1).max(200),
+                ProductName: Joi.string().required().min(1).max(200),
+                LargeUnit: Joi.string().required().max(50),
+                SmallUnit: Joi.string().allow(null, ''),
+                ConversionRate: Joi.when('SmallUnit', {
+                    is: Joi.string(),
+                    then: Joi.number().min(1).required(),
+                    otherwise: Joi.number().allow(null).min(1),
+                }),
+                Expire: Joi.number().required().min(0),
+            }).unknown();
+
+            data.forEach((product, index) => {
+                let validation = schema.validate(product);
+                if (validation.error) {
+                    throw new Error(`[${index+1}] ${validation.error.details[0].message}`);
+                }
+            });
+
+            return res.json(success(data));
         } catch (err) {
             await transaction.rollback();
             return res.json(error(err.message, 501));
@@ -141,11 +184,11 @@ const ProductController = {
              */
             const where = {}
 
-            if(req.query.ProductCode) {
+            if (req.query.ProductCode) {
                 where.ProductCode = { [Op.like]: `%${req.query.ProductCode}%` }
             }
 
-            if(req.query.ProductName) {
+            if (req.query.ProductName) {
                 where.ProductName = { [Op.like]: `%${req.query.ProductName}%` }
             }
 
@@ -154,11 +197,11 @@ const ProductController = {
              */
             const order_list = ['ProductCode', 'ProductName']
             let order = []
-            if(order_list.includes(req.query.sort)) {
+            if (order_list.includes(req.query.sort)) {
                 let sort_by = req.query.sort_by == 'desc' ? 'desc' : 'asc'
                 order = [[req.query.sort, sort_by]]
             }
-            
+
             /**
              * call select action
              */
@@ -167,7 +210,7 @@ const ProductController = {
             })
 
             let products = []
-            if(total > 0) {
+            if (total > 0) {
                 products = await Product.findAll({
                     order: order,
                     attributes: { include: ['ProductNameLabel'] }

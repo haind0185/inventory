@@ -67,6 +67,7 @@ const messages = {
             add: "Thêm mới",
             confirm: "Xác nhận",
             add_item: "Thêm",
+            import: "Thêm file",
         },
         modal: {
             add_product: "Thêm mặt hàng",

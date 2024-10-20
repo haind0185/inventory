@@ -32,6 +32,7 @@
             </div>
             <div class="flex justify-end w-[40%] gap-3">
                 <button type="button" class="btn green w-[6rem]" @click="onShowAdd()">{{ $t("button.add") }}</button>
+                <button type="button" class="btn silver w-[6rem]" @click="onShowImport()">{{ $t("button.import") }}</button>
             </div>
         </div>
 
@@ -69,6 +70,12 @@
             :show="showAdd"
             @close="onCloseAdd($event)"
             @save="onSaveAdd($event)" />
+
+        <ProductImport
+            v-if="showImport"
+            :show="showImport"
+            @close="onCloseImport($event)"
+            @save="onSaveImport($event)" />
     </div>
 </template>
 
@@ -76,8 +83,10 @@
 import { onMounted, onBeforeMount, computed, watch, ref } from 'vue'
 import { productStore } from '@/store/product';
 import ProductAddModal from './ProductAddModal.vue'
+import ProductImport from './ProductImport.vue'
 
 const showAdd = ref(false)
+const showImport = ref(false)
 const search = computed(() => productStore.search)
 const products = ref({})
 
@@ -97,11 +106,28 @@ const onSaveAdd = (event) => {
     }
 }
 
+const onShowImport = () => {
+    showImport.value = true
+}
+const onCloseImport = (event) => {
+    showImport.value = false
+    if(event) {
+        index()
+    }
+}
+const onSaveImport = (event) => {
+    showImport.value = false
+    if(event) {
+        index()
+    }
+}
+
 const clear = async () => {
     productStore.resetSearch()
     await index()
     console.log(search.value)
 }
+
 const index = async () => {
     await productStore.index(search.value).then((res) => {
         if(res && res.code == 200) {

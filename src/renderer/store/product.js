@@ -48,6 +48,18 @@ const createStore = defineStore('product', {
                     return false
                 })
         },
+        async import(payload) {
+            store.setLoading(true)
+            return await api.post(`/products/import`, payload)
+                .then((res) => {
+                    store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
         async list(params) {
             store.setLoading(true)
             return await api.get(`/products/list`, { params: params })
