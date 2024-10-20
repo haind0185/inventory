@@ -10,6 +10,16 @@ const initSearch = {
     sort_by: null,
     page: 1
 }
+const exitInit = {
+    ProductCode: null,
+    LargeUnitQty: 0,
+    SmallUnitQty: 0,
+}
+const payloadInit = {
+    ExitCode: null,
+    ExitDate: null,
+    ExitType: false,
+}
 
 const createStore = defineStore('exit', {
     state: () => {
@@ -17,7 +27,13 @@ const createStore = defineStore('exit', {
             search: {
                 ...initSearch
             },
-
+            payload: {
+                ...payloadInit
+            },
+            exits: [
+                {...exitInit}
+            ],
+            inventories: []
         }
     },
     getters: {
@@ -57,6 +73,24 @@ const createStore = defineStore('exit', {
         resetSearch() {
             this.search = {...this.search, ...initSearch}
         },
+        add() {
+            this.exits.push({...exitInit})
+        },
+        delete(index) {
+            this.exits = this.exits.filter((item, i) => i != index)
+        },
+        reset() {
+            this.exits = [{...exitInit}]
+            this.payload = {...payloadInit}
+        },
+        setInventories(data) {
+            this.inventories = data
+        },
+        getProduct(ProductCode) {
+            return this.inventories.find(item => {
+                return item.ProductCode == ProductCode
+            })?.product
+        }
     },
 })
 

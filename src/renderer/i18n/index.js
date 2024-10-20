@@ -26,7 +26,6 @@ const messages = {
                 ExitDate: "Ngày xuất kho",
                 ExitType: "Điều chỉnh",
                 ProductCode: "Mã mặt hàng",
-                ExpiryDate: "Hạn sử dụng",
                 ProductNameLabel: "Mặt hàng",
                 LargeUnitQty: "S.Lượng(đv1)",
                 SmallUnitQty: "S.Lượng(đv2)",
@@ -72,6 +71,7 @@ const messages = {
         modal: {
             add_product: "Thêm mặt hàng",
             add_entry: "Nhập kho",
+            add_exit: "Xuất kho",
         },
         title: {
             notify: "Thông báo",

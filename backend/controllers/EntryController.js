@@ -97,7 +97,7 @@ const EntryController = {
             }).unknown()
             let validation = entrySchema.validate({EntryCode: EntryCode, EntryDate: EntryDate, EntryType: EntryType});
             if (validation.error) {
-                return res.json(error(validation.error.details[0].message))
+                throw new Error(validation.error.details[0].message);
             }
 
             // Entry
@@ -108,12 +108,12 @@ const EntryController = {
                 SmallUnitQty: Joi.number().required().min(0),
             }).unknown();
             if(entries.length <= 0) {
-                return res.json(error(t('ctr.entry.no_entry')));
+                throw new Error(t('ctr.entry.no_entry'));
             }
             entries.forEach((entry, index) => {
                 let validation = schema.validate(entry);
                 if (validation.error) {
-                    return res.json(error(`[${index+1}] ${validation.error.details[0].message}`))
+                    throw new Error(`[${index+1}] ${validation.error.details[0].message}`);
                 }
             });
 
@@ -126,7 +126,7 @@ const EntryController = {
                 }
             })
             if(exists_warehouse_entry) {
-                return res.json(error(t('ctr.entry.code_exists')));
+                throw new Error(t('ctr.entry.code_exists'));
             }
 
             /**

@@ -45,7 +45,6 @@
                         <th>
                             <th-sort @sort="sort()" :search="search" :field="'ProductCode'">{{ $t("attr.exit.ProductNameLabel") }}</th-sort>
                         </th>
-                        <th>{{ $t("attr.exit.ExpiryDate") }}</th>
                         <th>{{ $t("attr.exit.LargeUnitQty") }}</th>
                         <th>{{ $t("attr.exit.SmallUnitQty") }}</th>
                     </tr>
@@ -55,34 +54,35 @@
                         <tr v-for="(exit, index) in item.exits">
                             <td class="text-center" :rowspan="item.exits.length" v-if="index == 0">{{ item.ExitCode }}<br>{{ item.ExitDate }}</td>
                             <td class="text-left" :class="{'row-left': index >= 1}">{{ exit.product.ProductNameLabel }}</td>
-                            <td class="text-center">{{ exit.ExpiryDate }}</td>
-                            <td class="text-center">{{ exit.LargeUnitQty }}</td>
-                            <td class="text-center">{{ exit.SmallUnitQty }}</td>
+                            <td class="text-center">{{ `${exit.LargeUnitQty} ${exit.product.LargeUnit}` }}</td>
+                            <td class="text-center">{{ exit.product.SmallUnit ? `${exit.SmallUnitQty} ${exit.product.SmallUnit}` : '' }}</td>
                         </tr>
                     </template>
                 </tbody>
             </table>
         </div>
 
-        <!-- <EntryAdd
+        <ExitAdd
             v-if="showAdd"
             :show="showAdd"
             @close="onCloseAdd($event)"
-            @save="onSaveAdd($event)" /> -->
+            @save="onSaveAdd($event)" />
     </div>
 </template>
 
 <script setup>
 import { onMounted, onBeforeMount, computed, watch, ref } from 'vue'
 import { exitStore } from '@/store/exit';
-// import EntryAdd from './EntryAdd.vue';
+import { inventoryStore } from '@/store/inventory';
+import ExitAdd from './ExitAdd.vue';
 
 const showAdd = ref(false)
 const search = computed(() => exitStore.search)
 const exits = ref({})
 
-const onShowAdd = () => {
+const onShowAdd = async () => {
     showAdd.value = true
+    await inventoriesList()
 }
 const onCloseAdd = (event) => {
     showAdd.value = false
@@ -119,6 +119,15 @@ const sort = async () => {
 const pagination = (page) => {
     search.value.page = page
     index()
+}
+
+const inventoriesList = async () => {
+    await inventoryStore.list().then((res) => {
+        if(res && res.code == 200) {
+            exitStore.setInventories(res.data.items)
+            return true
+        }
+    })
 }
 
 onMounted(async () => {

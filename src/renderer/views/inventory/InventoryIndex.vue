@@ -65,7 +65,7 @@
                 <tbody>
                     <tr v-for="item in inventories.items">
                         <td class="text-center">{{ item.ProductCode }}</td>
-                        <td class="text-left">{{ `${item.product.ProductName} [${item.ExpiryDate}] [${item.product.Expire}]` }}</td>
+                        <td class="text-left">{{ item.ProductNameLabel }}</td>
                         <td class="text-center">{{ item.ExpiryDate }}</td>
                         <td class="text-center">{{ `${item.LargeUnitQty} ${item.product?.LargeUnit}` }}</td>
                         <td class="text-center">{{ item.product?.SmallUnit ? `${item.SmallUnitQty} ${item.product?.SmallUnit}` : '' }}</td>

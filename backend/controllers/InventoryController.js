@@ -92,6 +92,32 @@ const InventoryController = {
             return res.json(error(err.message, 501));
         }
     },
+    list: async (req, res) => {
+        try {
+            console.log(req.query)
+            
+            /**
+             * call select action
+             */
+            let inventories = await Inventory.findAll({
+                attributes: [
+                    'ProductCode',
+                    [sequelize.fn('SUM', sequelize.col('LargeUnitQty')), 'LargeUnitQty'],
+                    [sequelize.fn('SUM', sequelize.col('SmallUnitQty')), 'SmallUnitQty'],
+                    'ProductNameLabelGroup'
+                ],
+                group: ['Inventory.ProductCode'],
+                include: { association: 'product' },
+                order: [['LargeUnitQty', 'DESC'], ['SmallUnitQty', 'DESC']],
+            });
+
+            return res.json(success({
+                items: inventories,
+            }));
+        } catch (err) {
+            return res.json(error(err.message, 501));
+        }
+    },
 };
 
 export default InventoryController;

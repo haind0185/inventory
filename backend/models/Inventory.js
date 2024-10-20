@@ -59,6 +59,18 @@ const Inventory = sequelize.define('Inventory', {
             return 0
         }
     },
+    ProductNameLabel: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            return `${this.product.ProductName} [${this.product.LargeUnit}]` + (this.product.SmallUnit ? `[x${this.product.ConversionRate}][${this.product.SmallUnit}]` : '') + `[${this.product.Expire} ngày]`;
+        }
+    },
+    ProductNameLabelGroup: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            return `[${this.product.ProductCode}][${this.product.Expire} ngày] ${this.product.ProductName} [${this.LargeUnitQty} ${this.product.LargeUnit}]` + (this.product.SmallUnit ? `[${this.SmallUnitQty} ${this.product.SmallUnit}]` : '');
+        }
+    }
 }, {
     indexes: [
         {

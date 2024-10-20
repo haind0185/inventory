@@ -180,7 +180,7 @@ const ProductController = {
         } catch (err) {
             return res.json(error(err.message, 501));
         }
-    }
+    },
 };
 
 export default ProductController;

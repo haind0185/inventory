@@ -1,21 +1,21 @@
 <template>
-    <Modal :show="show" :title="title" maxWidth="max-w-7xl" @close="onClose()" class="">
+    <Modal :show="show" :title="title" maxWidth="max-w-5xl" @close="onClose()" class="">
         <form class="flex flex-col justify-between h-full gap-1 p-2" style="min-height: 500px;" @submit.prevent="onSave()">
             <div class="flex-col gap-1 d-flex">
                 <div class="flex gap-3 w-[60%] mx-auto">
                     <fieldset class="w-1/3 form-input required">
-                        <legend>{{ $t("attr.entry.EntryCode") }}</legend>
-                        <input type="text" class="w-full text-center form-control" required v-model="payload.EntryCode">
+                        <legend>{{ $t("attr.exit.ExitCode") }}</legend>
+                        <input type="text" class="w-full text-center form-control" required v-model="payload.ExitCode">
                     </fieldset>
                     <fieldset class="w-1/3 form-input required">
-                        <legend>{{ $t("attr.entry.EntryDate") }}</legend>
-                        <date class="w-full from-control" v-model="payload.EntryDate" required></date>
+                        <legend>{{ $t("attr.exit.ExitDate") }}</legend>
+                        <date class="w-full from-control" v-model="payload.ExitDate" required></date>
                     </fieldset>
                     <div class="w-1/3 mt-2">
                         <div class="h-[21px]"></div>
                         <label class="flex items-center gap-1 text-sm">
-                            <input type="checkbox" v-model="payload.EntryType" >
-                            {{ $t("attr.entry.EntryType") }}
+                            <input type="checkbox" v-model="payload.ExitType" >
+                            {{ $t("attr.exit.ExitType") }}
                         </label>
                     </div>
                 </div>
@@ -26,43 +26,37 @@
                     <div class="flex gap-3 p-1 entry-item">
                         <div class="w-[2rem]">{{ ' ' }}</div>
                         <fieldset class="flex-1 form-input required">
-                            <legend>{{ $t("attr.entry.ProductCode") }}</legend>
-                        </fieldset>
-                        <fieldset class="w-[8rem] form-input required">
-                            <legend>{{ $t("attr.entry.ExpiryDate") }}</legend>
+                            <legend>{{ $t("attr.exit.ProductCode") }}</legend>
                         </fieldset>
                         <fieldset class="w-[10rem] form-input">
-                            <legend>{{ $t("attr.entry.LargeUnitQty") }}</legend>
+                            <legend>{{ $t("attr.exit.LargeUnitQty") }}</legend>
                         </fieldset>
                         <fieldset class="w-[10rem] form-input">
-                            <legend>{{ $t("attr.entry.SmallUnitQty") }}</legend>
+                            <legend>{{ $t("attr.exit.SmallUnitQty") }}</legend>
                         </fieldset>
                     </div>
                 </div>
                 <div class="entry">
-                    <template v-for="(entry, index) in entries">
+                    <template v-for="(exit, index) in exits">
                         <div class="flex w-full gap-3 p-1 entry-item">
                             <div class="flex items-center text-sm w-[2rem] gap-2" style="margin-bottom: -3px;">
-                                <span class="close-item" @click="deleteItem(index)" v-if="entries.length > 1">✕</span>
+                                <span class="close-item" @click="deleteItem(index)" v-if="exits.length > 1">✕</span>
                                 {{ index+1  }}
                             </div>
                             <fieldset class="flex-1 form-input required">
-                                <select2 class="form-control" required :options="products" v-model="entry.ProductCode" label="ProductNameLabel" :reduce="item => item.ProductCode" :option:selected="changeProduct(entry)">
+                                <select2 class="form-control" required :options="inventories" v-model="exit.ProductCode" label="ProductNameLabelGroup" :reduce="item => item.ProductCode" :option:selected="changeProduct(exit)">
                                     <template #search="{attributes, events}">
-                                        <input class="vs__search" :required="entry.ProductCode == null || entry.ProductCode == ''" v-bind="attributes" v-on="events" />
+                                        <input class="vs__search" :required="exit.ProductCode == null || exit.ProductCode == ''" v-bind="attributes" v-on="events" />
                                     </template>
                                 </select2>
                             </fieldset>
-                            <fieldset class="w-[8rem] form-input required">
-                                <date class="w-full from-control" v-model="entry.ExpiryDate" required></date>
+                            <fieldset class="w-[10rem] form-input flex items-center">
+                                <input type="number" class="w-[7rem] text-center form-control" v-model="exit.LargeUnitQty" min="0">
+                                <span class="w-[3rem] text-sm pl-1">{{ getLargeUnit(exit.ProductCode) }}</span>
                             </fieldset>
                             <fieldset class="w-[10rem] form-input flex items-center">
-                                <input type="number" class="w-[7rem] text-center form-control" v-model="entry.LargeUnitQty" min="0">
-                                <span class="w-[3rem] text-sm pl-1">{{ getLargeUnit(entry.ProductCode) }}</span>
-                            </fieldset>
-                            <fieldset class="w-[10rem] form-input flex items-center">
-                                <input type="number" class="w-[7rem] text-center form-control" v-model="entry.SmallUnitQty" min="0" :disabled="smallUnitDisable(entry.ProductCode)">
-                                <span class="w-[3rem] text-sm pl-1">{{ getSmallUnit(entry.ProductCode) }}</span>
+                                <input type="number" class="w-[7rem] text-center form-control" v-model="exit.SmallUnitQty" min="0" :disabled="smallUnitDisable(exit.ProductCode)">
+                                <span class="w-[3rem] text-sm pl-1">{{ getSmallUnit(exit.ProductCode) }}</span>
                             </fieldset>
                         </div>
                     </template>
@@ -91,19 +85,18 @@
 <script setup>
 import { onMounted, onBeforeMount, ref, watch } from 'vue'
 import { t } from '@/i18n'
-import { productStore } from '@/store/product';
-import { entryStore } from '@/store/entry';
+import { exitStore } from '@/store/exit';
 import { helper } from '@/helper'
 import { computed } from 'vue';
 
-const title = t("modal.add_entry")
+const title = t("modal.add_exit")
 const props = defineProps(['show'])
 const emit = defineEmits(['close', 'save'])
 
-const payload = computed(() => entryStore.payload)
+const payload = computed(() => exitStore.payload)
 
-const entries = computed(() => entryStore.entries)
-const products = computed(() => entryStore.products)
+const exits = computed(() => exitStore.exits)
+const inventories = computed(() => exitStore.inventories)
 const confirm = ref(null)
 const reload = ref(false)
 
@@ -111,8 +104,16 @@ const onClose = () => {
     emit('close', reload.value)
 }
 
+const addItem = () => {
+    exitStore.add()
+}
+
+const deleteItem = (index) => {
+    exitStore.delete(index)
+}
+
 const getLargeUnit = (ProductCode) => {
-    let product = entryStore.getProduct(ProductCode)
+    let product = exitStore.getProduct(ProductCode)
     if(product) {
         return product.LargeUnit
     }
@@ -120,7 +121,7 @@ const getLargeUnit = (ProductCode) => {
 }
 
 const getSmallUnit = (ProductCode) => {
-    let product = entryStore.getProduct(ProductCode)
+    let product = exitStore.getProduct(ProductCode)
     if(product) {
         return product.SmallUnit
     }
@@ -128,27 +129,19 @@ const getSmallUnit = (ProductCode) => {
 }
 
 const smallUnitDisable = (ProductCode) => {
-    let product = entryStore.getProduct(ProductCode)
+    let product = exitStore.getProduct(ProductCode)
     if(!product || !product.SmallUnit) {
         return true
     }
     return false
 }
 
-const changeProduct = (entry) => {
-    let product = entryStore.getProduct(entry.ProductCode)
+const changeProduct = (exit) => {
+    let product = exitStore.getProduct(exit.ProductCode)
 
     if(!product || !product.SmallUnit) {
-        entry.SmallUnitQty = 0
+        exit.SmallUnitQty = 0
     }
-}
-
-const addItem = () => {
-    entryStore.add()
-}
-
-const deleteItem = (index) => {
-    entryStore.delete(index)
 }
 
 onBeforeMount(async () => {
@@ -158,8 +151,10 @@ onBeforeMount(async () => {
  * Call API
  */
 const onSave = async () => {
-    payload.value.entries = entries.value
-    const res = await entryStore.store(payload.value).then((res) => {
+    payload.value.exits = exits.value
+    console.log(payload.value)
+
+    const res = await exitStore.store(payload.value).then((res) => {
         if(res && res.code == 200) {
             reload.value = true
             return true
@@ -173,7 +168,7 @@ const onSave = async () => {
             cancelButton: t("button.back"),
             type: 1
         })
-        entryStore.reset()
+        exitStore.reset()
         emit('save', reload.value)
     }
 

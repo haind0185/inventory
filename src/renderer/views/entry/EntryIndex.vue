@@ -45,9 +45,9 @@
                         <th>
                             <th-sort @sort="sort()" :search="search" :field="'ProductCode'">{{ $t("attr.entry.ProductNameLabel") }}</th-sort>
                         </th>
+                        <th>{{ $t("attr.entry.ExpiryDate") }}</th>
                         <th>{{ $t("attr.entry.LargeUnitQty") }}</th>
                         <th>{{ $t("attr.entry.SmallUnitQty") }}</th>
-                        <th>{{ $t("attr.entry.ExpiryDate") }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -55,9 +55,9 @@
                         <tr v-for="(entry, index) in item.entries">
                             <td class="text-center" :rowspan="item.entries.length" v-if="index == 0">{{ item.EntryCode }}<br>{{ item.EntryDate }}</td>
                             <td class="text-left" :class="{'row-left': index >= 1}">{{ entry.product.ProductNameLabel }}</td>
+                            <td class="text-center">{{ entry.ExpiryDate }}</td>
                             <td class="text-center">{{ entry.LargeUnitQty }}</td>
                             <td class="text-center">{{ entry.SmallUnitQty }}</td>
-                            <td class="text-center">{{ entry.ExpiryDate }}</td>
                         </tr>
                     </template>
                 </tbody>

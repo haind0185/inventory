@@ -4,6 +4,7 @@ const router = express.Router();
 
 
 router.get('/', InventoryController.index);
+router.get('/list', InventoryController.list);
 
 const InventoryRouter = router;
 

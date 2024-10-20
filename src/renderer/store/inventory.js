@@ -17,7 +17,7 @@ const createStore = defineStore('inventory', {
             search: {
                 ...initSearch
             },
-
+            inventories: []
         }
     },
     getters: {
@@ -36,7 +36,18 @@ const createStore = defineStore('inventory', {
                     return false
                 })
         },
-       
+        async list(params = {}) {
+            store.setLoading(true)
+            return await api.get(`/inventory/list`, { params: params })
+                .then((res) => {
+                    store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
 
         // mutation
         setSearch() {
