@@ -146,27 +146,16 @@ const ProductController = {
     
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
-            const data = xlsx.utils.sheet_to_json(worksheet);
+            let data = xlsx.utils.sheet_to_json(worksheet);
 
-            const schema = Joi.object({
-                ProductCode: Joi.string().required().min(1).max(200),
-                ProductName: Joi.string().required().min(1).max(200),
-                LargeUnit: Joi.string().required().max(50),
-                SmallUnit: Joi.string().allow(null, ''),
-                ConversionRate: Joi.when('SmallUnit', {
-                    is: Joi.string(),
-                    then: Joi.number().min(1).required(),
-                    otherwise: Joi.number().allow(null).min(1),
-                }),
-                Expire: Joi.number().required().min(0),
-            }).unknown();
-
-            data.forEach((product, index) => {
-                let validation = schema.validate(product);
-                if (validation.error) {
-                    throw new Error(`[${index+1}] ${validation.error.details[0].message}`);
+            data = data.map(item => {
+                return {
+                    ProductCode: item.ProductCode,
+                    ProductName: item.ProductName,
+                    Expire: item.Expire,
+                    ConversionRate: item.ConversionRate,
                 }
-            });
+            })
 
             return res.json(success(data));
         } catch (err) {

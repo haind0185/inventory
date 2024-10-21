@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { initPinia } from '@/store/setup'
 import api from '@/api'
 import { store } from '.'
+import { UNIT } from '@/constant';
 
 const initSearch = {
     ProductCode: null,
@@ -11,13 +12,26 @@ const initSearch = {
     page: 1
 }
 
+const productInit = {
+    ProductCode: null,
+    ProductName: null,
+    Expire: 1,
+    LargeUnit: UNIT[0],
+    SmallUnit: UNIT[1],
+    ConversionRate: 1,
+}
+
 const createStore = defineStore('product', {
     state: () => {
         return {
             search: {
                 ...initSearch
             },
-
+            products: [
+            ],
+            init: {
+                ...productInit
+            }
         }
     },
     getters: {
@@ -81,6 +95,23 @@ const createStore = defineStore('product', {
         resetSearch() {
             this.search = {...this.search, ...initSearch}
         },
+        add() {
+            this.products.push({...productInit})
+        },
+        delete(index) {
+            this.products = this.products.filter((item, i) => i != index)
+        },
+        reset() {
+            this.products = []
+        },
+        setProduct(product) {
+            this.products.push(product)
+        },
+        // getProduct(ProductCode) {
+        //     return this.products.find(item => {
+        //         return item.ProductCode == ProductCode
+        //     })
+        // }
     },
 })
 

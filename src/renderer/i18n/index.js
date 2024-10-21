@@ -9,7 +9,7 @@ const messages = {
                 LargeUnit: "Đơn vị 1",
                 SmallUnit: "Đơn vị 2",
                 ConversionRate: "Quy cách",
-                Expire: "Số ngày hết hạn",
+                Expire: "HSD (Ngày)",
             },
             entry: {
                 EntryCode: "Mã nhập hàng",

@@ -13,7 +13,7 @@
                     </fieldset>
                     <fieldset class="w-[20%] form-input required">
                         <legend>{{ $t("attr.product.Expire") }}</legend>
-                        <input type="number" class="w-full text-center form-control" required v-model="payload.Expire">
+                        <input type="number" class="w-full text-center form-control" required v-model="payload.Expire" min="0">
                     </fieldset>
                 </div>
                 <div class="flex gap-3">
@@ -31,7 +31,7 @@
                             <select2 class="form-control" :options="optionsList" v-model="payload.SmallUnit" :clearable="true"></select2>
                         </fieldset>
                         <fieldset class="w-1/2 form-input" :class="{'required': payload.SmallUnit}">
-                            <legend>{{ $t("attr.product.ConversionRate") }} <span class="text-xs text-gray-300">(Đv2 x Quycách = Đv1)</span></legend>
+                            <legend>{{ $t("attr.product.ConversionRate") }} <span class="text-xs text-gray-300">(Đv1 x QC = Đv1)</span></legend>
                             <input type="number" class="w-full text-center form-control" min="0" :required="payload.SmallUnit" :disabled="!payload.SmallUnit" v-model="payload.ConversionRate">
                         </fieldset>
                     </div>
@@ -60,10 +60,10 @@ const title = t("modal.add_product")
 const payload = ref({
     ProductCode: null,
     ProductName: null,
+    Expire: null,
     LargeUnit: UNIT[0],
     SmallUnit: null,
     ConversionRate: null,
-    Expire: null,
 })
 const confirm = ref(null)
 const reload = ref(false)
