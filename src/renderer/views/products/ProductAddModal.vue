@@ -5,7 +5,8 @@
                 <div class="flex gap-3">
                     <fieldset class="w-[20%] form-input required">
                         <legend>{{ $t("attr.product.ProductCode") }}</legend>
-                        <input type="text" class="w-full text-center form-control" required v-model="payload.ProductCode">
+                        <input type="text" class="w-full text-center form-control" required
+                            v-model="payload.ProductCode">
                     </fieldset>
                     <fieldset class="w-[60%] form-input required">
                         <legend>{{ $t("attr.product.ProductName") }}</legend>
@@ -13,26 +14,33 @@
                     </fieldset>
                     <fieldset class="w-[20%] form-input required">
                         <legend>{{ $t("attr.product.Expire") }}</legend>
-                        <input type="number" class="w-full text-center form-control" required v-model="payload.Expire" min="0">
+                        <input type="number" class="w-full text-center form-control" required v-model="payload.Expire"
+                            min="0">
                     </fieldset>
                 </div>
                 <div class="flex gap-3">
                     <fieldset class="w-1/3 form-input required">
                         <legend>{{ $t("attr.product.LargeUnit") }}</legend>
                         <select2 class="form-control" required :options="optionsList" v-model="payload.LargeUnit">
-                            <template #search="{attributes, events}">
-                                <input class="vs__search" :required="payload.LargeUnit == null || payload.LargeUnit == ''" v-bind="attributes" v-on="events" />
+                            <template #search="{ attributes, events }">
+                                <input class="vs__search"
+                                    :required="payload.LargeUnit == null || payload.LargeUnit == ''" v-bind="attributes"
+                                    v-on="events" />
                             </template>
                         </select2>
                     </fieldset>
                     <div class="flex w-2/3 gap-3">
                         <fieldset class="w-1/2 form-input">
                             <legend>{{ $t("attr.product.SmallUnit") }}</legend>
-                            <select2 class="form-control" :options="optionsList" v-model="payload.SmallUnit" :clearable="true"></select2>
+                            <select2 class="form-control" :options="optionsList" v-model="payload.SmallUnit"
+                                :clearable="true"></select2>
                         </fieldset>
-                        <fieldset class="w-1/2 form-input" :class="{'required': payload.SmallUnit}">
-                            <legend>{{ $t("attr.product.ConversionRate") }} <span class="text-xs text-gray-300">(Đv1 x QC = Đv1)</span></legend>
-                            <input type="number" class="w-full text-center form-control" min="0" :required="payload.SmallUnit" :disabled="!payload.SmallUnit" v-model="payload.ConversionRate">
+                        <fieldset class="w-1/2 form-input" :class="{ 'required': payload.SmallUnit }">
+                            <legend>{{ $t("attr.product.ConversionRate") }} <span class="text-xs text-gray-300">(Đv1 x
+                                    QC = Đv1)</span>
+                            </legend>
+                            <input type="number" class="w-full text-center form-control" :required="payload.SmallUnit"
+                                :disabled="!payload.SmallUnit" v-model="payload.ConversionRate" min="1">
                         </fieldset>
                     </div>
                 </div>
@@ -75,13 +83,13 @@ const onClose = () => {
 
 const onSave = async () => {
     const res = await productStore.store(payload.value).then((res) => {
-        if(res && res.code == 200) {
+        if (res && res.code == 200) {
             reload.value = true
             return true
         }
         return false
     })
-    if(res) {
+    if (res) {
         await confirm.value.show({
             title: t("title.notify"),
             message: t("msg.save_ok"),

@@ -45,6 +45,7 @@ const messages = {
                 code_exists: "Mã sản phẩm đã tồn tại",
                 code_not_exists: "Mã sản phẩm không tồn tại",
                 not_have_conversion_rate: "Mã sản phẩm không có đơn vị 2",
+                no_product: "Không thấy sản phẩm nào",
             },
             entry: {
                 code_exists: "Mã nhập kho đã tồn tại",

@@ -124,6 +124,20 @@ const functions = {
             return false
         }
         return true
+    },
+    findDuplicates: (array, key) => {
+        const seen = new Set();
+        const duplicates = [];
+
+        for (const item of array) {
+            if (seen.has(item[key])) {
+            duplicates.push(item);
+            } else {
+            seen.add(item[key]);
+            }
+        }
+
+        return duplicates;
     }
 }
 

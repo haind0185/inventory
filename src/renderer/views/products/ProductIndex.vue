@@ -46,20 +46,24 @@
                         <th class="w-[45%]">
                             <th-sort @sort="sort()" :search="search" :field="'ProductName'">{{ $t("attr.product.ProductName") }}</th-sort>
                         </th>
+                        <th>
+                            <th-sort @sort="sort()" :search="search" :field="'Expire'">{{ $t("attr.product.Expire") }}</th-sort>
+                        </th>
                         <th>{{ $t("attr.product.LargeUnit") }}</th>
                         <th>{{ $t("attr.product.SmallUnit") }}</th>
-                        <th>{{ $t("attr.product.ConversionRate") }}</th>
-                        <th>{{ $t("attr.product.Expire") }}</th>
+                        <th>
+                            <th-sort @sort="sort()" :search="search" :field="'ConversionRate'">{{ $t("attr.product.ConversionRate") }}</th-sort>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="item in products.items">
                         <td class="text-center">{{ item.ProductCode }}</td>
                         <td class="text-left">{{ item.ProductName }}</td>
+                        <td class="text-center">{{ item.Expire }}</td>
                         <td class="text-center">{{ item.LargeUnit }}</td>
                         <td class="text-center">{{ item.SmallUnit }}</td>
                         <td class="text-center">{{ item.ConversionRate }}</td>
-                        <td class="text-center">{{ item.Expire }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -125,7 +129,7 @@ const onSaveImport = (event) => {
 const clear = async () => {
     productStore.resetSearch()
     await index()
-    console.log(search.value)
+    // console.log(search.value)
 }
 
 const index = async () => {

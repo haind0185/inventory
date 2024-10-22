@@ -1,6 +1,7 @@
 import Product from '../models/Product';
 import { error, success } from './common/http';
 import { t } from '../../src/renderer/i18n'
+import { helper } from '../../src/renderer/helper'
 import sequelize from '../models/index';
 const xlsx = require('xlsx');
 const path = require('path');
@@ -29,7 +30,7 @@ const ProductController = {
             /**
              * order
              */
-            const order_list = ['ProductCode', 'ProductName']
+            const order_list = ['ProductCode', 'ProductName', 'Expire', 'ConversionRate']
             let order = []
             if (order_list.includes(req.query.sort)) {
                 let sort_by = req.query.sort_by == 'desc' ? 'desc' : 'asc'
@@ -86,6 +87,7 @@ const ProductController = {
             const schema = Joi.object({
                 ProductCode: Joi.string().required().min(1).max(200),
                 ProductName: Joi.string().required().min(1).max(200),
+                Expire: Joi.number().required().min(0),
                 LargeUnit: Joi.string().required().max(50),
                 SmallUnit: Joi.string().allow(null, ''),
                 ConversionRate: Joi.when('SmallUnit', {
@@ -93,7 +95,6 @@ const ProductController = {
                     then: Joi.number().min(1).required(),
                     otherwise: Joi.number().allow(null).min(1),
                 }),
-                Expire: Joi.number().required().min(0),
             }).unknown();
 
             const validation = schema.validate(req.body);
@@ -158,6 +159,82 @@ const ProductController = {
             })
 
             return res.json(success(data));
+        } catch (err) {
+            await transaction.rollback();
+            return res.json(error(err.message, 501));
+        }
+    },
+
+    bulkCreate: async (req, res) => {
+        const transaction = await sequelize.transaction();
+        try {
+            // console.log(req.body)
+            const { products } = req.body;
+
+            /**
+             * validation
+             */
+            const schema = Joi.object({
+                ProductCode: Joi.string().required().min(1).max(200),
+                ProductName: Joi.string().required().min(1).max(200),
+                Expire: Joi.number().required().min(0),
+                LargeUnit: Joi.string().required().max(50),
+                SmallUnit: Joi.string().allow(null, ''),
+                ConversionRate: Joi.when('SmallUnit', {
+                    is: Joi.string(),
+                    then: Joi.number().min(1).required(),
+                    otherwise: Joi.number().allow(null).min(1),
+                }),
+            }).unknown();
+
+            if(products.length <= 0) {
+                throw new Error(t('ctr.product.no_product'));
+            }
+
+            const duplicateItems = helper.findDuplicates(products, 'ProductCode');
+            if(duplicateItems.length > 0) {
+                throw new Error(`${duplicateItems[0].ProductCode} bị trùng lặp.`);
+            }
+
+            let ProductModels = []
+            products.forEach(async (product, index) => {
+                let validation = schema.validate(product);
+                if (validation.error) {
+                    throw new Error(`[${index+1}] ${validation.error.details[0].message}`);
+                }
+
+                ProductModels.push({
+                    ProductCode: product.ProductCode,
+                    ProductName: product.ProductName,
+                    Expire: product.Expire,
+                    LargeUnit: product.LargeUnit,
+                    SmallUnit: product.SmallUnit,
+                    ConversionRate: product.ConversionRate,
+                })
+            });
+            
+            let exists_products = await Product.findAll({
+                where: {
+                    ProductCode: {
+                        [Op.in]: products.map(item => {
+                            return item.ProductCode
+                        })
+                    }
+                }
+            }, {transaction: transaction})
+
+            if(exists_products.length > 0) {
+                throw new Error(`[${exists_products[0].ProductCode}] ` + t('ctr.product.code_exists'));
+            }
+
+
+            /**
+             * call create action
+             */
+            await Product.bulkCreate( ProductModels, { transaction: transaction });
+
+            await transaction.commit();
+            return res.json(success());
         } catch (err) {
             await transaction.rollback();
             return res.json(error(err.message, 501));

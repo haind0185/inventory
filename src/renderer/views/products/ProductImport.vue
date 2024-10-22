@@ -61,7 +61,7 @@
                                 <select2 class="form-control" :options="optionsList" v-model="product.SmallUnit" :clearable="true" :option:selected="changeSmallUnit(product)"></select2>
                             </fieldset>
                             <fieldset class="w-[10%] form-input" :class="{'required': product.SmallUnit}">
-                                <input type="number" class="w-full text-center form-control" min="0" :required="product.SmallUnit" :disabled="!product.SmallUnit" v-model="product.ConversionRate">
+                                <input type="number" class="w-full text-center form-control" min="1" :required="product.SmallUnit" :disabled="!product.SmallUnit" v-model="product.ConversionRate">
                             </fieldset>
                         </div>
                     </template>
@@ -82,7 +82,6 @@ import { onMounted, ref, watch, computed } from 'vue'
 import { t } from '@/i18n'
 import { productStore } from '@/store/product';
 import { UNIT } from '@/constant';
-import { data } from 'autoprefixer';
 
 const props = defineProps(['show'])
 const emit = defineEmits(['close', 'save'])
@@ -153,7 +152,23 @@ const onFileChange = async (e) => {
 }
 
 const onSave = async () => {
-    console.log(products.value)
+    // console.log(products.value)
+    const res = await productStore.bulkCreate({products: products.value}).then((res) => {
+        if (res && res.code == 200) {
+            reload.value = true
+            return true
+        }
+        return false
+    })
+    if (res) {
+        await confirm.value.show({
+            title: t("title.notify"),
+            message: t("msg.save_ok"),
+            cancelButton: t("button.back"),
+            type: 1
+        })
+        emit('save', reload.value)
+    }
 }
 
 </script>

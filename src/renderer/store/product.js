@@ -15,7 +15,7 @@ const initSearch = {
 const productInit = {
     ProductCode: null,
     ProductName: null,
-    Expire: 1,
+    Expire: 0,
     LargeUnit: UNIT[0],
     SmallUnit: UNIT[1],
     ConversionRate: 1,
@@ -65,6 +65,18 @@ const createStore = defineStore('product', {
         async import(payload) {
             store.setLoading(true)
             return await api.post(`/products/import`, payload)
+                .then((res) => {
+                    store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
+        async bulkCreate(payload) {
+            store.setLoading(true)
+            return await api.post(`/products/bulkCreate`, payload)
                 .then((res) => {
                     store.setLoading(false)
                     return res.data

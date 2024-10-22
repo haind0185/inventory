@@ -11,7 +11,10 @@ router.post('/', ProductController.store);
 
 router.post('/import', upload.single('file'), ProductController.import);
 
+router.post('/bulkCreate', ProductController.bulkCreate);
+
 router.get('/list', ProductController.list);
+
 
 const ProductRouter = router;
 
