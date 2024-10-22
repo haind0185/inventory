@@ -294,6 +294,7 @@ table.t-border tbody tr.selected {
 .vs__dropdown-menu {
     width: calc(100% + 2px);
     left: -1px;
+    max-height: 12rem;
 }
 
 .vs__dropdown-menu li {
@@ -313,4 +314,9 @@ input::-webkit-inner-spin-button {
 .close-item {
     font-size: 14px;
     cursor: pointer;
+}
+
+.a-detail {
+    text-decoration: underline;
+    color: var(--theme-color)
 }

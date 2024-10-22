@@ -62,6 +62,18 @@ const createStore = defineStore('product', {
                     return false
                 })
         },
+        async update(payload) {
+            store.setLoading(true)
+            return await api.put(`/products`, payload)
+                .then((res) => {
+                    store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
         async import(payload) {
             store.setLoading(true)
             return await api.post(`/products/import`, payload)
@@ -77,6 +89,18 @@ const createStore = defineStore('product', {
         async bulkCreate(payload) {
             store.setLoading(true)
             return await api.post(`/products/bulkCreate`, payload)
+                .then((res) => {
+                    store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
+        async show(params) {
+            store.setLoading(true)
+            return await api.get(`/products/show`, { params: params })
                 .then((res) => {
                     store.setLoading(false)
                     return res.data

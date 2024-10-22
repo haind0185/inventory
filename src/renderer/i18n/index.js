@@ -74,6 +74,7 @@ const messages = {
             add_product: "Thêm mặt hàng",
             add_entry: "Nhập kho",
             add_exit: "Xuất kho",
+            detail_product: "Chi tiết mặt hàng",
         },
         title: {
             notify: "Thông báo",

@@ -3,6 +3,7 @@ import { error, success } from './common/http';
 import { t } from '../../src/renderer/i18n'
 import { helper } from '../../src/renderer/helper'
 import sequelize from '../models/index';
+import Inventory from '../models/Inventory';
 const xlsx = require('xlsx');
 const path = require('path');
 const { Op } = require("sequelize");
@@ -235,6 +236,107 @@ const ProductController = {
 
             await transaction.commit();
             return res.json(success());
+        } catch (err) {
+            await transaction.rollback();
+            return res.json(error(err.message, 501));
+        }
+    },
+
+    show: async (req, res) => {
+        try {
+            console.log(req.query)
+
+            if (!req.query.ProductCode) {
+                throw new Error(`Thiếu ProductCode.`);
+            }
+
+            const product = await Product.findOne({
+                where: {
+                    'ProductCode': req.query.ProductCode
+                },
+                include: { association: 'inventories' }
+            })
+
+            if(!product) {
+                throw new Error(t('ctr.product.code_exists'));
+            }
+
+            return res.json(success(product));
+        } catch (err) {
+            return res.json(error(err.message, 501));
+        }
+    },
+
+    update: async (req, res) => {
+        const transaction = await sequelize.transaction();
+        try {
+            console.log(req.body)
+            const { ProductCode, ProductName, LargeUnit, SmallUnit, ConversionRate, Expire } = req.body;
+
+            /**
+             * validation
+             */
+            const schema = Joi.object({
+                ProductCode: Joi.string().required().min(1).max(200),
+                ProductName: Joi.string().required().min(1).max(200),
+                Expire: Joi.number().required().min(0),
+                LargeUnit: Joi.string().required().max(50),
+                SmallUnit: Joi.string().allow(null, ''),
+                ConversionRate: Joi.when('SmallUnit', {
+                    is: Joi.string(),
+                    then: Joi.number().min(1).required(),
+                    otherwise: Joi.number().allow(null).min(1),
+                }),
+            }).unknown();
+
+            const validation = schema.validate(req.body);
+
+            if (validation.error) {
+                throw new Error(validation.error.details[0].message)
+            }
+
+            /**
+             * check exists code
+             */
+            const existsProduct = await Product.findOne({
+                where: {
+                    ProductCode: ProductCode
+                },
+            }, { transaction: transaction })
+            if (!existsProduct) {
+                throw new Error(t('ctr.product.code_not_exists'))
+            }
+
+            const inventory = await Inventory.findOne({
+                where: {
+                    ProductCode: ProductCode
+                }
+            }, { transaction: transaction })
+
+            if(inventory) {
+                if(existsProduct.ConversionRate != ConversionRate) {
+                    throw new Error(`Không thể thay đổi Quy Cách vì mặt hàng này đã nhập kho rồi`)
+                }
+
+                if(existsProduct.ConversionRate && !SmallUnit) {
+                    throw new Error(`Vui lòng nhập đơn vị 2 vì đã có Quy Cách`)
+                }
+            }
+
+            /**
+             * call create action
+             */
+
+            existsProduct.ProductName = ProductName
+            existsProduct.Expire = Expire
+            existsProduct.LargeUnit = LargeUnit
+            existsProduct.SmallUnit = SmallUnit
+            existsProduct.ConversionRate = SmallUnit ? ConversionRate : null
+            
+            await existsProduct.save({ transaction: transaction })
+
+            await transaction.commit();
+            return res.json(success(existsProduct));
         } catch (err) {
             await transaction.rollback();
             return res.json(error(err.message, 501));

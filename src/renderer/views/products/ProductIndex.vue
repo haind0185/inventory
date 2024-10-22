@@ -54,6 +54,9 @@
                         <th>
                             <th-sort @sort="sort()" :search="search" :field="'ConversionRate'">{{ $t("attr.product.ConversionRate") }}</th-sort>
                         </th>
+                        <th>
+                            Chi tiết
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -64,6 +67,9 @@
                         <td class="text-center">{{ item.LargeUnit }}</td>
                         <td class="text-center">{{ item.SmallUnit }}</td>
                         <td class="text-center">{{ item.ConversionRate }}</td>
+                        <td class="text-center">
+                            <a href="javascript:void(0)" class="a-detail" @click="onShowDetail(item.ProductCode)">🃪</a>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -80,6 +86,13 @@
             :show="showImport"
             @close="onCloseImport($event)"
             @save="onSaveImport($event)" />
+
+        <ProductDetail
+            v-if="showDetail"
+            :show="showDetail"
+            :data="detail"
+            @close="onCloseDetail($event)"
+            @save="onSaveDetail($event)" />
     </div>
 </template>
 
@@ -88,11 +101,14 @@ import { onMounted, onBeforeMount, computed, watch, ref } from 'vue'
 import { productStore } from '@/store/product';
 import ProductAddModal from './ProductAddModal.vue'
 import ProductImport from './ProductImport.vue'
+import ProductDetail from './ProductDetail.vue'
 
 const showAdd = ref(false)
 const showImport = ref(false)
+const showDetail = ref(false)
 const search = computed(() => productStore.search)
 const products = ref({})
+const detail = ref({})
 
 const onShowAdd = () => {
     showAdd.value = true
@@ -150,6 +166,27 @@ const sort = async () => {
 const pagination = (page) => {
     search.value.page = page
     index()
+}
+
+const onShowDetail = async (ProductCode) => {
+    await productStore.show({ProductCode: ProductCode}).then((res) => {
+        if(res && res.code == 200) {
+            detail.value = res.data
+            showDetail.value = true
+        }
+    })
+}
+const onCloseDetail = (event) => {
+    showDetail.value = false
+    if(event) {
+        index()
+    }
+}
+const onSaveDetail = (event) => {
+    showDetail.value = false
+    if(event) {
+        index()
+    }
 }
 
 onMounted(async () => {

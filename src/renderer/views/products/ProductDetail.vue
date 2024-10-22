@@ -6,7 +6,7 @@
                     <fieldset class="w-[20%] form-input required">
                         <legend>{{ $t("attr.product.ProductCode") }}</legend>
                         <input type="text" class="w-full text-center form-control" required
-                            v-model="payload.ProductCode">
+                            v-model="payload.ProductCode" disabled>
                     </fieldset>
                     <fieldset class="w-[60%] form-input required">
                         <legend>{{ $t("attr.product.ProductName") }}</legend>
@@ -40,7 +40,7 @@
                                     QC = Đv2)</span>
                             </legend>
                             <input type="number" class="w-full text-center form-control" :required="payload.SmallUnit"
-                                :disabled="!payload.SmallUnit" v-model="payload.ConversionRate" min="1">
+                                :disabled="!payload.SmallUnit || disable" v-model="payload.ConversionRate" min="1">
                         </fieldset>
                     </div>
                 </div>
@@ -61,9 +61,10 @@ import { t } from '@/i18n'
 import { productStore } from '@/store/product';
 import { UNIT } from '@/constant';
 
-const props = defineProps(['show'])
+const { show, data } = defineProps(['show', 'data'])
 const emit = defineEmits(['close', 'save'])
-const title = t("modal.add_product")
+const title = t("modal.detail_product")
+const disable = ref(false)
 
 const payload = ref({
     ProductCode: null,
@@ -82,7 +83,7 @@ const onClose = () => {
 }
 
 const onSave = async () => {
-    const res = await productStore.store(payload.value).then((res) => {
+    const res = await productStore.update(payload.value).then((res) => {
         if (res && res.code == 200) {
             reload.value = true
             return true
@@ -104,10 +105,17 @@ const onSave = async () => {
 watch(
     payload,
     async () => {
-        if (!payload.value.SmallUnit) {
+        if (!payload.value.SmallUnit && !disable.value) {
             payload.value.ConversionRate = null
         }
     },
     { deep: true }
 )
+
+onMounted(async () => {
+    payload.value = data
+    if(data.inventories && data.inventories.length > 0) {
+        disable.value = true
+    }
+})
 </script>

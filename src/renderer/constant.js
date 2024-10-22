@@ -4,4 +4,8 @@ export const UNIT = [
     'túi',
     'vỉ',
     'lốc',
+    'lon',
+    'chiếc',
+    'cái',
+    'Huyền',
 ]
