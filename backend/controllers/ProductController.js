@@ -144,6 +144,7 @@ const ProductController = {
             }
     
             const filePath = path.join(__dirname, '../../' + req.file.path);
+            // const filePath = path.join(__dirname, '../../../../' + req.file.path);
             const workbook = xlsx.readFile(filePath);
     
             const sheetName = workbook.SheetNames[0];

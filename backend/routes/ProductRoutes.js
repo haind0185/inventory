@@ -3,7 +3,7 @@ const express = require('express');
 const multer = require('multer');
 const router = express.Router();
 
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ dest: 'resources/app/uploads/' });
 
 router.get('/', ProductController.index);
 
