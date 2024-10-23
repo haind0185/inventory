@@ -135,7 +135,7 @@ const setProducts = (data) => {
         }
         productStore.setProduct(product)
     }
-    console.log(products)
+    // console.log(products)
 }
 
 const onFileChange = async (e) => {

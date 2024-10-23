@@ -143,8 +143,7 @@ const ProductController = {
                 throw new Error("Không tìm thấy file");
             }
     
-            const filePath = path.join(__dirname, '../../' + req.file.path);
-            // const filePath = path.join(__dirname, '../../../../' + req.file.path);
+            const filePath = req.file.path;
             const workbook = xlsx.readFile(filePath);
     
             const sheetName = workbook.SheetNames[0];
