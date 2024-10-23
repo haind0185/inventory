@@ -39,7 +39,7 @@
             <table class="view-scroll t-border">
                 <thead>
                     <tr>
-                        <th class="w-[9rem]">
+                        <th class="w-[6rem]">
                             <th-sort @sort="sort()" :search="search" :field="'ProductCode'">{{ $t("attr.inventory.ProductCode") }}</th-sort>
                         </th>
                         <th class="">
@@ -54,10 +54,10 @@
                         <th class="w-[9rem]">
                             <th-sort @sort="sort()" :search="search" :field="'SmallUnitQty'">{{ $t("attr.inventory.SmallUnitQty") }}</th-sort>
                         </th>
-                        <th class="w-[9rem]">
+                        <th class="w-[8rem]">
                             <th-sort @sort="sort()" :search="search" :field="'ExpireCount'">{{ $t("attr.inventory.ExpireCount") }}</th-sort>
                         </th>
-                        <th class="w-[12rem]">
+                        <th class="w-[11rem]">
                             <th-sort @sort="sort()" :search="search" :field="'ExpirePercent'">{{ $t("attr.inventory.ExpirePercent") }}</th-sort>
                         </th>
                     </tr>

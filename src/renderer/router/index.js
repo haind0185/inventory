@@ -20,6 +20,11 @@ const routes = [
                 component: () => import("@/views/inventory/InventoryIndex.vue"),
             },
             {
+                path: '/inventory-total',
+                name: 'InventoryTotal',
+                component: () => import("@/views/inventory/InventoryTotal.vue"),
+            },
+            {
                 path: '/products',
                 name: 'Products',
                 component: () => import("@/views/products/ProductIndex.vue"),

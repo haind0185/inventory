@@ -21,7 +21,7 @@ body {
     min-height: 100vh;
     height: 100%;
     display: grid;
-    grid-template-columns: 15rem 1fr;
+    grid-template-columns: 12rem 1fr;
 }
 
 .menu {
@@ -59,11 +59,11 @@ ul.menus {
     border-radius: 0.2rem;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
     outline: none;
 }
 
-ul li {
+ul li.item {
     list-style: none;
     cursor: pointer;
     height: 2rem;
@@ -76,19 +76,19 @@ ul li {
     outline: none;
 }
 
-ul li:last-child {
+ul li.item:last-child {
     border-bottom: none;
 }
 
-ul li:hover {
+ul li.item:hover {
     background: #181c2e;
 }
 
-ul li:active {
+ul li.item:active {
     background: #a6c2e9;
 }
 
-ul li[active="true"] {
+ul li.item[active="true"] {
     background: #408dfb;
 }
 
@@ -103,6 +103,33 @@ ul li[active="true"] {
     height: 100%;
     padding: 0.3rem 0.5rem;
     outline: none;
+}
+
+.item-parent {
+    position: relative;
+    cursor: pointer;
+}
+
+.item-parent::after {
+    content: '\22BF';
+    transform: rotate(45deg);
+    padding: 2px;
+    position: absolute;
+    right: 0px;
+    top: -3px;
+}
+
+.item-parent.active {
+    background: #344272;
+    padding-bottom: 5px;
+    border-radius: 4px;
+    height: auto;
+}
+
+.item-parent.active::after {
+    transform: rotate(225deg);
+    top: 6px;
+    right: 5px;
 }
 
 .wrapper-scroll {

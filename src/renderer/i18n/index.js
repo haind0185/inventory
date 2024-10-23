@@ -31,10 +31,10 @@ const messages = {
                 SmallUnitQty: "S.Lượng(đv2)",
             },
             inventory: {
-                ProductCode: "Mã mặt hàng",
+                ProductCode: "Mã MH",
                 ProductName: "Tên mặt hàng",
                 ExpiryDate: "Hạn sử dụng",
-                ExpireCount: "Số ngày HSD",
+                ExpireCount: "HSD(ngày)",
                 ExpirePercent: "Phần trăm HSD",
                 LargeUnitQty: "S.Lượng(đv1)",
                 SmallUnitQty: "S.Lượng(đv2)",
