@@ -80,7 +80,8 @@ const createStore = defineStore('exit', {
             this.exits = this.exits.filter((item, i) => i != index)
         },
         reset() {
-            this.exits = [{...exitInit}]
+            this.exits = []
+            // this.exits = [{...exitInit}]
             this.payload = {...payloadInit}
         },
         setInventories(data) {

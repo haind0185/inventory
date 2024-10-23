@@ -39,14 +39,14 @@
             <table class="view-scroll t-border">
                 <thead>
                     <tr>
-                        <th>
+                        <th class="w-[11rem]">
                             <th-sort @sort="sort()" :search="search" :field="'ExitDate'">{{ $t("attr.exit.ExitCode") }}<br>{{  $t("attr.exit.ExitDate") }}</th-sort>
                         </th>
                         <th>
                             <th-sort @sort="sort()" :search="search" :field="'ProductCode'">{{ $t("attr.exit.ProductNameLabel") }}</th-sort>
                         </th>
-                        <th>{{ $t("attr.exit.LargeUnitQty") }}</th>
-                        <th>{{ $t("attr.exit.SmallUnitQty") }}</th>
+                        <th class="w-[7rem]">{{ $t("attr.exit.LargeUnitQty") }}</th>
+                        <th class="w-[7rem]">{{ $t("attr.exit.SmallUnitQty") }}</th>
                     </tr>
                 </thead>
                 <tbody>

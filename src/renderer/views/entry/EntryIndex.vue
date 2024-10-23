@@ -39,15 +39,15 @@
             <table class="view-scroll t-border">
                 <thead>
                     <tr>
-                        <th>
+                        <th class="w-[11rem]">
                             <th-sort @sort="sort()" :search="search" :field="'EntryDate'">{{ $t("attr.entry.EntryCode") }}<br>{{  $t("attr.entry.EntryDate") }}</th-sort>
                         </th>
                         <th>
                             <th-sort @sort="sort()" :search="search" :field="'ProductCode'">{{ $t("attr.entry.ProductNameLabel") }}</th-sort>
                         </th>
-                        <th>{{ $t("attr.entry.ExpiryDate") }}</th>
-                        <th>{{ $t("attr.entry.LargeUnitQty") }}</th>
-                        <th>{{ $t("attr.entry.SmallUnitQty") }}</th>
+                        <th class="w-[7rem]">{{ $t("attr.entry.ExpiryDate") }}</th>
+                        <th class="w-[7rem]">{{ $t("attr.entry.LargeUnitQty") }}</th>
+                        <th class="w-[7rem]">{{ $t("attr.entry.SmallUnitQty") }}</th>
                     </tr>
                 </thead>
                 <tbody>

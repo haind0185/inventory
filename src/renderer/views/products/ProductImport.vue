@@ -3,18 +3,24 @@
         <form class="flex flex-col justify-between gap-3 p-2" @submit.prevent="onSave()" style="height: 40rem;" >
             <div class="flex justify-between p-2">
                 <div>
-                    <button type="button" class="btn green" @click="addItem()">{{ t('button.add_item') }}</button>
                 </div>
-                <div>{{ products.length ? products.length : '' }}</div>
-                <div class="flex justify-end">
+                <div class="flex justify-end gap-3">
+                    <button type="button" class="btn green w-[6rem]" @click="addItem()">{{ $t('button.add_item') }}</button>
+                    <!-- <button type="button" class="btn green w-[3rem]" @click="addItem()">{{ '&#43;' }}</button> -->
                     <input id="file" ref="file" type="file" @change="onFileChange($event)" class="hidden">
-                    <button type="button" class="btn silver" @click="openFile()">{{ $t('button.import') }}</button>
+                    <button type="button" class="btn silver w-[6rem]" @click="openFile()">{{ $t('button.import') }}</button>
+                    <button type="button" class="btn silver w-[6rem]" @click="reset()">{{ $t('button.reset') }}</button>
                 </div>
             </div>
             <div class="flex-1" style="overflow: auto; border-top: 1px solid gray; border-bottom: 1px solid gray;">
-                <div class="flex-col gap-1 d-flex">
-                    <div class="flex gap-3">
-                        <div class="w-[2rem]">{{ ' ' }}</div>
+                <div class="flex-col gap-1 p-1 d-flex">
+                    <div class="flex gap-1">
+                        <div class="w-[3rem] justify-center items-end flex">
+                            <div class="flex-1"></div>
+                            <span class="w-[2rem] text-end text-sm">
+                                {{ products.length ? products.length : '' }}
+                            </span>
+                        </div>
                         <fieldset class="w-[10%] form-input required">
                             <legend>{{ $t("attr.product.ProductCode") }}</legend>
                         </fieldset>
@@ -37,9 +43,13 @@
                     
                     <template v-for="(product, index) in products">
                         <div class="flex gap-3">
-                            <div class="flex items-center text-sm w-[2rem] gap-2" style="margin-bottom: -3px;">
-                                <span class="close-item" @click="deleteItem(index)" v-if="products.length > 1">✕</span>
-                                {{ index+1  }}
+                            <div class="flex items-center text-sm w-[3rem] gap-1" style="margin-bottom: -3px;">
+                                <div class="flex-1">
+                                    <span class="close-item" @click="deleteItem(index)" v-if="products.length > 1">✕</span>
+                                </div>
+                                <span class="w-[2rem] text-end">
+                                    {{ index+1  }}
+                                </span>
                             </div>
                             <fieldset class="w-[10%] form-input required">
                                 <input type="text" class="w-full text-center form-control" required v-model="product.ProductCode">
@@ -70,7 +80,7 @@
 
             <div class="flex items-center justify-around w-full" style="height: 3rem;">
                 <button type="button" class="btn silver w-[6rem]" @click="onClose()">{{ $t("button.cancel") }}</button>
-                <button type="submit" class="btn w-[6rem]">{{ $t("button.save") }}</button>
+                <button type="submit" class="btn w-[6rem]" :disabled="products.length <= 0">{{ $t("button.save") }}</button>
             </div>
         </form>
     </Modal>
@@ -149,6 +159,10 @@ const onFileChange = async (e) => {
             }
         })
     }
+}
+
+const reset = () => {
+    productStore.reset()
 }
 
 const onSave = async () => {

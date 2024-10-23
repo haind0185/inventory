@@ -81,7 +81,8 @@ const createStore = defineStore('entry', {
             this.entries = this.entries.filter((item, i) => i != index)
         },
         reset() {
-            this.entries = [{...entryInit}]
+            // this.entries = [{...entryInit}]
+            this.entries = []
             this.payload = {...payloadInit}
         },
         setProducts(products) {

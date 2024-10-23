@@ -40,21 +40,21 @@
             <table class="view-scroll t-border">
                 <thead>
                     <tr>
-                        <th>
+                        <th class="w-[9rem]">
                             <th-sort @sort="sort()" :search="search" :field="'ProductCode'">{{ $t("attr.product.ProductCode") }}</th-sort>
                         </th>
-                        <th class="w-[45%]">
+                        <th class="">
                             <th-sort @sort="sort()" :search="search" :field="'ProductName'">{{ $t("attr.product.ProductName") }}</th-sort>
                         </th>
-                        <th>
+                        <th class="w-[9rem]">
                             <th-sort @sort="sort()" :search="search" :field="'Expire'">{{ $t("attr.product.Expire") }}</th-sort>
                         </th>
-                        <th>{{ $t("attr.product.LargeUnit") }}</th>
-                        <th>{{ $t("attr.product.SmallUnit") }}</th>
-                        <th>
+                        <th class="w-[7rem]">{{ $t("attr.product.LargeUnit") }}</th>
+                        <th class="w-[7rem]">{{ $t("attr.product.SmallUnit") }}</th>
+                        <th class="w-[7rem]">
                             <th-sort @sort="sort()" :search="search" :field="'ConversionRate'">{{ $t("attr.product.ConversionRate") }}</th-sort>
                         </th>
-                        <th>
+                        <th class="w-[5rem]">
                             Chi tiết
                         </th>
                     </tr>

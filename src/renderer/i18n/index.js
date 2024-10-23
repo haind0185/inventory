@@ -69,6 +69,7 @@ const messages = {
             confirm: "Xác nhận",
             add_item: "Thêm",
             import: "Thêm file",
+            reset: "Dọn sạch",
         },
         modal: {
             add_product: "Thêm mặt hàng",
