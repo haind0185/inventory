@@ -86,6 +86,8 @@ export const create_exits = {
                 allowNull: true,
             }
         });
+
+        await queryInterface.context.addIndex(table_name, ['ProductCode', 'ExitDate']);
     },
 
     async down(queryInterface) {
