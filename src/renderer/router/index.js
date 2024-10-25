@@ -15,29 +15,77 @@ const routes = [
                 component: () => import("@/views/dashboard/DashboardIndex.vue"),
             },
             {
-                path: '/inventory',
-                name: 'Inventory',
-                component: () => import("@/views/inventory/InventoryIndex.vue"),
-            },
-            {
-                path: '/inventory-total',
-                name: 'InventoryTotal',
-                component: () => import("@/views/inventory/InventoryTotal.vue"),
-            },
-            {
                 path: '/products',
                 name: 'Products',
                 component: () => import("@/views/products/ProductIndex.vue"),
             },
             {
-                path: '/entry',
-                name: 'Entry',
-                component: () => import("@/views/entry/EntryIndex.vue"),
+                path: '/',
+                name: 'Inventories',
+                children: [
+                    {
+                        path: '/inventory',
+                        name: 'Inventory',
+                        component: () => import("@/views/inventory/InventoryIndex.vue"),
+                    },
+                    {
+                        path: '/inventory/total',
+                        name: 'InventoryTotal',
+                        component: () => import("@/views/inventory/InventoryTotal.vue"),
+                    },
+                    {
+                        path: '/inventory/safety-stock',
+                        name: 'InventorySafetyStock',
+                        component: () => import("@/views/inventory/InventorySafetyStock.vue"),
+                    },
+                ]
             },
             {
-                path: '/exit',
-                name: 'Exit',
-                component: () => import("@/views/exit/ExitIndex.vue"),
+                path: '/',
+                name: 'Entries',
+                children: [
+                    {
+                        path: '/entry',
+                        name: 'Entry',
+                        component: () => import("@/views/entry/EntryIndex.vue"),
+                    },
+                    {
+                        path: '/entry/product-expiry',
+                        name: 'EntryProductExpiry',
+                        component: () => import("@/views/entry/EntryProductExpiry.vue"),
+                    },
+                    {
+                        path: '/entry/product',
+                        name: 'EntryProduct',
+                        component: () => import("@/views/entry/EntryProduct.vue"),
+                    },
+                    {
+                        path: '/entry/date',
+                        name: 'EntryDate',
+                        component: () => import("@/views/entry/EntryDate.vue"),
+                    },
+                ]
+            },
+            {
+                path: '/',
+                name: 'Exits',
+                children: [
+                    {
+                        path: '/exit',
+                        name: 'Exit',
+                        component: () => import("@/views/exit/ExitIndex.vue"),
+                    },
+                    {
+                        path: '/exit/product',
+                        name: 'ExitProduct',
+                        component: () => import("@/views/exit/ExitProduct.vue"),
+                    },
+                    {
+                        path: '/exit/date',
+                        name: 'ExitDate',
+                        component: () => import("@/views/exit/ExitDate.vue"),
+                    },
+                ]
             },
             {
                 path: '/errors',

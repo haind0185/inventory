@@ -1,3 +1,3 @@
 <template>
-    total
+    Thông kê kho tổng
 </template>

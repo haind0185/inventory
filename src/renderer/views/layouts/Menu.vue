@@ -41,27 +41,64 @@ const route = useRoute()
 
 const menus = ref([
     {
-        name: 'Inventory',
+        name: 'Inventories',
         label: 'Kho',
         children: [
+            {
+                name: 'InventoryTotal',
+                label: 'Kho Tổng',
+            },
             {
                 name: 'Inventory',
                 label: 'Kho theo HSD',
             },
             {
-                name: 'InventoryTotal',
-                label: 'Kho Tổng',
+                name: 'InventorySafetyStock',
+                label: 'Tồn kho an toàn',
             },
         ],
         open: false
     },
     {
-        name: 'Entry',
-        label: 'Nhập kho'
+        name: 'Entries',
+        label: 'Nhập kho',
+        children: [
+            {
+                name: 'Entry',
+                label: 'NK theo đơn',
+            },
+            {
+                name: 'EntryProduct',
+                label: 'NK theo sản phẩm',
+            },
+            {
+                name: 'EntryProductExpiry',
+                label: 'NK theo HSD',
+            },
+            {
+                name: 'EntryDate',
+                label: 'NK theo ngày',
+            },
+        ],
+        open: false,
     },
     {
-        name: 'Exit',
-        label: 'Xuất kho'
+        name: 'Exits',
+        label: 'Xuất kho',
+        children: [
+            {
+                name: 'Exit',
+                label: 'XK theo đơn',
+            },
+            {
+                name: 'ExitProduct',
+                label: 'XK theo sản phẩm',
+            },
+            {
+                name: 'ExitDate',
+                label: 'XK theo ngày',
+            },
+        ],
     },
     {
         name: 'Products',

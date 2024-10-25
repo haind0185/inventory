@@ -96,7 +96,7 @@ ul li.item[active="true"] {
     display: flex;
     align-items: center;
     text-decoration: none;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 400;
     color: white;
     width: 100%;
@@ -108,6 +108,7 @@ ul li.item[active="true"] {
 .item-parent {
     position: relative;
     cursor: pointer;
+    transition: height 0.3s ease;
 }
 
 .item-parent::after {
