@@ -1,6 +1,5 @@
 import sequelize from './index';
 import Product from './Product';
-import WarehouseEntry from './WarehouseEntry';
 import moment from 'moment';
 const { DataTypes } = require('sequelize');
 
