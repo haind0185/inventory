@@ -6,10 +6,11 @@ const messages = {
             product: {
                 ProductCode: "Mã mặt hàng",
                 ProductName: "Tên mặt hàng",
+                Expire: "HSD (Ngày)",
+                Price: "Đơn giá",
                 LargeUnit: "Đơn vị 1",
                 SmallUnit: "Đơn vị 2",
                 ConversionRate: "Quy cách",
-                Expire: "HSD (Ngày)",
             },
             entry: {
                 EntryCode: "Mã nhập hàng",

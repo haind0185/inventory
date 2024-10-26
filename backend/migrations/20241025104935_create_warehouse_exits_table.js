@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 
-const table_name = 'WarehouseExit'
+const table_name = 'WarehouseExits'
 
 export const create_warehouse_exits = {
     name: '20241025104935_create_warehouse_exits_table',

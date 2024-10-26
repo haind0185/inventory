@@ -37,6 +37,6 @@ const submit = (by) => {
  }
  .sort-icon.active {
     cursor: default;
-    color: white;
+    color: greenyellow;
  }
 </style>

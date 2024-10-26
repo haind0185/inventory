@@ -31,7 +31,7 @@ const ProductController = {
             /**
              * order
              */
-            const order_list = ['ProductCode', 'ProductName', 'Expire', 'ConversionRate']
+            const order_list = ['ProductCode', 'ProductName', 'Expire', 'Price', 'ConversionRate']
             let order = []
             if (order_list.includes(req.query.sort)) {
                 let sort_by = req.query.sort_by == 'desc' ? 'desc' : 'asc'
@@ -64,12 +64,12 @@ const ProductController = {
             let page = parseInt(req.query.page ?? 0)
 
             return res.json(success({
-                items: products,
-                total: total,
-                page: page,
+                items     : products,
+                total     : total,
+                page      : page,
                 page_count: Math.ceil(total / limit),
-                firstItem: products.length ? (((page - 1) * limit) + 1) : 0,
-                lastItem: products.length ? ((page * limit) <= total ? (page * limit) : total) : 0,
+                firstItem : products.length ? (((page - 1) * limit) + 1) : 0,
+                lastItem  : products.length ? ((page * limit) <= total ? (page * limit) : total) : 0,
             }));
         } catch (err) {
             return res.json(error(err.message, 501));
@@ -80,20 +80,21 @@ const ProductController = {
         const transaction = await sequelize.transaction();
         try {
             console.log(req.body)
-            const { ProductCode, ProductName, LargeUnit, SmallUnit, ConversionRate, Expire } = req.body;
+            const { ProductCode, ProductName, Expire, Price, LargeUnit, SmallUnit, ConversionRate } = req.body;
 
             /**
              * validation
              */
             const schema = Joi.object({
-                ProductCode: Joi.string().required().min(1).max(200),
-                ProductName: Joi.string().required().min(1).max(200),
-                Expire: Joi.number().required().min(0),
-                LargeUnit: Joi.string().required().max(50),
-                SmallUnit: Joi.string().allow(null, ''),
+                ProductCode   : Joi.string().required().min(1).max(200),
+                ProductName   : Joi.string().required().min(1).max(200),
+                Expire        : Joi.number().required().min(0),
+                Price         : Joi.number().required().min(0),
+                LargeUnit     : Joi.string().required().max(50),
+                SmallUnit     : Joi.string().allow(null, '').max(50),
                 ConversionRate: Joi.when('SmallUnit', {
-                    is: Joi.string(),
-                    then: Joi.number().min(1).required(),
+                    is       : Joi.string(),
+                    then     : Joi.number().min(1).required(),
                     otherwise: Joi.number().allow(null).min(1),
                 }),
             }).unknown();
@@ -120,12 +121,13 @@ const ProductController = {
              * call create action
              */
             const product = await Product.create({
-                ProductCode: ProductCode,
-                ProductName: ProductName,
-                LargeUnit: LargeUnit,
-                SmallUnit: SmallUnit,
+                ProductCode   : ProductCode,
+                ProductName   : ProductName,
+                Expire        : Expire,
+                Price         : Price,
+                LargeUnit     : LargeUnit,
+                SmallUnit     : SmallUnit,
                 ConversionRate: ConversionRate,
-                Expire: Expire,
             }, { transaction: transaction });
 
             await transaction.commit();
@@ -152,9 +154,10 @@ const ProductController = {
 
             data = data.map(item => {
                 return {
-                    ProductCode: item.ProductCode,
-                    ProductName: item.ProductName,
-                    Expire: item.Expire,
+                    ProductCode   : item.ProductCode,
+                    ProductName   : item.ProductName,
+                    Expire        : item.Expire,
+                    Price         : item.Price,
                     ConversionRate: item.ConversionRate,
                 }
             })
@@ -169,21 +172,21 @@ const ProductController = {
     bulkCreate: async (req, res) => {
         const transaction = await sequelize.transaction();
         try {
-            // console.log(req.body)
             const { products } = req.body;
 
             /**
              * validation
              */
             const schema = Joi.object({
-                ProductCode: Joi.string().required().min(1).max(200),
-                ProductName: Joi.string().required().min(1).max(200),
-                Expire: Joi.number().required().min(0),
-                LargeUnit: Joi.string().required().max(50),
-                SmallUnit: Joi.string().allow(null, ''),
+                ProductCode   : Joi.string().required().min(1).max(200),
+                ProductName   : Joi.string().required().min(1).max(200),
+                Expire        : Joi.number().required().min(0),
+                Price         : Joi.number().required().min(0),
+                LargeUnit     : Joi.string().required().max(50),
+                SmallUnit     : Joi.string().allow(null, '').max(50),
                 ConversionRate: Joi.when('SmallUnit', {
-                    is: Joi.string(),
-                    then: Joi.number().min(1).required(),
+                    is       : Joi.string(),
+                    then     : Joi.number().min(1).required(),
                     otherwise: Joi.number().allow(null).min(1),
                 }),
             }).unknown();
@@ -205,11 +208,12 @@ const ProductController = {
                 }
 
                 ProductModels.push({
-                    ProductCode: product.ProductCode,
-                    ProductName: product.ProductName,
-                    Expire: product.Expire,
-                    LargeUnit: product.LargeUnit,
-                    SmallUnit: product.SmallUnit,
+                    ProductCode   : product.ProductCode,
+                    ProductName   : product.ProductName,
+                    Expire        : product.Expire,
+                    Price         : product.Price,
+                    LargeUnit     : product.LargeUnit,
+                    SmallUnit     : product.SmallUnit,
                     ConversionRate: product.ConversionRate,
                 })
             });
@@ -271,20 +275,21 @@ const ProductController = {
         const transaction = await sequelize.transaction();
         try {
             console.log(req.body)
-            const { ProductCode, ProductName, LargeUnit, SmallUnit, ConversionRate, Expire } = req.body;
+            const { ProductCode, ProductName, Expire, Price, LargeUnit, SmallUnit, ConversionRate } = req.body;
 
             /**
              * validation
              */
             const schema = Joi.object({
-                ProductCode: Joi.string().required().min(1).max(200),
-                ProductName: Joi.string().required().min(1).max(200),
-                Expire: Joi.number().required().min(0),
-                LargeUnit: Joi.string().required().max(50),
-                SmallUnit: Joi.string().allow(null, ''),
+                ProductCode   : Joi.string().required().min(1).max(200),
+                ProductName   : Joi.string().required().min(1).max(200),
+                Expire        : Joi.number().required().min(0),
+                Price         : Joi.number().required().min(0),
+                LargeUnit     : Joi.string().required().max(50),
+                SmallUnit     : Joi.string().allow(null, '').max(50),
                 ConversionRate: Joi.when('SmallUnit', {
-                    is: Joi.string(),
-                    then: Joi.number().min(1).required(),
+                    is       : Joi.string(),
+                    then     : Joi.number().min(1).required(),
                     otherwise: Joi.number().allow(null).min(1),
                 }),
             }).unknown();
@@ -326,11 +331,11 @@ const ProductController = {
             /**
              * call create action
              */
-
-            existsProduct.ProductName = ProductName
-            existsProduct.Expire = Expire
-            existsProduct.LargeUnit = LargeUnit
-            existsProduct.SmallUnit = SmallUnit
+            existsProduct.ProductName    = ProductName
+            existsProduct.Expire         = Expire
+            existsProduct.Price          = Price
+            existsProduct.LargeUnit      = LargeUnit
+            existsProduct.SmallUnit      = SmallUnit
             existsProduct.ConversionRate = SmallUnit ? ConversionRate : null
             
             await existsProduct.save({ transaction: transaction })

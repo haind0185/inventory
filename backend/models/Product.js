@@ -11,6 +11,16 @@ const Product = sequelize.define('Product', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    Expire: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+    },
+    Price: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        defaultValue: 0,
+    },
     LargeUnit: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -22,10 +32,6 @@ const Product = sequelize.define('Product', {
     ConversionRate: {
         type: DataTypes.INTEGER,
         allowNull: true,
-    },
-    Expire: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
     },
 
     // get attribute

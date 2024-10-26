@@ -49,21 +49,25 @@
                         <th class="w-[9rem]">
                             <th-sort @sort="sort()" :search="search" :field="'Expire'">{{ $t("attr.product.Expire") }}</th-sort>
                         </th>
+                        <th class="w-[7rem]">
+                            <th-sort @sort="sort()" :search="search" :field="'Price'">{{ $t("attr.product.Price") }}</th-sort>
+                        </th>
                         <th class="w-[7rem]">{{ $t("attr.product.LargeUnit") }}</th>
                         <th class="w-[7rem]">{{ $t("attr.product.SmallUnit") }}</th>
                         <th class="w-[7rem]">
                             <th-sort @sort="sort()" :search="search" :field="'ConversionRate'">{{ $t("attr.product.ConversionRate") }}</th-sort>
                         </th>
-                        <th class="w-[5rem]">
-                            Chi tiết
+                        <th class="w-[2rem]">
+                            .
                         </th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="item in products.items">
                         <td class="text-center">{{ item.ProductCode }}</td>
-                        <td class="text-left">{{ item.ProductName }}</td>
+                        <td class="text-left" style="font-size: 13px;">{{ item.ProductName }}</td>
                         <td class="text-center">{{ item.Expire }}</td>
+                        <td class="text-center">{{ format_number(item.Price) }}</td>
                         <td class="text-center">{{ item.LargeUnit }}</td>
                         <td class="text-center">{{ item.SmallUnit }}</td>
                         <td class="text-center">{{ item.ConversionRate }}</td>

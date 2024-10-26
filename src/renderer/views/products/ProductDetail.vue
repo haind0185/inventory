@@ -1,25 +1,37 @@
 <template>
-    <Modal :show="show" :title="title" maxWidth="max-w-3xl" @close="onClose()" class="">
+    <Modal :show="show" :title="title" maxWidth="max-w-lg" @close="onClose()" class="">
         <form class="flex flex-col justify-between h-full gap-1 p-2" @submit.prevent="onSave()">
             <div class="flex-col gap-1 d-flex">
+                <!-- ProductCode -->
+                <fieldset class="w-[100%] form-input required">
+                    <legend>{{ $t("attr.product.ProductCode") }}</legend>
+                    <input type="text" class="w-full text-center form-control" required
+                        v-model="payload.ProductCode" disabled>
+                </fieldset>
+
+                <!-- ProductName -->
+                <fieldset class="w-[100%] form-input required">
+                    <legend>{{ $t("attr.product.ProductName") }}</legend>
+                    <input type="text" class="w-full form-control" required v-model="payload.ProductName">
+                </fieldset>
+
+                <!-- Expire, Price -->
                 <div class="flex gap-3">
-                    <fieldset class="w-[20%] form-input required">
-                        <legend>{{ $t("attr.product.ProductCode") }}</legend>
-                        <input type="text" class="w-full text-center form-control" required
-                            v-model="payload.ProductCode" disabled>
-                    </fieldset>
-                    <fieldset class="w-[60%] form-input required">
-                        <legend>{{ $t("attr.product.ProductName") }}</legend>
-                        <input type="text" class="w-full form-control" required v-model="payload.ProductName">
-                    </fieldset>
-                    <fieldset class="w-[20%] form-input required">
+                    <fieldset class="w-[50%] form-input required">
                         <legend>{{ $t("attr.product.Expire") }}</legend>
                         <input type="number" class="w-full text-center form-control" required v-model="payload.Expire"
                             min="0">
                     </fieldset>
+                    <fieldset class="w-[50%] form-input required">
+                        <legend>{{ $t("attr.product.Price") }}</legend>
+                        <input type="number" class="w-full text-right form-control" required v-model="payload.Price"
+                            min="0">
+                    </fieldset>
                 </div>
+
+                <!-- LargeUnit, SmallUnit, ConversionRate -->
                 <div class="flex gap-3">
-                    <fieldset class="w-1/3 form-input required">
+                    <fieldset class="w-[30%] form-input required">
                         <legend>{{ $t("attr.product.LargeUnit") }}</legend>
                         <select2 class="form-control" required :options="optionsList" v-model="payload.LargeUnit">
                             <template #search="{ attributes, events }">
@@ -29,20 +41,20 @@
                             </template>
                         </select2>
                     </fieldset>
-                    <div class="flex w-2/3 gap-3">
-                        <fieldset class="w-1/2 form-input">
-                            <legend>{{ $t("attr.product.SmallUnit") }}</legend>
-                            <select2 class="form-control" :options="optionsList" v-model="payload.SmallUnit"
-                                :clearable="true"></select2>
-                        </fieldset>
-                        <fieldset class="w-1/2 form-input" :class="{ 'required': payload.SmallUnit }">
-                            <legend>{{ $t("attr.product.ConversionRate") }} <span class="text-xs text-gray-300">(Đv1 x
-                                    QC = Đv2)</span>
-                            </legend>
-                            <input type="number" class="w-full text-center form-control" :required="payload.SmallUnit"
-                                :disabled="!payload.SmallUnit || disable" v-model="payload.ConversionRate" min="1">
-                        </fieldset>
-                    </div>
+
+                    <fieldset class="w-[30%] form-input">
+                        <legend>{{ $t("attr.product.SmallUnit") }}</legend>
+                        <select2 class="form-control" :options="optionsList" v-model="payload.SmallUnit"
+                            :clearable="true"></select2>
+                    </fieldset>
+
+                    <fieldset class="w-[40%] form-input" :class="{ 'required': payload.SmallUnit }">
+                        <legend>{{ $t("attr.product.ConversionRate") }} <span class="text-xs text-gray-300">(Đv1 x
+                                QC = Đv2)</span>
+                        </legend>
+                        <input type="number" class="w-full text-center form-control" :required="payload.SmallUnit"
+                            :disabled="!payload.SmallUnit || disable" v-model="payload.ConversionRate" min="1">
+                    </fieldset>
                 </div>
             </div>
 
@@ -70,6 +82,7 @@ const payload = ref({
     ProductCode: null,
     ProductName: null,
     Expire: null,
+    Price: null,
     LargeUnit: UNIT[0],
     SmallUnit: null,
     ConversionRate: null,

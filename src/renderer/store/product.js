@@ -16,6 +16,7 @@ const productInit = {
     ProductCode: null,
     ProductName: null,
     Expire: 0,
+    Price: 0,
     LargeUnit: UNIT[0],
     SmallUnit: UNIT[1],
     ConversionRate: 1,
