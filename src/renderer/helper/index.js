@@ -140,7 +140,7 @@ const functions = {
         return duplicates;
     },
     unitQty: (LargeUnitQty, SmallUnitQty, product) => {
-        
+
         if(SmallUnitQty > 0 && (!product.SmallUnit || product.ConversionRate <= 0)) {
             throw new Error(`Mã sản phẩm [${product.ProductCode}] không có đơn vị 2`);
         }
@@ -150,7 +150,34 @@ const functions = {
             SmallUnitQty = SmallUnitQty % product.ConversionRate
         }
 
-        return  { LargeUnitQty: LargeUnitQty, SmallUnitQty: SmallUnitQty}
+        return  { LargeUnitQty: LargeUnitQty, SmallUnitQty: SmallUnitQty }
+    },
+    unitQtyTransfer: (LargeUnitQty, SmallUnitQty, product) => {
+        
+        if(SmallUnitQty > 0 && (!product.SmallUnit || product.ConversionRate <= 0)) {
+            throw new Error(`Mã sản phẩm [${product.ProductCode}] không có đơn vị 2`);
+        }
+
+        let TransferUnitQty = SmallUnitQty
+        if(product.ConversionRate > 0) {
+            TransferUnitQty = SmallUnitQty + (LargeUnitQty * product.ConversionRate)
+        } else {
+            TransferUnitQty = LargeUnitQty
+        }
+
+        return TransferUnitQty
+    },
+    unitQtyLS: (Qty, product) => {
+        let LargeUnitQty = 0
+        let SmallUnitQty = 0
+        if(product.ConversionRate > 0) {
+            LargeUnitQty = Math.floor(Qty / product.ConversionRate)
+            SmallUnitQty = Qty % product.ConversionRate
+        } else {
+            LargeUnitQty = Qty
+        }
+
+        return { LargeUnitQty: LargeUnitQty, SmallUnitQty: SmallUnitQty }
     }
 }
 

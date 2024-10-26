@@ -133,174 +133,158 @@ const ExitController = {
             /**
              * call create action
              */
-            const create = async (ExitCode, exits) => {
-
-                /**
-                 * Format Exit[] model
-                 */
-                const ExitsModel = exits.map(exit => {
-                    return {
-                        ExitCode: ExitCode,
-                        ProductCode: exit.ProductCode,
-                        LargeUnitQty: exit.LargeUnitQty,
-                        SmallUnitQty: exit.SmallUnitQty,
-                    }
-                })
-
-                /**
-                 * Merge Exit by ProductCode
-                 */
-                let exits_merge = {}
-                for (const exit of exits) {
-                    let key = `${exit.ProductCode}`
-                    if(exits_merge[key]) {
-                        exits_merge[key].LargeUnitQty += exit.LargeUnitQty
-                        exits_merge[key].SmallUnitQty += exit.SmallUnitQty
-                    } else {
-                        exits_merge[key] = exit
+            const products = await Product.findAll({
+                where: {
+                    ProductCode: {
+                        [Op.in]: exits.map(item => {
+                            return item.ProductCode
+                        })
                     }
                 }
+            }, {transaction: transaction})
 
-                exits_merge = Object.values(exits_merge)
-
-                /**
-                 * Check product and transfer unit
-                 */
-                let products = await Product.findAll({
-                    where: {
-                        ProductCode: {
-                            [Op.in]: exits_merge.map(item => {
-                                return item.ProductCode
-                            })
-                        }
+            let inventories = await Inventory.findAll({
+                attributes: [
+                    'ProductCode',
+                    [sequelize.fn('SUM', sequelize.col('LargeUnitQty')), 'LargeUnitQty'],
+                    [sequelize.fn('SUM', sequelize.col('SmallUnitQty')), 'SmallUnitQty'],
+                ],
+                where: {
+                    ProductCode: {
+                        [Op.in]: exits.map(item => {
+                            return item.ProductCode
+                        })
                     }
-                }, {transaction: transaction})
-                .then((products) => {
-                    exits_merge = exits_merge.map((exit) => {
-    
-                        let LargeUnitQty = exit.LargeUnitQty
-                        let SmallUnitQty = exit.SmallUnitQty
-    
-                        let product = products.find(item => {
-                            return item.ProductCode == exit.ProductCode
-                        });
-    
-                        if(!product) {
-                            throw new Error(`Mã sản phẩm [${exit.ProductCode}] không tồn tại`);
-                        }
-    
-                        if(SmallUnitQty > 0 && (!product.SmallUnit || product.ConversionRate <= 0)) {
-                            throw new Error(`Mã sản phẩm [${exit.ProductCode}] không có đơn vị 2`);
-                        }
-    
-                        let TransferUnitQty = SmallUnitQty
-                        if(product.ConversionRate > 0) {
-                            TransferUnitQty = SmallUnitQty + (LargeUnitQty * product.ConversionRate)
-                        } else {
-                            TransferUnitQty = LargeUnitQty
-                        }
-    
-                        return {
-                            ExitCode: exit.ExitCode,
-                            ProductCode: exit.ProductCode,
-                            LargeUnitQty: exit.LargeUnitQty,
-                            SmallUnitQty: exit.SmallUnitQty,
-    
-                            TransferUnitQty: TransferUnitQty,
-                        }
-                    })
+                },
+                group: ['Inventory.ProductCode'],
+            }, {transaction: transaction});
 
-                    return products
-                });
+            const create = async (WarehouseExit, exits) => {
+                let ExitModels = []
 
-                /**
-                 * Check Qty in Inventory
-                 */
-                let upsert = []
-                for (const i in exits_merge) {
-                    let exit = exits_merge[i]
-                    let qtyNeeded = exit.TransferUnitQty
+                // Insert Exit
+                for(const i in exits) {
+                    let exit = exits[i]
+
+                    // Product check
                     let product = products.find(item => {
                         return item.ProductCode == exit.ProductCode
                     })
-                    
-                    let shipments = await Inventory.findAll({
-                        where: {
-                            ProductCode: exit.ProductCode
-                        }
-                    }).then(async (inventories) => {
-                        inventories = inventories.sort((a, b) => new Date(a.ExpiryDate) - new Date(b.ExpiryDate));
-                        let shipment = []
-                        for (let i = 0; i < inventories.length; i++) {
-                            if (qtyNeeded <= 0) break;
-                            let inventory = inventories[i]
-            
-                            let AvailableUnitQty = inventory.SmallUnitQty
-                            if(product.ConversionRate > 0) {
-                                AvailableUnitQty = inventory.SmallUnitQty + (inventory.LargeUnitQty * product.ConversionRate)
-                            } else {
-                                AvailableUnitQty = inventory.LargeUnitQty
-                            }
-
-                            console.log('qtyNeeded', qtyNeeded)
-                            console.log('AvailableUnitQty', AvailableUnitQty)
-                            
-                            if(AvailableUnitQty <= qtyNeeded) {
-                                shipment.push({
-                                    ProductCode: inventory.ProductCode,
-                                    ExpiryDate: inventory.ExpiryDate,
-                                    LargeUnitQty: 0,
-                                    SmallUnitQty: 0,
-                                })
-
-                                // exit
-                                qtyNeeded -= AvailableUnitQty;
-                            } else {
-                                let new_invent = {
-                                    ProductCode : inventory.ProductCode,
-                                    ExpiryDate  : inventory.ExpiryDate,
-                                    LargeUnitQty: inventory.LargeUnitQty,
-                                    SmallUnitQty: inventory.SmallUnitQty,
-                                }
-                                
-                                if(product.ConversionRate && product.ConversionRate > 0) {
-                                    if(new_invent.SmallUnitQty >= qtyNeeded) {
-                                        new_invent.SmallUnitQty -= qtyNeeded
-                                    } else {
-                                        qtyNeeded -= new_invent.SmallUnitQty
-
-                                        new_invent.SmallUnitQty = 0
-
-                                        let large = (new_invent.LargeUnitQty * product.ConversionRate) - qtyNeeded
-
-                                        new_invent.LargeUnitQty = Math.floor(large / product.ConversionRate)
-                                        new_invent.SmallUnitQty += large % product.ConversionRate
-                                    }
-                                } else {
-                                    new_invent.LargeUnitQty -= qtyNeeded
-                                }
-
-                                shipment.push(new_invent)
-                                qtyNeeded = 0
-                            }
-                        }
-
-                        return shipment
-                    })
-
-                    if(qtyNeeded > 0) {
-                        throw new Error(`Mã sản phẩm [${product.ProductCode}] không đủ số lượng`);
+                    if(!product) {
+                        throw new Error(`Mã sản phẩm [${exit.ProductCode}] không tồn tại.`);
                     }
 
-                    upsert = upsert.concat(shipments)
+                    // Inventory check
+                    const inventory = inventories.find(item => {
+                        return item.ProductCode == exit.ProductCode
+                    })
+
+                    if(!inventory) {
+                        throw new Error(`Mã sản phẩm [${exit.ProductCode}] không tồn tại trong kho.`);
+                    }
+
+                    // Inventory check
+                    inventories = inventories.map(inventory => {
+                        inventory.qtyNeeded = inventory.qtyNeeded ?? 0
+                        let Qty = helper.unitQtyTransfer(inventory.LargeUnitQty, inventory.SmallUnitQty, product)
+                        let exitQty = helper.unitQtyTransfer(exit.LargeUnitQty, exit.SmallUnitQty, product)
+
+                        if(inventory.ProductCode == exit.ProductCode) {
+                            Qty -= exitQty
+                            if(Qty < 0) {
+                                throw new Error(`Mã sản phẩm [${exit.ProductCode}] không đủ số lượng.`);
+                            }
+                            
+                            let stockQty = helper.unitQtyLS(Qty, product)
+                            inventory.LargeUnitQty = stockQty.LargeUnitQty
+                            inventory.SmallUnitQty = stockQty.SmallUnitQty
+
+                            exit.StockLargeUnitQty = inventory.LargeUnitQty
+                            exit.StockSmallUnitQty = inventory.SmallUnitQty
+
+                            inventory.qtyNeeded += exitQty
+                        }
+
+                        return inventory
+                    })
+
+                    let ExitModel = {
+                        ExitCode        : WarehouseExit.ExitCode,
+                        ExitDate        : WarehouseExit.ExitDate,
+                        ExitType        : WarehouseExit.ExitType,
+
+                        ProductCode      : exit.ProductCode,
+                        LargeUnitQty     : exit.LargeUnitQty,
+                        SmallUnitQty     : exit.SmallUnitQty,
+                        Price            : product.Price,
+
+                        StockLargeUnitQty: exit.StockLargeUnitQty,
+                        StockSmallUnitQty: exit.StockSmallUnitQty,
+                    }
+
+                    ExitModels.push(ExitModel)
+                }
+
+                // update Inventory
+                let shipments = []
+                for(const i in inventories) {
+                    let inv = inventories[i]
+                    let qtyNeeded = inv.qtyNeeded
+
+                    // Product check
+                    let product = products.find(item => {
+                        return item.ProductCode == inv.ProductCode
+                    })
+                    if(!product) {
+                        throw new Error(`Mã sản phẩm [${inv.ProductCode}] không tồn tại.`);
+                    }
+
+                    const expiryInventories = await Inventory.findAll({
+                        where: {
+                            ProductCode: inv.ProductCode
+                        },
+                        order: [['ExpiryDate', 'ASC']]
+                    }, {transaction: transaction})
+
+                    for (let i = 0; i < expiryInventories.length; i++) {
+
+                        if (qtyNeeded <= 0) break;
+
+                        let inventory = expiryInventories[i]
+
+                        let AvailableUnitQty = helper.unitQtyTransfer(inventory.LargeUnitQty, inventory.SmallUnitQty, product)
+                        if(AvailableUnitQty <= qtyNeeded) {
+                            shipments.push({
+                                ProductCode : inventory.ProductCode,
+                                ExpiryDate  : inventory.ExpiryDate,
+                                LargeUnitQty: 0,
+                                SmallUnitQty: 0,
+                            })
+
+                            // exit
+                            qtyNeeded -= AvailableUnitQty;
+                        } else {
+                            let newQty = AvailableUnitQty - qtyNeeded;
+                            let qtyLS = helper.unitQtyLS(newQty, product)
+                            shipments.push({
+                                ProductCode : inventory.ProductCode,
+                                ExpiryDate  : inventory.ExpiryDate,
+                                LargeUnitQty: qtyLS.LargeUnitQty,
+                                SmallUnitQty: qtyLS.SmallUnitQty,
+                            })
+                            qtyNeeded = 0
+                        }
+                    }
                 }
 
                 /**
                  * Insert action
                  */
-                await Exit.bulkCreate(ExitsModel, {transaction: transaction}).then(async (res) => {
-                    for(const i in upsert) {
-                        let inventory = upsert[i]
+                console.log(ExitModels)
+                await Exit.bulkCreate(ExitModels, {transaction: transaction}).then(async (res) => {
+                    console.log(shipments)
+                    for(const i in shipments) {
+                        let inventory = shipments[i]
                         await Inventory.upsert(
                             {
                                 ProductCode : inventory.ProductCode,
@@ -321,7 +305,7 @@ const ExitController = {
                 ExitDate: ExitDate,
                 ExitType: ExitType,
             }, {transaction: transaction}).then(async (WarehouseExit) => {
-                return await create(WarehouseExit.ExitCode, exits)
+                return await create(WarehouseExit, exits)
             })
 
             await transaction.commit();
