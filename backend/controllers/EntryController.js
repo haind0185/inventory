@@ -1,8 +1,10 @@
 import WarehouseEntry from '../models/WarehouseEntry';
 import Entry from '../models/Entry';
 import Product from '../models/Product';
+import Inventory from '../models/Inventory';
 import { error, success } from './common/http';
 import { t } from '../../src/renderer/i18n'
+import { helper } from '../../src/renderer/helper'
 import sequelize from '../models/index';
 const { Op } = require("sequelize");
 const Joi = require('joi');
@@ -133,17 +135,104 @@ const EntryController = {
              * call create action
              */
 
-            const create = async (EntryCode, entries) => {
-                entries = entries.map(entry => {
-                    return {
-                        EntryCode   : EntryCode,
-                        ProductCode : entry.ProductCode,
-                        ExpiryDate  : entry.ExpiryDate,
-                        LargeUnitQty: entry.LargeUnitQty,
-                        SmallUnitQty: entry.SmallUnitQty,
+            const products = await Product.findAll({
+                where: {
+                    ProductCode: {
+                        [Op.in]: entries.map(item => {
+                            return item.ProductCode
+                        })
                     }
-                })
-                await Entry.bulkCreate(entries, {transaction: transaction});
+                }
+            }, {transaction: transaction})
+
+            let inventories = await Inventory.findAll({
+                attributes: [
+                    'ProductCode',
+                    [sequelize.fn('SUM', sequelize.col('LargeUnitQty')), 'LargeUnitQty'],
+                    [sequelize.fn('SUM', sequelize.col('SmallUnitQty')), 'SmallUnitQty'],
+                ],
+                where: {
+                    ProductCode: {
+                        [Op.in]: entries.map(item => {
+                            return item.ProductCode
+                        })
+                    }
+                },
+                group: ['Inventory.ProductCode'],
+            }, {transaction: transaction});
+
+            const create = async (WarehouseEntry, entries) => {
+                let EntryModels = []
+                for(const i in entries) {
+                    let entry = entries[i]
+
+                    // Product check
+                    let product = products.find(item => {
+                        return item.ProductCode == entry.ProductCode
+                    })
+                    if(!product) {
+                        throw new Error(`Mã sản phẩm [${entry.ProductCode}] không tồn tại.`);
+                    }
+
+                    // Inventory check
+                    inventories = inventories.map(inventory => {
+                        let LargeUnitQty = inventory.LargeUnitQty
+                        let SmallUnitQty = inventory.SmallUnitQty
+
+                        LargeUnitQty += entry.LargeUnitQty
+                        SmallUnitQty += entry.SmallUnitQty
+
+                        // format
+                        let Qty = helper.unitQty(LargeUnitQty, SmallUnitQty, product)
+
+                        // set for Inventory
+                        inventory.LargeUnitQty = Qty.LargeUnitQty
+                        inventory.SmallUnitQty = Qty.SmallUnitQty
+
+                        // set for Entry
+                        entry.StockLargeUnitQty = inventory.LargeUnitQty
+                        entry.StockSmallUnitQty = inventory.SmallUnitQty
+
+                        return inventory
+                    })
+
+                    let inventory = inventories.find(item => {
+                        return item.ProductCode == entry.ProductCode
+                    })
+
+                    let StockLargeUnitQty = 0
+                    let StockSmallUnitQty = 0
+                    if(!inventory) {
+                        let Pre_LargeUnitQty = EntryModels.filter(item => item.ProductCode == entry.ProductCode).reduce((sum, item) => sum + item.LargeUnitQty, 0);
+                        let Pre_SmallUnitQty = EntryModels.filter(item => item.ProductCode == entry.ProductCode).reduce((sum, item) => sum + item.SmallUnitQty, 0);
+                        
+                        let Qty = helper.unitQty(Pre_LargeUnitQty + entry.LargeUnitQty, Pre_SmallUnitQty + entry.SmallUnitQty, product)
+                        StockLargeUnitQty = Qty.LargeUnitQty
+                        StockSmallUnitQty = Qty.SmallUnitQty
+                    } else {
+                        StockLargeUnitQty = entry.StockLargeUnitQty
+                        StockSmallUnitQty = entry.StockSmallUnitQty
+                    }
+
+                    let EntryModel = {
+                        EntryCode        : WarehouseEntry.EntryCode,
+                        EntryDate        : WarehouseEntry.EntryDate,
+                        EntryType        : WarehouseEntry.EntryType,
+
+                        ProductCode      : entry.ProductCode,
+                        ExpiryDate       : entry.ExpiryDate,
+                        LargeUnitQty     : entry.LargeUnitQty,
+                        SmallUnitQty     : entry.SmallUnitQty,
+                        Price            : product.Price,
+
+                        StockLargeUnitQty: StockLargeUnitQty,
+                        StockSmallUnitQty: StockSmallUnitQty,
+                    }
+
+                    EntryModels.push(EntryModel)
+                }
+
+                await Entry.bulkCreate(EntryModels, {transaction: transaction});
             }
 
             await WarehouseEntry.create({
@@ -151,7 +240,7 @@ const EntryController = {
                 EntryDate: EntryDate,
                 EntryType: EntryType,
             }, {transaction: transaction}).then(async (WarehouseEntry) => {
-                return await create(WarehouseEntry.EntryCode, entries)
+                return await create(WarehouseEntry, entries)
             })
 
             await transaction.commit();

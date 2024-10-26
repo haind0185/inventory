@@ -138,6 +138,19 @@ const functions = {
         }
 
         return duplicates;
+    },
+    unitQty: (LargeUnitQty, SmallUnitQty, product) => {
+        
+        if(SmallUnitQty > 0 && (!product.SmallUnit || product.ConversionRate <= 0)) {
+            throw new Error(`Mã sản phẩm [${product.ProductCode}] không có đơn vị 2`);
+        }
+
+        if(SmallUnitQty > 0 && SmallUnitQty > product.ConversionRate) {
+            LargeUnitQty += Math.floor(SmallUnitQty / product.ConversionRate)
+            SmallUnitQty = SmallUnitQty % product.ConversionRate
+        }
+
+        return  { LargeUnitQty: LargeUnitQty, SmallUnitQty: SmallUnitQty}
     }
 }
 

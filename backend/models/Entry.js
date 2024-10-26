@@ -15,6 +15,14 @@ const Entry = sequelize.define('Entry', {
             key: 'EntryCode',
         },
     },
+    EntryDate: {
+        type: DataTypes.DATEONLY,
+        allowNull: false,
+    },
+    EntryType: {
+        type: DataTypes.BOOLEAN,
+        default: false, // false: normal | true: adjustment
+    },
     ProductCode: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -34,6 +42,21 @@ const Entry = sequelize.define('Entry', {
     SmallUnitQty: {
         type: DataTypes.FLOAT,
         allowNull: false,
+    },
+    Price: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        default: 0,
+    },
+    StockLargeUnitQty: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        default: 0,
+    },
+    StockSmallUnitQty: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        default: 0,
     },
 }, {
     hooks: {

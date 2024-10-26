@@ -128,6 +128,7 @@ const createStore = defineStore('product', {
         setSearch() {
             this.search.sort = null
             this.search.sort_by = 'asc'
+            this.search.page = 1
         },
         resetSearch() {
             this.search = {...this.search, ...initSearch}

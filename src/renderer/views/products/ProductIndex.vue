@@ -1,6 +1,6 @@
 <template>
     <div class="gap-1 wrapper-scroll">
-        <form class="flex content-between gap-3" @submit.prevent="index()">
+        <form class="flex content-between gap-3" @submit.prevent="submit()">
             <div class="flex flex-col flex-1">
                 <div class="flex w-full gap-3">
                     <fieldset class="form-input w-[30%]">
@@ -150,6 +150,11 @@ const clear = async () => {
     productStore.resetSearch()
     await index()
     // console.log(search.value)
+}
+
+const submit = async () => {
+    productStore.setSearch()
+    await index()
 }
 
 const index = async () => {
