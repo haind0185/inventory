@@ -3,6 +3,7 @@ import Product from './Product';
 import WarehouseEntry from './WarehouseEntry';
 import Inventory from './Inventory';
 import { t } from '../../src/renderer/i18n'
+import { helper } from '../../src/renderer/helper'
 import { error } from '../controllers/common/http';
 const { DataTypes } = require('sequelize');
 
@@ -86,32 +87,23 @@ const Entry = sequelize.define('Entry', {
                 let LargeUnitQty = (inventory?.LargeUnitQty ?? 0) + entry.LargeUnitQty
                 let SmallUnitQty = (inventory?.SmallUnitQty ?? 0) + entry.SmallUnitQty
     
-                if(SmallUnitQty > 0) {
-                    let product = await Product.findOne({
-                        where: {
-                            ProductCode: entry.ProductCode
-                        }
-                    }, {transaction: transaction});
-    
-                    if(!product) {
-                        throw new Error(t('ctr.product.code_not_exists'));
+                let product = await Product.findOne({
+                    where: {
+                        ProductCode: entry.ProductCode
                     }
-    
-                    if(!product.SmallUnit || product.ConversionRate <= 0) {
-                        throw new Error(t('ctr.product.not_have_conversion_rate'));
-                    }
-    
-                    if(SmallUnitQty > product.ConversionRate) {
-                        LargeUnitQty += Math.floor(SmallUnitQty / product.ConversionRate)
-                        SmallUnitQty = SmallUnitQty % product.ConversionRate
-                    }
+                }, {transaction: transaction});
+
+                if(!product) {
+                    throw new Error(t('ctr.product.code_not_exists'));
                 }
-    
+
+                let Qty = helper.unitQty(LargeUnitQty, SmallUnitQty, product)
+                
                 await Inventory.upsert({
                     ProductCode : entry.ProductCode,
                     ExpiryDate  : entry.ExpiryDate,
-                    LargeUnitQty: LargeUnitQty,
-                    SmallUnitQty: SmallUnitQty,
+                    LargeUnitQty: Qty.LargeUnitQty,
+                    SmallUnitQty: Qty.SmallUnitQty,
                 }, {
                     transaction: transaction,
                     conflictFields: ['ProductCode', 'ExpiryDate']
