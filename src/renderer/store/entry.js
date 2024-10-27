@@ -65,6 +65,18 @@ const createStore = defineStore('entry', {
                     return false
                 })
         },
+        async import(payload) {
+            store.setLoading(true)
+            return await api.post(`/entries/import`, payload)
+                .then((res) => {
+                    store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
 
         // mutation
         setSearch() {
@@ -79,6 +91,9 @@ const createStore = defineStore('entry', {
         },
         delete(index) {
             this.entries = this.entries.filter((item, i) => i != index)
+        },
+        setEntry(entry) {
+            this.entries.push(entry)
         },
         reset() {
             // this.entries = [{...entryInit}]

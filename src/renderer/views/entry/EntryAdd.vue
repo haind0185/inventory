@@ -21,6 +21,8 @@
 
             <div class="flex justify-end gap-3">
                 <button type="button" class="btn green w-[6rem]" @click="addItem()">{{ t('button.add_item') }}</button>
+                <input id="file" ref="file" type="file" @change="onFileChange($event)" class="hidden">
+                <button type="button" class="btn silver w-[6rem]" @click="openFile()">{{ $t('button.import') }}</button>
                 <button type="button" class="btn silver w-[6rem]" @click="reset()">{{ t('button.reset') }}</button>
             </div>
 
@@ -115,6 +117,7 @@ const entries = computed(() => entryStore.entries)
 const products = computed(() => entryStore.products)
 const confirm = ref(null)
 const reload = ref(false)
+const file = ref(null)
 
 const onClose = () => {
     emit('close', reload.value)
@@ -166,6 +169,48 @@ const reset = () => {
 
 onBeforeMount(async () => {
 })
+
+const openFile = () => {
+    file.value.value = null
+    file.value.click()
+}
+
+const onFileChange = async (e) => {
+    let file = e.target.files ? e.target.files[0] : null
+    if(file) {
+        let formData = new FormData();
+        formData.append('file', file);
+        await entryStore.import(formData).then((res) => {
+            if(res && res.code == 200) {
+                setEntries(res.data)
+            }
+        })
+    }
+}
+
+const setEntries = (data) => {
+    entryStore.reset()
+    for(const i in data) {
+        let entry = {...entryStore.entryInit}
+
+        if(data[i].ProductCode) {
+            entry.ProductCode = data[i].ProductCode
+        }
+        
+        if(data[i].ExpiryDate) {
+            entry.ExpiryDate = data[i].ExpiryDate
+        }
+        if(data[i].LargeUnitQty || data[i].LargeUnitQty == 0) {
+            entry.LargeUnitQty = data[i].LargeUnitQty
+        }
+        if(data[i].SmallUnitQty || data[i].SmallUnitQty == 0) {
+            entry.SmallUnitQty = data[i].SmallUnitQty
+        }
+
+        entryStore.setEntry(entry)
+    }
+    console.log(entries)
+}
 
 /**
  * Call API

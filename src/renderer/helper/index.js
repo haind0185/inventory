@@ -178,6 +178,14 @@ const functions = {
         }
 
         return { LargeUnitQty: LargeUnitQty, SmallUnitQty: SmallUnitQty }
+    },
+    excelDate: (value) => {
+        if(!(Number.isInteger(value) && value >= 0)) {
+            throw new Error(`Ngày [${value}] bị sai format.`);
+        }
+        const date = moment('1899-12-30').add(value, 'days');
+
+        return date.format('YYYY-MM-DD');
     }
 }
 
