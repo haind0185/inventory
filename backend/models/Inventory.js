@@ -43,7 +43,7 @@ const Inventory = sequelize.define('Inventory', {
         type: DataTypes.VIRTUAL,
         get() {
             let product = this.product
-            if(product) {
+            if(product && product.Expire) {
                 let percent = this.ExpireCount / product.Expire * 100
                 if(percent < 0) {
                     percent = 0

@@ -21,6 +21,8 @@
 
             <div class="flex justify-end gap-3">
                 <button type="button" class="btn green w-[6rem]" @click="addItem()">{{ t('button.add_item') }}</button>
+                <input id="file" ref="file" type="file" @change="onFileChange($event)" class="hidden">
+                <button type="button" class="btn silver w-[6rem]" @click="openFile()">{{ $t('button.import') }}</button>
                 <button type="button" class="btn silver w-[6rem]" @click="reset()">{{ t('button.reset') }}</button>
             </div>
 
@@ -108,6 +110,7 @@ const exits = computed(() => exitStore.exits)
 const inventories = computed(() => exitStore.inventories)
 const confirm = ref(null)
 const reload = ref(false)
+const file = ref(null)
 
 const onClose = () => {
     emit('close', reload.value)
@@ -159,6 +162,43 @@ const changeProduct = (exit) => {
 
 onBeforeMount(async () => {
 })
+
+const openFile = () => {
+    file.value.value = null
+    file.value.click()
+}
+
+const onFileChange = async (e) => {
+    let file = e.target.files ? e.target.files[0] : null
+    if(file) {
+        let formData = new FormData();
+        formData.append('file', file);
+        await exitStore.import(formData).then((res) => {
+            if(res && res.code == 200) {
+                setExits(res.data)
+            }
+        })
+    }
+}
+
+const setExits = (data) => {
+    exitStore.reset()
+    for(const i in data) {
+        let exit = {...exitStore.exitInit}
+
+        if(data[i].ProductCode) {
+            exit.ProductCode = data[i].ProductCode
+        }
+        if(data[i].LargeUnitQty || data[i].LargeUnitQty == 0) {
+            exit.LargeUnitQty = data[i].LargeUnitQty
+        }
+        if(data[i].SmallUnitQty || data[i].SmallUnitQty == 0) {
+            exit.SmallUnitQty = data[i].SmallUnitQty
+        }
+
+        exitStore.setExit(exit)
+    }
+}
 
 /**
  * Call API

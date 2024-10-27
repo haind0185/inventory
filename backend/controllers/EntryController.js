@@ -264,7 +264,6 @@ const EntryController = {
     
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
-            console.log(worksheet)
             let data = xlsx.utils.sheet_to_json(worksheet);
 
             data = data.map(item => {

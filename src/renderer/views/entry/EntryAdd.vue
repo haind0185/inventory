@@ -209,7 +209,6 @@ const setEntries = (data) => {
 
         entryStore.setEntry(entry)
     }
-    console.log(entries)
 }
 
 /**

@@ -232,6 +232,7 @@ table.t-border {
 table.t-border thead {
     position: sticky;
     top: 0;
+    z-index: 20;
 }
 
 table.t-border th {
