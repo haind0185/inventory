@@ -5,6 +5,8 @@ const router = express.Router();
 
 router.get('/', InventoryController.index);
 router.get('/list', InventoryController.list);
+router.get('/total', InventoryController.total);
+router.get('/totalPrice', InventoryController.totalPrice);
 
 const InventoryRouter = router;
 

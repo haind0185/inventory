@@ -37,8 +37,11 @@ const messages = {
                 ExpiryDate: "Hạn sử dụng",
                 ExpireCount: "HSD(ngày)",
                 ExpirePercent: "Phần trăm HSD",
-                LargeUnitQty: "S.Lượng(đv1)",
-                SmallUnitQty: "S.Lượng(đv2)",
+                LargeUnitQty: "S.L(đv1)",
+                SmallUnitQty: "S.L(đv2)",
+                Qty: "Tổng SL",
+                Price: "Đơn giá",
+                QtyPrice: "Tổng tiền",
             },
         },
         ctr: {

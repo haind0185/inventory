@@ -1,6 +1,7 @@
 import sequelize from './index';
 import Product from './Product';
 import moment from 'moment';
+import { helper } from '../../src/renderer/helper'
 const { DataTypes } = require('sequelize');
 
 const Inventory = sequelize.define('Inventory', {
@@ -71,7 +72,30 @@ const Inventory = sequelize.define('Inventory', {
             if(!this.product) return ''
             return `[${this.product.ProductCode}][${this.product.Expire} ngày]`+(this.product.SmallUnit ? `[x${this.product.ConversionRate}] ` : ' ')+`${this.product.ProductName} [${this.LargeUnitQty} ${this.product.LargeUnit}]` + (this.product.SmallUnit ? `[${this.SmallUnitQty} ${this.product.SmallUnit}]` : '');
         }
-    }
+    },
+    // Qty: {
+    //     type: DataTypes.VIRTUAL,
+    //     get() {
+    //         if(!this.product) return 0
+    //         return helper.unitQtyTransfer(this.LargeUnitQty, this.SmallUnitQty, this.product)
+    //     }
+    // },
+    // Price: {
+    //     type: DataTypes.VIRTUAL,
+    //     get() {
+    //         if(!this.product) return 0
+    //         return this.product.Price
+    //     }
+    // },
+    // QtyPrice: {
+    //     type: DataTypes.VIRTUAL,
+    //     get() {
+    //         if(!this.product) return 0
+    //         let Qty = helper.unitQtyTransfer(this.LargeUnitQty, this.SmallUnitQty, this.product)
+    //         return Qty * this.product.Price
+    //     }
+    // },
+    
 }, {
     indexes: [
         {
