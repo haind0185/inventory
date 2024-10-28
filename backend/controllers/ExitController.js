@@ -29,6 +29,14 @@ const ExitController = {
                 where.ExitDate = { [Op.eq]: `${req.query.ExitDate}` }
             }
 
+            if(req.query.ExitDateFrom) {
+                where.ExitDate = { ...where.ExitDate, [Op.gte]: `${req.query.ExitDateFrom}` }
+            }
+
+            if(req.query.ExitDateTo) {
+                where.ExitDate = { ...where.ExitDate, [Op.lte]: `${req.query.ExitDateTo}` }
+            }
+
             if(req.query.ProductCode) {
                 where.ProductCode = { [Op.like]: `%${req.query.ProductCode}%` }
             }
@@ -60,7 +68,7 @@ const ExitController = {
             if(total > 0) {
                 exits = await WarehouseExit.findAll({
                     where: where,
-                    order: order,
+                    order: [['ExitDate', 'DESC'], ['id', 'DESC']],
                     limit: limit,
                     offset: offset,
                     include: [

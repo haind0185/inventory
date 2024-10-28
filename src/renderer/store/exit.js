@@ -6,6 +6,8 @@ import { store } from '.'
 const initSearch = {
     ExitCode: null,
     ExitDate: null,
+    EntryDateFrom: null,
+    EntryDateTo: null,
     sort: null,
     sort_by: null,
     page: 1
@@ -14,6 +16,8 @@ const exitInit = {
     ProductCode: null,
     LargeUnitQty: 0,
     SmallUnitQty: 0,
+    Price: 0,
+    PriceQty: 0,
 }
 const payloadInit = {
     ExitCode: null,

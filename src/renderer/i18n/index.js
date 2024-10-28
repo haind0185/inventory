@@ -31,8 +31,11 @@ const messages = {
                 ExitType: "Điều chỉnh",
                 ProductCode: "Mã mặt hàng",
                 ProductNameLabel: "Mặt hàng",
-                LargeUnitQty: "S.Lượng(đv1)",
-                SmallUnitQty: "S.Lượng(đv2)",
+                LargeUnitQty: "S.L(đv1)",
+                SmallUnitQty: "S.L(đv2)",
+                Price: "Đơn giá",
+                Qty: "Tổng SL",
+                PriceQty: "Tổng tiền",
             },
             inventory: {
                 ProductCode: "Mã MH",

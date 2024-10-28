@@ -8,9 +8,13 @@
                         <input type="text" class="w-full form-control" v-model="search.ExitCode">
                     </fieldset>
     
-                    <fieldset class="form-input w-[30%]">
+                    <fieldset class="form-input w-[40%]">
                         <legend>{{ $t("attr.exit.ExitDate") }}</legend>
-                        <date class="w-full from-control" v-model="search.ExitDate"></date>
+                        <div class="flex gap-3">
+                            <date class="w-full from-control" v-model="search.ExitDateFrom" :max-date="search.ExitDateTo"></date>
+                            ~
+                            <date class="w-full from-control" v-model="search.ExitDateTo" :min-date="search.ExitDateFrom"></date>
+                        </div>
                     </fieldset>
                 </div>
             </div>
@@ -39,23 +43,35 @@
             <table class="view-scroll t-border">
                 <thead>
                     <tr>
-                        <th class="w-[11rem]">
-                            <th-sort @sort="sort()" :search="search" :field="'ExitDate'">{{ $t("attr.exit.ExitCode") }}<br>{{  $t("attr.exit.ExitDate") }}</th-sort>
-                        </th>
-                        <th>
-                            <th-sort @sort="sort()" :search="search" :field="'ProductCode'">{{ $t("attr.exit.ProductNameLabel") }}</th-sort>
-                        </th>
-                        <th class="w-[7rem]">{{ $t("attr.exit.LargeUnitQty") }}</th>
-                        <th class="w-[7rem]">{{ $t("attr.exit.SmallUnitQty") }}</th>
+                        <th class="" colspan="2">{{ $t("attr.exit.ProductNameLabel") }}</th>
+                        <th class="w-[5rem]">{{ $t("attr.exit.LargeUnitQty") }}</th>
+                        <th class="w-[5rem]">{{ $t("attr.exit.SmallUnitQty") }}</th>
+                        <th class="w-[6rem]">{{ $t("attr.exit.Price") }}</th>
+                        <th class="w-[6rem]">{{ $t("attr.exit.Qty") }}</th>
+                        <th class="w-[7rem]">{{ $t("attr.exit.PriceQty") }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <template v-for="item in exits.items">
-                        <tr v-for="(exit, index) in item.exits">
-                            <td class="text-center" :rowspan="item.exits.length" v-if="index == 0">{{ item.ExitCode }}<br>{{ item.ExitDate }}</td>
-                            <td class="text-left" :class="{'row-left': index >= 1}">{{ exit.product.ProductNameLabel }}</td>
-                            <td class="text-center">{{ `${exit.LargeUnitQty} ${exit.product.LargeUnit}` }}</td>
-                            <td class="text-center">{{ exit.product.SmallUnit ? `${exit.SmallUnitQty} ${exit.product.SmallUnit}` : '' }}</td>
+                        <tr style="background: rgb(210 221 245);">
+                            <td class="w-[2.5rem] text-center show-list" @click="item.show = !item.show">{{ item.exits.length }}<br>{{ item.show ? '-' : '+' }}</td>
+                            <td colspan="5" class="text-center">
+                                Mã xuất: {{ item.ExitCode }}
+                                <br>
+                                Ngày xuất: {{ item.ExitDate }}
+                            </td>
+                            <td class="text-right">
+                                {{ format_number(item.PriceQty) }}
+                            </td>
+                        </tr>
+                        <tr v-for="(exit, index) in item.exits" v-show="item.show">
+                            <td class="text-center">{{ index+1 }}</td>
+                            <td class="text-left">{{ exit.product.ProductNameLabel }}</td>
+                            <td class="text-right">{{ format_number(exit.LargeUnitQty) }}</td>
+                            <td class="text-right">{{ format_number(exit.SmallUnitQty) }}</td>
+                            <td class="text-right">{{ format_number(exit.Price) }}</td>
+                            <td class="text-right">{{ format_number(exit.Qty) }}</td>
+                            <td class="text-right">{{ format_number(exit.PriceQty) }}</td>
                         </tr>
                     </template>
                 </tbody>
@@ -104,8 +120,16 @@ const clear = async () => {
 const index = async () => {
     await exitStore.index(search.value).then((res) => {
         if(res && res.code == 200) {
-            exits.value = res.data
+            setData(res.data)
         }
+    })
+}
+
+const setData = (data) => {
+    exits.value = data
+    exits.value.items.map(item => {
+        item.show = false
+        return item
     })
 }
 
