@@ -162,6 +162,7 @@ const ProductController = {
                 }
             })
 
+            await transaction.commit();
             return res.json(success(data));
         } catch (err) {
             await transaction.rollback();
@@ -397,6 +398,47 @@ const ProductController = {
             return res.json(error(err.message, 501));
         }
     },
+
+    delete: async (req, res) => {
+        const transaction = await sequelize.transaction();
+        try {
+            console.log(req.query)
+
+            const { ProductCode } = req.body;
+
+            if(!ProductCode) {
+                throw new Error("Không tìm thấy mặt hàng.");
+            }
+
+            const product = await Product.findOne({
+                where: {
+                    ProductCode: ProductCode
+                }
+            }, { transaction: transaction })
+
+            if(!product) {
+                throw new Error("Không tìm thấy mặt hàng.");
+            }
+
+            const inventories = await Inventory.findAll({
+                where: {
+                    ProductCode: ProductCode
+                }
+            }, { transaction: transaction })
+
+            if(inventories.length > 0) {
+                throw new Error("Mặt hàng này đã có trong kho, không thể xóa.");
+            }
+
+            await product.destroy({ transaction: transaction })
+            
+            await transaction.commit();
+            return res.json(success());
+        } catch (err) {
+            await transaction.rollback();
+            return res.json(error(err.message, 501));
+        }
+    }
 };
 
 export default ProductController;

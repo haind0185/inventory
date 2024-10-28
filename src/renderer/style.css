@@ -212,6 +212,10 @@ button.btn.green {
     background: rgb(36, 226, 115);
 }
 
+button.btn.red {
+    background: red;
+}
+
 button.btn[disabled] {
     background: #ccc;
     color: white;

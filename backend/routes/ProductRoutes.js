@@ -20,6 +20,8 @@ router.get('/show', ProductController.show);
 
 router.get('/list', ProductController.list);
 
+router.post('/delete', ProductController.delete);
+
 const ProductRouter = router;
 
 export default ProductRouter;

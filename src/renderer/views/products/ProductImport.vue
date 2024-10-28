@@ -190,6 +190,7 @@ const onSave = async () => {
             cancelButton: t("button.back"),
             type: 1
         })
+        productStore.reset()
         emit('save', reload.value)
     }
 }

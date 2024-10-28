@@ -60,6 +60,7 @@
 
             <div class="flex justify-around w-full mt-[10rem]">
                 <button type="button" class="btn silver w-[6rem]" @click="onClose()">{{ $t("button.cancel") }}</button>
+                <button type="button" class="btn red w-[6rem]" @click="onDelete()">{{ $t("button.delete") }}</button>
                 <button type="submit" class="btn w-[6rem]">{{ $t("button.save") }}</button>
             </div>
         </form>
@@ -113,6 +114,27 @@ const onSave = async () => {
         emit('save', reload.value)
     }
 
+}
+
+const onDelete = async () => {
+    const ok = await confirm.value.show({
+        title: t("title.confirm"),
+        message: t("msg.delete_product", {ProductCode: data.ProductCode, ProductName: data.ProductName}),
+        cancelButton: t("button.back"),
+    })
+    if(ok) {
+        await confirm.value.close()
+        const res = await productStore.destroy({ProductCode: payload.value.ProductCode}).then((res) => {
+            if (res && res.code == 200) {
+                reload.value = true
+                return true
+            }
+            return false
+        })
+        if(res) {
+            emit('save', reload.value)
+        }
+    }
 }
 
 watch(

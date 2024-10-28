@@ -74,6 +74,7 @@ const messages = {
             add_item: "Thêm",
             import: "Thêm file",
             reset: "Dọn sạch",
+            delete: "Xóa bỏ",
         },
         modal: {
             add_product: "Thêm mặt hàng",
@@ -87,7 +88,8 @@ const messages = {
             confirm: "Xác nhận",
         },
         msg: {
-            save_ok: "Lưu thành công"
+            save_ok: "Lưu thành công",
+            delete_product: "Xác nhận xóa mặt hàng [{ProductCode}] {ProductName}"
         }
     }
 }
