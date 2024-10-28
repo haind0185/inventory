@@ -8,9 +8,13 @@
                         <input type="text" class="w-full form-control" v-model="search.EntryCode">
                     </fieldset>
     
-                    <fieldset class="form-input w-[30%]">
+                    <fieldset class="form-input w-[40%]">
                         <legend>{{ $t("attr.entry.EntryDate") }}</legend>
-                        <date class="w-full from-control" v-model="search.EntryDate"></date>
+                        <div class="flex gap-3">
+                            <date class="w-full from-control" v-model="search.EntryDateFrom" :max-date="search.EntryDateTo"></date>
+                            ~
+                            <date class="w-full from-control" v-model="search.EntryDateTo" :min-date="search.EntryDateFrom"></date>
+                        </div>
                     </fieldset>
                 </div>
             </div>
@@ -39,25 +43,37 @@
             <table class="view-scroll t-border">
                 <thead>
                     <tr>
-                        <th class="w-[11rem]">
-                            <th-sort @sort="sort()" :search="search" :field="'EntryDate'">{{ $t("attr.entry.EntryCode") }}<br>{{  $t("attr.entry.EntryDate") }}</th-sort>
-                        </th>
-                        <th>
-                            <th-sort @sort="sort()" :search="search" :field="'ProductCode'">{{ $t("attr.entry.ProductNameLabel") }}</th-sort>
-                        </th>
+                        <th class="" colspan="2">{{ $t("attr.entry.ProductNameLabel") }}</th>
                         <th class="w-[7rem]">{{ $t("attr.entry.ExpiryDate") }}</th>
-                        <th class="w-[7rem]">{{ $t("attr.entry.LargeUnitQty") }}</th>
-                        <th class="w-[7rem]">{{ $t("attr.entry.SmallUnitQty") }}</th>
+                        <th class="w-[5rem]">{{ $t("attr.entry.LargeUnitQty") }}</th>
+                        <th class="w-[5rem]">{{ $t("attr.entry.SmallUnitQty") }}</th>
+                        <th class="w-[6rem]">{{ $t("attr.entry.Price") }}</th>
+                        <th class="w-[6rem]">{{ $t("attr.entry.Qty") }}</th>
+                        <th class="w-[7rem]">{{ $t("attr.entry.PriceQty") }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <template v-for="item in entries.items">
-                        <tr v-for="(entry, index) in item.entries">
-                            <td class="text-center" :rowspan="item.entries.length" v-if="index == 0">{{ item.EntryCode }}<br>{{ item.EntryDate }}</td>
-                            <td class="text-left" :class="{'row-left': index >= 1}">{{ entry.product.ProductNameLabel }}</td>
+                        <tr style="background: rgb(210 221 245);">
+                            <td class="w-[2.5rem] text-center show-list" @click="item.show = !item.show">{{ item.entries.length }}<br>{{ item.show ? '-' : '+' }}</td>
+                            <td colspan="6" class="text-center">
+                                Mã nhập: {{ item.EntryCode }}
+                                <br>
+                                Ngày nhập: {{ item.EntryDate }}
+                            </td>
+                            <td class="text-right">
+                                {{ format_number(item.PriceQty) }}
+                            </td>
+                        </tr>
+                        <tr v-for="(entry, index) in item.entries" v-show="item.show">
+                            <td class="text-center">{{ index+1 }}</td>
+                            <td class="text-left">{{ entry.product.ProductNameLabel }}</td>
                             <td class="text-center">{{ entry.ExpiryDate }}</td>
-                            <td class="text-center">{{ entry.LargeUnitQty }}</td>
-                            <td class="text-center">{{ entry.SmallUnitQty }}</td>
+                            <td class="text-right">{{ format_number(entry.LargeUnitQty) }}</td>
+                            <td class="text-right">{{ format_number(entry.SmallUnitQty) }}</td>
+                            <td class="text-right">{{ format_number(entry.Price) }}</td>
+                            <td class="text-right">{{ format_number(entry.Qty) }}</td>
+                            <td class="text-right">{{ format_number(entry.PriceQty) }}</td>
                         </tr>
                     </template>
                 </tbody>
@@ -106,8 +122,16 @@ const clear = async () => {
 const index = async () => {
     await entryStore.index(search.value).then((res) => {
         if(res && res.code == 200) {
-            entries.value = res.data
+            setData(res.data)
         }
+    })
+}
+
+const setData = (data) => {
+    entries.value = data
+    entries.value.items.map(item => {
+        item.show = false
+        return item
     })
 }
 

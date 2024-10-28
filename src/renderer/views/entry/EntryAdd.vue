@@ -36,14 +36,20 @@
                 <fieldset class="flex-1 form-input required">
                     <legend>{{ $t("attr.entry.ProductCode") }}</legend>
                 </fieldset>
-                <fieldset class="w-[8rem] form-input required">
+                <fieldset class="w-[7.5rem] form-input required">
                     <legend>{{ $t("attr.entry.ExpiryDate") }}</legend>
                 </fieldset>
-                <fieldset class="w-[10rem] form-input">
+                <fieldset class="w-[8rem] form-input">
                     <legend>{{ $t("attr.entry.LargeUnitQty") }}</legend>
                 </fieldset>
-                <fieldset class="w-[10rem] form-input">
+                <fieldset class="w-[8rem] form-input">
                     <legend>{{ $t("attr.entry.SmallUnitQty") }}</legend>
+                </fieldset>
+                <fieldset class="w-[5rem] form-input">
+                    <legend>{{ $t("attr.entry.Price") }}</legend>
+                </fieldset>
+                <fieldset class="w-[7rem] form-input">
+                    <legend>{{ $t("attr.entry.PriceQty") }}</legend>
                 </fieldset>
             </div>
 
@@ -65,24 +71,33 @@
                                 </template>
                             </select2>
                         </fieldset>
-                        <fieldset class="w-[8rem] form-input required">
+                        <fieldset class="w-[7.5rem] form-input required">
                             <date class="w-full from-control" v-model="entry.ExpiryDate" required></date>
                         </fieldset>
-                        <fieldset class="w-[10rem] form-input flex items-center">
-                            <input type="number" class="w-[7rem] text-center form-control" v-model="entry.LargeUnitQty" min="0">
+                        <fieldset class="w-[8rem] form-input flex items-center">
+                            <input type="number" class="w-[5rem] text-center form-control" v-model="entry.LargeUnitQty" min="0">
                             <span class="w-[3rem] text-sm pl-1">{{ getLargeUnit(entry.ProductCode) }}</span>
                         </fieldset>
-                        <fieldset class="w-[10rem] form-input flex items-center">
-                            <input type="number" class="w-[7rem] text-center form-control" v-model="entry.SmallUnitQty" min="0" :disabled="smallUnitDisable(entry.ProductCode)">
+                        <fieldset class="w-[8rem] form-input flex items-center">
+                            <input type="number" class="w-[5rem] text-center form-control" v-model="entry.SmallUnitQty" min="0" :disabled="smallUnitDisable(entry.ProductCode)">
                             <span class="w-[3rem] text-sm pl-1">{{ getSmallUnit(entry.ProductCode) }}</span>
+                        </fieldset>
+                        <fieldset class="w-[5rem] form-input flex items-center">
+                            <input type="text" class="w-[5rem] text-right form-control" v-model="entry.PriceLabel" disabled>
+                        </fieldset>
+                        <fieldset class="w-[7rem] form-input flex items-center">
+                            <input type="text" class="w-[7rem] text-right form-control" v-model="entry.PriceQtyLabel" disabled>
                         </fieldset>
                     </div>
                 </template>
             </div>
 
-            <div class="flex justify-around w-full mt-[2rem]">
-                <button type="button" class="btn silver w-[6rem]" @click="onClose()">{{ $t("button.cancel") }}</button>
-                <button type="submit" class="btn w-[6rem]" :disabled="entries.length <= 0">{{ $t("button.save") }}</button>
+            <div class="">
+                <div class="flex justify-end h-6 px-5">Tổng: {{ PriceQtyTotal() }}</div>
+                <div class="flex justify-around w-full">
+                    <button type="button" class="btn silver w-[6rem]" @click="onClose()">{{ $t("button.cancel") }}</button>
+                    <button type="submit" class="btn w-[6rem]" :disabled="entries.length <= 0">{{ $t("button.save") }}</button>
+                </div>
             </div>
         </form>
     </Modal>
@@ -118,6 +133,7 @@ const products = computed(() => entryStore.products)
 const confirm = ref(null)
 const reload = ref(false)
 const file = ref(null)
+const price_total = ref(null)
 
 const onClose = () => {
     emit('close', reload.value)
@@ -153,6 +169,41 @@ const changeProduct = (entry) => {
     if(!product || !product.SmallUnit) {
         entry.SmallUnitQty = 0
     }
+    if(product) {
+        entry.Price = product.Price
+        entry.PriceLabel = helper.format_number(entry.Price)
+
+        entry.PriceQty = helper.unitQtyTransfer(entry.LargeUnitQty, entry.SmallUnitQty, product) * entry.Price
+        entry.PriceQtyLabel = helper.format_number(entry.PriceQty)
+    } else {
+        entry.Price = 0
+        entry.PriceLabel = helper.format_number(entry.Price)
+
+        entry.PriceQty = 0
+        entry.PriceQtyLabel = helper.format_number(entry.PriceQty)
+    }
+}
+
+const PriceQtyTotal = () => {
+    let errors = []
+    const total = entries.value.reduce((sum, item, index) => {
+        if(item.PriceQty != 0 && !item.PriceQty) {
+            errors.push(index + 1)
+        }
+        return sum + item.PriceQty
+    }, 0)
+
+    if(errors.length > 0) {
+        confirm.value.show({
+            title: t("title.error"),
+            message: `Các dòng sau bị lỗi: `+errors.join(', '),
+            type: 3
+        })
+    }
+
+    price_total.value = total ? helper.format_number(total ?? 0) : ''
+
+    return price_total.value
 }
 
 const addItem = () => {
@@ -215,23 +266,30 @@ const setEntries = (data) => {
  * Call API
  */
 const onSave = async () => {
-    payload.value.entries = entries.value
-    const res = await entryStore.store(payload.value).then((res) => {
-        if(res && res.code == 200) {
-            reload.value = true
-            return true
-        }
-        return false
+    const ok = await confirm.value.show({
+        title: t("title.confirm"),
+        message: 'Xác nhận nhập kho có tổng giá trị: '+price_total.value,
+        cancelButton: t("button.back"),
     })
-    if(res) {
-        await confirm.value.show({
-            title: t("title.notify"),
-            message: t("msg.save_ok"),
-            cancelButton: t("button.back"),
-            type: 1
+    if(ok) {
+        payload.value.entries = entries.value
+        const res = await entryStore.store(payload.value).then((res) => {
+            if(res && res.code == 200) {
+                reload.value = true
+                return true
+            }
+            return false
         })
-        entryStore.reset()
-        emit('save', reload.value)
+        if(res) {
+            await confirm.value.show({
+                title: t("title.notify"),
+                message: t("msg.save_ok"),
+                cancelButton: t("button.back"),
+                type: 1
+            })
+            entryStore.reset()
+            emit('save', reload.value)
+        }
     }
 
 }

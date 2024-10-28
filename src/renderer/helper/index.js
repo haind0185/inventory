@@ -153,7 +153,6 @@ const functions = {
         return  { LargeUnitQty: LargeUnitQty, SmallUnitQty: SmallUnitQty }
     },
     unitQtyTransfer: (LargeUnitQty, SmallUnitQty, product) => {
-        
         if(SmallUnitQty > 0 && (!product.SmallUnit || product.ConversionRate <= 0)) {
             throw new Error(`Mã sản phẩm [${product.ProductCode}] không có đơn vị 2`);
         }

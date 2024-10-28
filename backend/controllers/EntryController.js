@@ -29,6 +29,14 @@ const EntryController = {
                 where.EntryDate = { [Op.eq]: `${req.query.EntryDate}` }
             }
 
+            if(req.query.EntryDateFrom) {
+                where.EntryDate = { ...where.EntryDate, [Op.gte]: `${req.query.EntryDateFrom}` }
+            }
+
+            if(req.query.EntryDateTo) {
+                where.EntryDate = { ...where.EntryDate, [Op.lte]: `${req.query.EntryDateTo}` }
+            }
+
             if(req.query.ProductCode) {
                 where.ProductCode = { [Op.like]: `%${req.query.ProductCode}%` }
             }
@@ -60,7 +68,7 @@ const EntryController = {
             if(total > 0) {
                 entries = await WarehouseEntry.findAll({
                     where: where,
-                    order: order,
+                    order: [['EntryDate', 'DESC'], ['id', 'DESC']],
                     limit: limit,
                     offset: offset,
                     include: [

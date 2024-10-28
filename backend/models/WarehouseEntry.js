@@ -14,7 +14,18 @@ const WarehouseEntry = sequelize.define('WarehouseEntry', {
     EntryType: {
         type: DataTypes.BOOLEAN,
         default: false
-    }
+    },
+    PriceQty: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            if(this.entries.length < 0) return 0
+            let total = 0
+            this.entries.forEach(item => {
+                total += item.PriceQty
+            });
+            return total
+        }
+    },
 });
 
 export default WarehouseEntry;

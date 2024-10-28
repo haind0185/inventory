@@ -59,6 +59,21 @@ const Entry = sequelize.define('Entry', {
         allowNull: false,
         default: 0,
     },
+    Qty: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            if(!this.product) return 0
+            return helper.unitQtyTransfer(this.LargeUnitQty, this.SmallUnitQty, this.product)
+        }
+    },
+    PriceQty: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            if(!this.product) return 0
+            let Qty = helper.unitQtyTransfer(this.LargeUnitQty, this.SmallUnitQty, this.product)
+            return Qty * this.Price
+        }
+    },
 }, {
     hooks: {
         afterBulkCreate: async (instances, options) => {

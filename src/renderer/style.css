@@ -313,6 +313,7 @@ table.t-border tbody tr.selected {
 
 .vs__selected-options {
     padding: 0;
+    overflow: hidden;
 }
 
 .v-select .vs__dropdown-toggle {
@@ -371,4 +372,8 @@ input::-webkit-inner-spin-button {
     width: 100%;
     display: flex;
     justify-content: center;
+}
+
+.show-list {
+    cursor: pointer;
 }

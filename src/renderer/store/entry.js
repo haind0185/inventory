@@ -15,10 +15,14 @@ const entryInit = {
     ExpiryDate: null,
     LargeUnitQty: 0,
     SmallUnitQty: 0,
+    Price: 0,
+    PriceQty: 0,
 }
 const payloadInit = {
     EntryCode: null,
     EntryDate: null,
+    EntryDateFrom: null,
+    EntryDateTo: null,
     EntryType: false,
 }
 
