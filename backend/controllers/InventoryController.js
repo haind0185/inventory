@@ -172,11 +172,22 @@ const InventoryController = {
                 inventories = await Inventory.findAll({
                     attributes: [
                         'ProductCode',
-                        [sequelize.fn('SUM', sequelize.col('LargeUnitQty')), 'LargeUnitQty'],
-                        [sequelize.fn('SUM', sequelize.col('SmallUnitQty')), 'SmallUnitQty'],
+                        [sequelize.literal("(CASE WHEN `product`.`SmallUnit` IS NOT NULL "+
+                            "THEN (SUM(`Inventory`.`LargeUnitQty`) + CAST(SUM(`Inventory`.`SmallUnitQty`) / `product`.`ConversionRate` AS INTEGER)) "+
+                            "ELSE SUM(`Inventory`.`LargeUnitQty`) "+
+                            "END)"), 'LargeUnitQty'],
+
+                        [sequelize.literal("(CASE WHEN `product`.`SmallUnit` IS NOT NULL "+
+                            "THEN (SUM(`Inventory`.`SmallUnitQty`) % `product`.`ConversionRate`) "+
+                            "ELSE SUM(`Inventory`.`SmallUnitQty`) "+
+                            "END)"), 'SmallUnitQty'],
+
                         [sequelize.literal("(CASE WHEN `product`.`SmallUnit` IS NOT NULL THEN SUM(`Inventory`.`LargeUnitQty`) * `product`.`ConversionRate` + SUM(`Inventory`.`SmallUnitQty`) ELSE SUM(`Inventory`.`LargeUnitQty`) END)"), 'Qty'],
+
                         [sequelize.literal("product.Price"), 'Price'],
+
                         [sequelize.literal("(CASE WHEN `product`.`SmallUnit` IS NOT NULL THEN (SUM(`Inventory`.`LargeUnitQty`) * `product`.`ConversionRate` + SUM(`Inventory`.`SmallUnitQty`)) * `product`.`Price` ELSE SUM(`Inventory`.`LargeUnitQty`) * `product`.`Price` END)"), 'QtyPrice'],
+
                         'ProductNameLabelGroup',
                     ],
                     include: [
