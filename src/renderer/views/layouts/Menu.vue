@@ -53,6 +53,10 @@ const menus = ref([
                 label: 'Kho theo HSD',
             },
             {
+                name: 'InventoryProduct',
+                label: 'Lịch sử mặt hàng',
+            },
+            {
                 name: 'InventorySafetyStock',
                 label: 'Tồn kho an toàn',
             },

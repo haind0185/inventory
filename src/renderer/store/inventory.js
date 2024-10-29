@@ -19,6 +19,15 @@ const initTotalSearch = {
     page: 1
 }
 
+const initProductSearch = {
+    ProductCode: null,
+    TypeDateFrom: null,
+    TypeDateTo: null,
+    sort: null,
+    sort_by: null,
+    page: 1
+}
+
 const createStore = defineStore('inventory', {
     state: () => {
         return {
@@ -27,6 +36,9 @@ const createStore = defineStore('inventory', {
             },
             totalSearch: {
                 ...initTotalSearch
+            },
+            productSearch: {
+                ...initProductSearch
             },
             inventories: []
         }
@@ -83,6 +95,18 @@ const createStore = defineStore('inventory', {
                     return false
                 })
         },
+        async product(params = {}) {
+            store.setLoading(true)
+            return await api.get(`/inventory/product`, { params: params })
+                .then((res) => {
+                    store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
 
         // mutation
         setSearch() {
@@ -100,6 +124,11 @@ const createStore = defineStore('inventory', {
         },
         resetTotalSearch() {
             this.totalSearch = {...this.totalSearch, ...initTotalSearch}
+        },
+        setProductSearch() {
+            this.productSearch.sort = null
+            this.productSearch.sort_by = 'asc'
+            this.productSearch.page = 1
         },
     },
 })

@@ -245,6 +245,90 @@ const InventoryController = {
         } catch (err) {
             return res.json(error(err.message, 501));
         }
+    },
+
+    product: async (req, res) => {
+        try {
+            console.log(req.query)
+
+            const { page, TypeDateFrom, TypeDateTo, ProductCode} = req.query;
+            const limit = 50
+            let offset = ((page ?? 1) - 1) * limit
+            /**
+             * set condition
+             */
+            if(!ProductCode) {
+                throw new Error("Không tìm thấy mặt hàng."); 
+            }
+
+            let whereDate = ''
+            if(TypeDateFrom && !TypeDateTo) {
+                whereDate = `AND TypeDate >= '${TypeDateFrom}'`
+            }
+            if(!TypeDateFrom && TypeDateTo) {
+                whereDate = `AND TypeDate <= '${TypeDateTo}'`
+            }
+
+            if(TypeDateFrom && TypeDateTo) {
+                whereDate = `AND (TypeDate >= '${TypeDateFrom}' AND TypeDate <= '${TypeDateTo}')`
+            }
+
+            let query =
+                `SELECT
+                    ProductCode,
+                    EntryCode AS Code,
+                    EntryDate AS TypeDate,
+                    LargeUnitQty,
+                    SmallUnitQty,
+                    Price,
+                    1 AS Type,
+                    createdAt
+                FROM
+                    Entries 
+                WHERE
+                    ProductCode = '${ProductCode}' ${whereDate}
+
+                UNION
+
+                SELECT
+                    ProductCode,
+                    ExitCode AS Code,
+                    ExitDate AS TypeDate,
+                    LargeUnitQty,
+                    SmallUnitQty,
+                    Price,
+                    0 AS Type,
+                    createdAt
+                FROM
+                    Exits 
+                WHERE
+                    ProductCode = '${ProductCode}' ${whereDate}`
+
+            const [result] = await sequelize.query(
+                `SELECT COUNT(*) as total FROM (${query})`
+            )
+
+            let total = result[0].total
+
+            const [results] = await sequelize.query(
+                `${query}
+                ORDER BY TypeDate ASC, createdAt ASC
+                LIMIT ${limit}
+                OFFSET ${offset}
+                `
+            );
+            
+            return res.json(success({
+                items: results,
+                total: total,
+                page: page,
+                page_count: Math.ceil(total / limit),
+                firstItem: results.length ? (((page - 1) * limit) + 1) : 0,
+                lastItem: results.length ? ((page * limit) <= total ? (page * limit) : total) : 0,
+            }));
+        } catch (err) {
+            return res.json(error(err.message, 501));
+        }
     }
 };
 
