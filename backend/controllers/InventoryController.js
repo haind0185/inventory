@@ -147,7 +147,7 @@ const InventoryController = {
             /**
              * page and limit a page
              */
-            const limit = 50
+            const limit = 100
             let offset = req.query.page ? ((req.query.page - 1) * limit) : 0
             
             /**
@@ -302,7 +302,7 @@ const InventoryController = {
                 FROM
                     Entries 
                 WHERE
-                    ProductCode = '${ProductCode}' ${whereDate}
+                    ProductCode = '${ProductCode}'
 
                 UNION
 
@@ -320,7 +320,8 @@ const InventoryController = {
                 FROM
                     Exits 
                 WHERE
-                    ProductCode = '${ProductCode}' ${whereDate}`
+                    ProductCode = '${ProductCode}'
+                ORDER BY TypeDate ASC, createdAt ASC`
             let view_table = `(
                 ${query}
             )`;
@@ -332,36 +333,46 @@ const InventoryController = {
 
             let total = result[0].total
 
-            let sumQtyColum = isSmall ? `(
-            SELECT (SUM(CalLargeUnitQty) * ${ConversionRate} + SUM(CalSmallUnitQty)) AS TotalPreUnitQty
-            FROM ${view_table} AS plus
-            WHERE plus.TypeDate <= view_table.TypeDate 
-		    AND plus.createdAt < view_table.createdAt ) AS TotalPreUnitQty`
-            : `(
-            SELECT (SUM(CalLargeUnitQty)) AS TotalPreUnitQty
-            FROM ${view_table} AS plus
-            WHERE plus.TypeDate <= view_table.TypeDate 
-		    AND plus.createdAt < view_table.createdAt ) AS TotalPreUnitQty`
-            const [results] = await sequelize.query(
-                `SELECT
+            let Qty = isSmall ? `(LargeUnitQty * ${ConversionRate} + SmallUnitQty)` : `LargeUnitQty`
+            let QtyPrice = `(${Qty} * Price)`
+
+            let CalQty = isSmall ? `(CalLargeUnitQty * ${ConversionRate} + CalSmallUnitQty)` : `CalLargeUnitQty`
+            let CalQtyPrice = `(${CalQty} * Price)`
+            
+            let SumQty = `(SUM(${CalQty}) OVER (ORDER BY TypeDate ASC, createdAt ASC))`
+            let SumQtyPrice = `(SUM(${CalQtyPrice}) OVER (ORDER BY TypeDate ASC, createdAt ASC))`
+
+            let stm = `(SELECT
                     ProductCode,
                     Code,
                     TypeDate,
+                    Price,
+
                     LargeUnitQty,
                     SmallUnitQty,
+                    ${Qty} AS Qty,
+                    ${QtyPrice} AS QtyPrice,
+
                     CalLargeUnitQty,
                     CalSmallUnitQty,
-                    Price,
+                    ${CalQty} AS CalQty,
+                    ${CalQtyPrice} AS CalQtyPrice,
+                    
+                    ${SumQty} AS SumQty,
+                    ${SumQtyPrice} AS SumQtyPrice,
+
                     Type,
-                    createdAt,
-                    ${sumQtyColum}
+                    createdAt
                 FROM
-                ${view_table} AS view_table
+                ${view_table} AS view_table)`
+
+            const [results] = await sequelize.query(`
+                SELECT * FROM ${stm}
+                WHERE true ${whereDate}
                 ORDER BY TypeDate ASC, createdAt ASC
                 LIMIT ${limit}
                 OFFSET ${offset}
-                `
-            );
+            `);
             
             return res.json(success({
                 items: results,

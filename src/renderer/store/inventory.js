@@ -109,7 +109,7 @@ const createStore = defineStore('inventory', {
         },
 
         // mutation
-        setSearch() {
+        setSearch(attr = {}) {
             this.search.sort = null
             this.search.sort_by = 'asc'
             this.search.page = 1
@@ -129,6 +129,12 @@ const createStore = defineStore('inventory', {
             this.productSearch.sort = null
             this.productSearch.sort_by = 'asc'
             this.productSearch.page = 1
+        },
+        resetProductSearch() {
+            this.productSearch = {...this.productSearch, ...initProductSearch}
+        },
+        setAttrProductSearch(attr = {}) {
+            this.search =  {...this.search, ...attr}
         },
     },
 })

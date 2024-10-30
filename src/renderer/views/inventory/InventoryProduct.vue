@@ -32,7 +32,7 @@
 
         <div class="flex mt-5">
             <div class="w-[40%] flex">
-                <Pagination v-if="data.total" v-model="search.page" class="mb-0" :page-count="products.page_count ?? 0" :click-handler="pagination"></Pagination>
+                <Pagination v-if="data.total" v-model="search.page" class="mb-0" :page-count="data.page_count ?? 0" :click-handler="pagination"></Pagination>
                 
             </div>
             <div class="flex justify-center w-[20%] items-center">
@@ -49,24 +49,50 @@
                 <thead>
                     <tr>
                         <th>
-                             Mã
+                            Mã SP
                         </th>
                         <th>
-                             Ngày xử lý
+                            Mã Đơn
                         </th>
                         <th>
-                             Loại
+                            Ngày xử lý
                         </th>
                         <th>
-                             S.L(Đv1)
+                            Đơn giá
                         </th>
                         <th>
-                             S.L(Đv2)
+                            S.L(Đv1)
+                        </th>
+                        <th>
+                            S.L(Đv2)
+                        </th>
+                        <th>
+                            Tổng S.L
+                        </th>
+                        <th>
+                            Thành tiền
+                        </th>
+                        <th>
+                            S.L(Kho)
+                        </th>
+                        <th>
+                            Thành tiền(Kho)
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    
+                    <tr v-for="item in data.items" :class="{'exit': !item.Type}">
+                        <td class="text-center">{{ item.ProductCode }}</td>
+                        <td class="text-left">{{ item.Code }}</td>
+                        <td class="text-center">{{ item.TypeDate }}</td>
+                        <td class="text-right">{{ format_number(item.Price) }}</td>
+                        <td class="text-right">{{ format_number(item.LargeUnitQty) }}</td>
+                        <td class="text-right">{{ format_number(item.SmallUnitQty) }}</td>
+                        <td class="text-right">{{ format_number(item.Qty) }}</td>
+                        <td class="text-right">{{ format_number(item.QtyPrice) }}</td>
+                        <td class="text-right">{{ format_number(item.SumQty) }}</td>
+                        <td class="text-right">{{ format_number(item.SumQtyPrice) }}</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -74,6 +100,12 @@
         
     </div>
 </template>
+
+<style>
+    .exit {
+        background-color: #edc4c4;
+    }
+</style>
 
 <script setup>
 import { onMounted, onBeforeMount, computed, watch, ref } from 'vue'
@@ -102,20 +134,20 @@ const list = async () => {
 const index = async () => {
     await inventoryStore.product(search.value).then((res) => {
         if(res && res.code == 200) {
-            console.log(res)
+            data.value = res.data
         }
     })
 }
 
 const sort = async () => {
     if (products.value.total > 0) {
-        search.value.page = 1
+        inventoryStore.setAttrProductSearch({page: 1})
         await index()
     }
 }
 
 const pagination = (page) => {
-    search.value.page = page
+    inventoryStore.setAttrProductSearch({page: page})
     index()
 }
 
