@@ -261,6 +261,19 @@ const InventoryController = {
                 throw new Error("Không tìm thấy mặt hàng."); 
             }
 
+            const product = await Product.findOne({
+                where: {
+                    ProductCode: ProductCode
+                }
+            })
+
+            if(!product) {
+                throw new Error("Không tìm thấy mặt hàng."); 
+            }
+
+            let isSmall = product.SmallUnit ? true : false
+            let ConversionRate = product.ConversionRate
+
             let whereDate = ''
             if(TypeDateFrom && !TypeDateTo) {
                 whereDate = `AND TypeDate >= '${TypeDateFrom}'`
@@ -273,6 +286,7 @@ const InventoryController = {
                 whereDate = `AND (TypeDate >= '${TypeDateFrom}' AND TypeDate <= '${TypeDateTo}')`
             }
 
+            
             let query =
                 `SELECT
                     ProductCode,
@@ -280,6 +294,8 @@ const InventoryController = {
                     EntryDate AS TypeDate,
                     LargeUnitQty,
                     SmallUnitQty,
+                    LargeUnitQty AS CalLargeUnitQty,
+                    SmallUnitQty AS CalSmallUnitQty,
                     Price,
                     1 AS Type,
                     createdAt
@@ -296,6 +312,8 @@ const InventoryController = {
                     ExitDate AS TypeDate,
                     LargeUnitQty,
                     SmallUnitQty,
+                    (0 - LargeUnitQty) AS CalLargeUnitQty,
+                    (0 - SmallUnitQty) AS CalSmallUnitQty,
                     Price,
                     0 AS Type,
                     createdAt
@@ -303,15 +321,42 @@ const InventoryController = {
                     Exits 
                 WHERE
                     ProductCode = '${ProductCode}' ${whereDate}`
+            let view_table = `(
+                ${query}
+            )`;
+
 
             const [result] = await sequelize.query(
-                `SELECT COUNT(*) as total FROM (${query})`
+                `SELECT COUNT(*) AS total FROM ${view_table}`
             )
 
             let total = result[0].total
 
+            let sumQtyColum = isSmall ? `(
+            SELECT (SUM(CalLargeUnitQty) * ${ConversionRate} + SUM(CalSmallUnitQty)) AS TotalPreUnitQty
+            FROM ${view_table} AS plus
+            WHERE plus.TypeDate <= view_table.TypeDate 
+		    AND plus.createdAt < view_table.createdAt ) AS TotalPreUnitQty`
+            : `(
+            SELECT (SUM(CalLargeUnitQty)) AS TotalPreUnitQty
+            FROM ${view_table} AS plus
+            WHERE plus.TypeDate <= view_table.TypeDate 
+		    AND plus.createdAt < view_table.createdAt ) AS TotalPreUnitQty`
             const [results] = await sequelize.query(
-                `${query}
+                `SELECT
+                    ProductCode,
+                    Code,
+                    TypeDate,
+                    LargeUnitQty,
+                    SmallUnitQty,
+                    CalLargeUnitQty,
+                    CalSmallUnitQty,
+                    Price,
+                    Type,
+                    createdAt,
+                    ${sumQtyColum}
+                FROM
+                ${view_table} AS view_table
                 ORDER BY TypeDate ASC, createdAt ASC
                 LIMIT ${limit}
                 OFFSET ${offset}
