@@ -66,12 +66,12 @@
                         <th>
                             S.L(Đv2)
                         </th>
-                        <th>
+                        <!-- <th>
                             Tổng S.L
                         </th>
                         <th>
                             Thành tiền
-                        </th>
+                        </th> -->
                         <th>
                             S.L(Kho)
                         </th>
@@ -88,8 +88,8 @@
                         <td class="text-right">{{ format_number(item.Price) }}</td>
                         <td class="text-right">{{ format_number(item.LargeUnitQty) }}</td>
                         <td class="text-right">{{ format_number(item.SmallUnitQty) }}</td>
-                        <td class="text-right">{{ format_number(item.Qty) }}</td>
-                        <td class="text-right">{{ format_number(item.QtyPrice) }}</td>
+                        <!-- <td class="text-right">{{ format_number(item.Qty) }}</td>
+                        <td class="text-right">{{ format_number(item.QtyPrice) }}</td> -->
                         <td class="text-right">{{ format_number(item.SumQty) }}</td>
                         <td class="text-right">{{ format_number(item.SumQtyPrice) }}</td>
                     </tr>
