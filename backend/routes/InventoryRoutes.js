@@ -13,7 +13,7 @@ router.get("/totalPrice", InventoryController.totalPrice);
 router.get("/product", InventoryController.product);
 
 router.get("/download-database", async (req, res) => {
-    const databasePath = app.isPackaged ? path.join(__dirname, 'database.sqlite') : path.join(__dirname, '../../database.sqlite');
+    const databasePath = app.isPackaged ? path.join(process.resourcesPath, '../database.sqlite') : path.join(__dirname, '../../database.sqlite');
     let filename = moment().format('YYYYMMDD_HHmmss')+"_database.sqlite"
 
     const { filePath: savePath } = await dialog.showSaveDialog({
@@ -22,7 +22,7 @@ router.get("/download-database", async (req, res) => {
         buttonLabel: 'Save'
     });
 
-    if (!savePath) return res.json();
+    if (!savePath) return res.json({path: databasePath});
 
     fs.copyFile(databasePath, savePath, (err) => {
         if (err) {
@@ -31,7 +31,7 @@ router.get("/download-database", async (req, res) => {
             console.log('File saved successfully to', savePath);
         }
     });
-    return res.json()
+    return res.json({path: databasePath})
 });
 
 const InventoryRouter = router;
