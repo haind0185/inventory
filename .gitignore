@@ -93,4 +93,4 @@ out/
 
 package-lock.json
 .vscode/
-.database.sqlite
+database.sqlite
