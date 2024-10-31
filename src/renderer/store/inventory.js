@@ -108,6 +108,19 @@ const createStore = defineStore('inventory', {
                 })
         },
 
+        async database() {
+            // store.setLoading(true)
+            return await api.get(`/inventory/download-database`)
+                .then((res) => {
+                    // store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    // store.setLoading(false)
+                    return false
+                })
+        },
+
         // mutation
         setSearch(attr = {}) {
             this.search.sort = null

@@ -30,12 +30,24 @@
                 </template>
             </template>
         </ul>
+        <ul class="menus">
+            <li class="flex flex-col gap-2 p-3 active setting">
+                <ul style="padding-right: 5px;" class="flex flex-col gap-1">
+                    <template v-for="item in setting">
+                        <li class="item">
+                            <a href="javascript:void(0)" class="justify-center menu-item" @click="item.action">{{ item.label }}</a>
+                        </li>
+                    </template>
+                </ul>
+            </li>
+        </ul>
     </div>
 </template>
 
 <script setup>
 import { onMounted, onBeforeMount, computed, watch, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { inventoryStore } from '@/store/inventory';
 
 const route = useRoute()
 
@@ -114,6 +126,18 @@ const dashboard = ref([
     {
         name: 'Dashboard',
         label: 'Dashboard',
+    }
+])
+
+const setting = ref([
+    {
+        name: 'DatabaseDownload',
+        label: 'Tải xuống Data',
+        action: async () => {
+            await inventoryStore.database().then((res) => {
+                
+            })
+        }
     }
 ])
 
