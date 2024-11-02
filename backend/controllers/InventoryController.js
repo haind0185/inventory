@@ -742,7 +742,7 @@ const InventoryController = {
 
             // format data in excel
             for (let rowIndex = 0; rowIndex < sheetData.length; rowIndex++) {
-                if(rowIndex == 0 || rowIndex == 1) {
+                if(rowIndex == 0) {
                     continue;
                 }
                 for(let colIndex = 0; colIndex < 11; colIndex++) {
