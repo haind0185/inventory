@@ -82,12 +82,15 @@ const messages = {
             reset: 'Dọn sạch',
             delete: 'Xóa bỏ',
             stock_report: 'Xuất file kiểm kho',
+            stocktaking: 'Kiểm kho bằng file',
+            export: 'Xuất file'
         },
         modal: {
             add_product: 'Thêm mặt hàng',
             add_entry: 'Nhập kho',
             add_exit: 'Xuất kho',
             detail_product: 'Chi tiết mặt hàng',
+            stocktaking: 'Danh sách kiểm kho',
         },
         title: {
             notify: 'Thông báo',

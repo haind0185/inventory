@@ -5,9 +5,10 @@ import { error, success } from './common/http';
 import { t } from '../../src/renderer/i18n';
 import { Service } from './common/download';
 import moment, { RFC_2822 } from 'moment';
+import { helper } from '../../src/renderer/helper';
 const { Op } = require('sequelize');
 const Joi = require('joi');
-const XLSX = require('xlsx');
+const xlsx = require('xlsx');
 
 const InventoryController = {
     index: async (req, res) => {
@@ -517,22 +518,22 @@ const InventoryController = {
                 };
             });
 
-            const workbook = XLSX.utils.book_new();
-            const worksheet = XLSX.utils.json_to_sheet(data);
+            const workbook = xlsx.utils.book_new();
+            const worksheet = xlsx.utils.json_to_sheet(data);
 
             // format data in excel
             Object.keys(data[0]).forEach((column, index) => {
                 for (let rowIndex = 0; rowIndex < data.length; rowIndex++) {
-                    const cellAddress = XLSX.utils.encode_cell({ c: index, r: rowIndex + 1 });
+                    const cellAddress = xlsx.utils.encode_cell({ c: index, r: rowIndex + 1 });
                     if(worksheet[cellAddress]) {
                         if (['Số lượng (đv1)', 'Số lượng (đv2)', 'Số lượng tổng'].includes(column)) {
                             worksheet[cellAddress].z = '#,##0';
                         }
-                        if (['Mã sản phẩm'].includes(column)) {
-                            worksheet[cellAddress].s = {
-                                alignment: { horizontal: 'right' } 
-                            }
-                        }
+                        // if (['Mã sản phẩm'].includes(column)) {
+                        //     worksheet[cellAddress].s = {
+                        //         alignment: { horizontal: 'right' } 
+                        //     }
+                        // }
                     }
                 }
             });
@@ -545,10 +546,240 @@ const InventoryController = {
             ];
 
             // add worksheet to workbook
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+            xlsx.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
             // add workbook to file and download
             let filename = moment().format('YYYYMMDD_HHmmss') + '_kiem_kho.xlsx';
+            const r = await Service.download(workbook, filename);
+
+            if (r) {
+                return res.json(
+                    success({
+                        path: r,
+                    })
+                );
+            }
+        } catch (err) {
+            return res.json(error(err.message, 501));
+        }
+    },
+
+    stocktaking: async (req, res) => {
+        const transaction = await sequelize.transaction();
+        try {
+            if (!req.file) {
+                throw new Error("Không tìm thấy file");
+            }
+    
+            const filePath = req.file.path;
+            const workbook = xlsx.readFile(filePath);
+    
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            let data = xlsx.utils.sheet_to_json(worksheet);
+
+            data = data.map(item => {
+                return {
+                    ProductCode : item.ProductCode,
+                    LargeUnitQty: item.LargeUnitQty,
+                    SmallUnitQty: item.SmallUnitQty,
+                }
+            })
+
+            const inventories = await Inventory.findAll({
+                attributes: [
+                    'ProductCode',
+                    [
+                        sequelize.literal(
+                            '(CASE WHEN `product`.`SmallUnit` IS NOT NULL ' +
+                                'THEN (SUM(`Inventory`.`LargeUnitQty`) + CAST(SUM(`Inventory`.`SmallUnitQty`) / `product`.`ConversionRate` AS INTEGER)) ' +
+                                'ELSE SUM(`Inventory`.`LargeUnitQty`) ' +
+                                'END)'
+                        ),
+                        'LargeUnitQty',
+                    ],
+                    [
+                        sequelize.literal(
+                            '(CASE WHEN `product`.`SmallUnit` IS NOT NULL ' +
+                                'THEN (SUM(`Inventory`.`SmallUnitQty`) % `product`.`ConversionRate`) ' +
+                                'ELSE SUM(`Inventory`.`SmallUnitQty`) ' +
+                                'END)'
+                        ),
+                        'SmallUnitQty',
+                    ],
+                    [
+                        sequelize.literal(
+                            '(CASE WHEN `product`.`SmallUnit` IS NOT NULL ' +
+                                'THEN SUM(`Inventory`.`LargeUnitQty`) * `product`.`ConversionRate` + SUM(`Inventory`.`SmallUnitQty`) ' +
+                                'ELSE SUM(`Inventory`.`LargeUnitQty`) ' +
+                                'END)'
+                        ),
+                        'Qty',
+                    ],
+                ],
+                include: [{ association: 'product' }],
+                group: ['Inventory.ProductCode'],
+            }, {transaction: transaction});
+
+            const results = inventories.map((item) => {
+                item = item.toJSON();
+
+                let resItem = {
+                    ProductCode: item.ProductCode,
+                    ProductName: item.product.ProductName,
+                    LargeUnitQty: item.LargeUnitQty,
+                    SmallUnitQty: item.SmallUnitQty,
+                    Qty: item.Qty,
+
+                    CheckLargeUnitQty: 0,
+                    CheckSmallUnitQty: 0,
+                    CheckQty: 0,
+
+                    DiscLargeUnitQty: item.LargeUnitQty,
+                    DiscSmallUnitQty: item.SmallUnitQty,
+                    DiscQty: item.Qty,
+
+                    Class: 'bg-3notfound'
+                }
+
+                let checkItem = data.find(i => i.ProductCode == item.ProductCode)
+                if(checkItem) {
+                    resItem.CheckLargeUnitQty = parseInt(checkItem.LargeUnitQty, 10);
+                    resItem.CheckSmallUnitQty = parseInt(checkItem.SmallUnitQty, 10);
+                    resItem.CheckQty = helper.unitQtyTransfer(resItem.CheckLargeUnitQty, resItem.CheckSmallUnitQty, item.product)
+
+                    resItem.DiscLargeUnitQty = resItem.LargeUnitQty - resItem.CheckLargeUnitQty
+                    resItem.DiscSmallUnitQty =  resItem.SmallUnitQty - resItem.CheckSmallUnitQty
+                    resItem.DiscQty = resItem.Qty - resItem.CheckQty
+                    resItem.Class = resItem.DiscQty < 0 ? 'bg-1warning' : (resItem.DiscQty > 0 ? 'bg-2omg' : 'bg-4nothing')
+                }
+
+                return resItem;
+            });
+            results.sort((a, b) => Math.abs(b.DiscQty) - Math.abs(a.DiscQty));
+            results.sort((a, b) => {
+                if (a.Class === b.Class) {
+                    return Math.abs(b.DiscQty) - Math.abs(a.DiscQty);
+                }
+                return a.Class.localeCompare(b.Class);
+            });
+
+            await transaction.commit();
+            return res.json(success(results));
+        } catch (err) {
+            await transaction.rollback();
+            return res.json(error(err.message, 501));
+        }
+    },
+
+    exportStocktaking: async (req, res) => {
+        try {
+            console.log(`Request.body:`, req.body);
+
+            const { data } = req.body;
+
+            // format data
+            let dataFormat = data.map((item) => {
+                return [
+                    item.ProductCode,
+                    item.ProductName,
+                    item.LargeUnitQty,
+                    item.SmallUnitQty,
+                    item.Qty,
+
+                    item.CheckLargeUnitQty,
+                    item.CheckSmallUnitQty,
+                    item.CheckQty,
+
+                    item.DiscLargeUnitQty,
+                    item.DiscSmallUnitQty,
+                    item.DiscQty,
+                ]
+            });
+
+            const sheetData = [
+                [
+                    'Mã mặt hàng',
+                    'Tên mặt hàng',
+                    'Trong kho',
+                    null,
+                    null,
+                    'Trong file',
+                    null,
+                    null,
+                    'Lệch',
+                    null,
+                    null,
+                ],
+                [
+                    null,
+                    null,
+                    'S.L(đv1)',
+                    'S.L(đv2)',
+                    'Tổng S.L',
+                    'S.L(đv1)',
+                    'S.L(đv2)',
+                    'Tổng S.L',
+                    'S.L(đv1)',
+                    'S.L(đv2)',
+                    'Tổng S.L',
+                ],
+                ...dataFormat
+            ]
+
+            const workbook = xlsx.utils.book_new();
+            const worksheet = xlsx.utils.aoa_to_sheet(sheetData);
+
+            worksheet['!merges'] = [
+                { s: { r: 0, c: 0 }, e: { r: 1, c: 0 } }, //Mã mặt hàng
+                { s: { r: 0, c: 1 }, e: { r: 1, c: 1 } }, //Tên mặt hàng
+
+                { s: { r: 0, c: 2 }, e: { r: 0, c: 4 } }, //Trong kho
+                { s: { r: 0, c: 5 }, e: { r: 0, c: 7 } }, //Trong file
+                { s: { r: 0, c: 8 }, e: { r: 0, c: 10 } }, //Lệch
+            ];
+            
+
+            // format data in excel
+            for (let rowIndex = 0; rowIndex < sheetData.length; rowIndex++) {
+                if(rowIndex == 0 || rowIndex == 1) {
+                    continue;
+                }
+                for(let colIndex = 0; colIndex < 11; colIndex++) {
+                    const cellAddress = xlsx.utils.encode_cell({ c: colIndex, r: rowIndex + 1 });
+                    if(worksheet[cellAddress]) {
+                        if ([2, 3, 4, 5, 6, 7, 8, 9, 10].includes(colIndex)) {
+                            worksheet[cellAddress].z = '#,##0';
+                        }
+
+                        // worksheet[cellAddress].s = {
+                        //     fill: {
+                        //         fgColor: { rgb: "D3D3D3" }
+                        //     }
+                        // };
+                    }
+                }
+            }
+            worksheet['!cols'] = [
+                { width: 12 },
+                { width: 62 },
+                { width: 8 },
+                { width: 8 },
+                { width: 8 },
+                { width: 8 },
+                { width: 8 },
+                { width: 8 },
+                { width: 8 },
+                { width: 8 },
+                { width: 8 },
+                
+            ];
+
+            // add worksheet to workbook
+            xlsx.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+            // add workbook to file and download
+            let filename = moment().format('YYYYMMDD_HHmmss') + '_kiem_kho_chenh_lech.xlsx';
             const r = await Service.download(workbook, filename);
 
             if (r) {

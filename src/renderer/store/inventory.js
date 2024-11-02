@@ -134,6 +134,32 @@ const createStore = defineStore('inventory', {
                 })
         },
 
+        async exportStocktaking(payload) {
+            // store.setLoading(true)
+            return await api.post(`/inventory/export-stocktaking`, payload)
+                .then((res) => {
+                    // store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    // store.setLoading(false)
+                    return false
+                })
+        },
+
+        async stocktaking(payload) {
+            store.setLoading(true)
+            return await api.post(`/inventory/stocktaking`, payload)
+                .then((res) => {
+                    store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
+
         // mutation
         setSearch(attr = {}) {
             this.search.sort = null

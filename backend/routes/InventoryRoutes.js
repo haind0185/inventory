@@ -1,6 +1,7 @@
 import moment from 'moment';
 import InventoryController from '../controllers/InventoryController';
 import { Service } from '../controllers/common/download';
+import { upload, setPermissions } from './multer';
 const express = require('express');
 const router = express.Router();
 const path = require('path');
@@ -23,6 +24,8 @@ router.get('/download-database', async (req, res) => {
 });
 
 router.get('/export-report', InventoryController.exportReport);
+router.post('/stocktaking', upload.single('file'), setPermissions, InventoryController.stocktaking);
+router.post('/export-stocktaking', InventoryController.exportStocktaking);
 
 const InventoryRouter = router;
 

@@ -21,6 +21,8 @@
         </form>
 
         <div class="flex items-center justify-end w-full gap-3 mt-5">
+            <input id="file" ref="file" type="file" @change="onFileChange($event)" class="hidden">
+            <button type="button" class="btn silver w-[9rem]" @click="openFile()">{{ $t('button.stocktaking') }}</button>
             <button type="button" class="btn silver w-[9rem]" @click="exportStockReport()">{{ $t("button.stock_report") }}</button>
         </div>
 
@@ -70,9 +72,9 @@
                     <tr v-for="item in inventories.items">
                         <td class="text-center">{{ item.ProductCode }}</td>
                         <td class="text-left">{{ item.product.ProductNameLabel }}</td>
-                        <td class="text-center">{{ `${item.LargeUnitQty} ${item.product?.LargeUnit}` }}</td>
-                        <td class="text-center">{{ item.product?.SmallUnit ? `${item.SmallUnitQty} ${item.product?.SmallUnit}` : '' }}</td>
-                        <td class="text-center">{{ item.Qty }}</td>
+                        <td class="text-center">{{ `${format_number(item.LargeUnitQty)} ${item.product?.LargeUnit}` }}</td>
+                        <td class="text-center">{{ item.product?.SmallUnit ? `${format_number(item.SmallUnitQty)} ${item.product?.SmallUnit}` : '' }}</td>
+                        <td class="text-center">{{ format_number(item.Qty) }}</td>
                         <td class="text-right">{{ format_number(item.Price) }}</td>
                         <td class="text-right">{{ format_number(item.QtyPrice) }}</td>
                     </tr>
@@ -80,17 +82,26 @@
             </table>
         </div>
     </div>
+    
+    <StocktakingModal
+            v-if="showStocktaking"
+            :show="showStocktaking"
+            @close="showStocktaking = false"
+            :data="stocktakingData" />
 </template>
 
 <script setup>
 import { onMounted, onBeforeMount, computed, watch, ref } from 'vue'
 import { inventoryStore } from '@/store/inventory';
 import ProgressBar from '../component/ProgressBar.vue';
+import StocktakingModal from './StocktakingModal.vue';
 
-const showAdd = ref(false)
+const showStocktaking = ref(false)
+const stocktakingData = ref([])
 const search = computed(() => inventoryStore.totalSearch)
 const inventories = ref({})
 const report = ref({})
+const file = ref(null)
 
 const clear = async () => {
     inventoryStore.resetTotalSearch()
@@ -135,10 +146,28 @@ const exportStockReport = async () => {
     await inventoryStore.stockReport().then((res) => {
         if(res && res.code == 200) {
             console.log(res)
-            // report.value = res.data
-            // console.log(res.data)
         }
     })
+}
+
+const openFile = () => {
+    file.value.value = null
+    file.value.click()
+}
+
+const onFileChange = async (e) => {
+    let file = e.target.files ? e.target.files[0] : null
+    if(file) {
+        let formData = new FormData();
+        formData.append('file', file);
+        await inventoryStore.stocktaking(formData).then((res) => {
+            if(res && res.code == 200) {
+                console.log(res)
+                stocktakingData.value = res.data
+                showStocktaking.value = true
+            }
+        })
+    }
 }
 
 onBeforeMount(async () => {
