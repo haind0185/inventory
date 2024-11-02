@@ -1,38 +1,28 @@
 import moment from 'moment';
-import InventoryController from "../controllers/InventoryController";
-const express = require("express");
+import InventoryController from '../controllers/InventoryController';
+import { Service } from '../controllers/common/download';
+const express = require('express');
 const router = express.Router();
 const path = require('path');
-const { app, dialog } = require('electron');
-const fs = require('fs');
+const { app } = require('electron');
 
-router.get("/", InventoryController.index);
-router.get("/list", InventoryController.list);
-router.get("/total", InventoryController.total);
-router.get("/totalPrice", InventoryController.totalPrice);
-router.get("/product", InventoryController.product);
+router.get('/', InventoryController.index);
+router.get('/list', InventoryController.list);
+router.get('/total', InventoryController.total);
+router.get('/totalPrice', InventoryController.totalPrice);
+router.get('/product', InventoryController.product);
 
-router.get("/download-database", async (req, res) => {
-    const databasePath = app.isPackaged ? path.join(process.resourcesPath, '../database.sqlite') : path.join(__dirname, '../../database.sqlite');
-    let filename = moment().format('YYYYMMDD_HHmmss')+"_database.sqlite"
+router.get('/download-database', async (req, res) => {
+    const databasePath = app.isPackaged
+        ? path.join(process.resourcesPath, '../database.sqlite')
+        : path.join(__dirname, '../../database.sqlite');
+    let filename = moment().format('YYYYMMDD_HHmmss') + '_database.sqlite';
 
-    const { filePath: savePath } = await dialog.showSaveDialog({
-        title: 'Save Database File',
-        defaultPath: filename,
-        buttonLabel: 'Save'
-    });
-
-    if (!savePath) return res.json({path: databasePath});
-
-    fs.copyFile(databasePath, savePath, (err) => {
-        if (err) {
-            console.error('Error saving the file:', err);
-        } else {
-            console.log('File saved successfully to', savePath);
-        }
-    });
-    return res.json({path: databasePath})
+    const r = await Service.copy(databasePath, filename);
+    return res.json({ path: r });
 });
+
+router.get('/export-report', InventoryController.exportReport);
 
 const InventoryRouter = router;
 

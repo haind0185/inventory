@@ -121,6 +121,19 @@ const createStore = defineStore('inventory', {
                 })
         },
 
+        async stockReport() {
+            // store.setLoading(true)
+            return await api.get(`/inventory/export-report`)
+                .then((res) => {
+                    // store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    // store.setLoading(false)
+                    return false
+                })
+        },
+
         // mutation
         setSearch(attr = {}) {
             this.search.sort = null

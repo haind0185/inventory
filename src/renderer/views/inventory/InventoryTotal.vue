@@ -20,6 +20,10 @@
             </div>
         </form>
 
+        <div class="flex items-center justify-end w-full gap-3 mt-5">
+            <button type="button" class="btn silver w-[9rem]" @click="exportStockReport()">{{ $t("button.stock_report") }}</button>
+        </div>
+
         <div class="flex mt-5">
             <div class="w-[40%] flex">
                 <Pagination v-if="inventories.total" v-model="search.page" class="mb-0" :page-count="inventories.page_count ?? 0" :click-handler="pagination"></Pagination>
@@ -122,6 +126,16 @@ const totalPrice = async () => {
     await inventoryStore.totalPrice().then((res) => {
         if(res && res.code == 200) {
             report.value = res.data
+            // console.log(res.data)
+        }
+    })
+}
+
+const exportStockReport = async () => {
+    await inventoryStore.stockReport().then((res) => {
+        if(res && res.code == 200) {
+            console.log(res)
+            // report.value = res.data
             // console.log(res.data)
         }
     })
