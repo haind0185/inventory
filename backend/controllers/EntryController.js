@@ -290,6 +290,214 @@ const EntryController = {
             return res.json(error(err.message, 501));
         }
     },
+
+    product: async (req, res) => {
+        try {
+            console.log(req.query)
+
+            /**
+             * set condition
+             */
+            const where = {}
+
+            if(req.query.ProductCode) {
+                where.ProductCode = { [Op.like]: `%${req.query.ProductCode}%` }
+            }
+
+            if(req.query.EntryCode) {
+                where.EntryCode = { [Op.like]: `%${req.query.EntryCode}%` }
+            }
+
+            if(req.query.EntryDateFrom) {
+                where.EntryDate = { ...where.EntryDate, [Op.gte]: `${req.query.EntryDateFrom}` }
+            }
+
+            if(req.query.EntryDateTo) {
+                where.EntryDate = { ...where.EntryDate, [Op.lte]: `${req.query.EntryDateTo}` }
+            }
+
+            /**
+             * order
+             */
+
+            /**
+             * page and limit a page
+             */
+            const limit = 50
+            let offset = req.query.page ? ((req.query.page - 1) * limit) : 0
+            
+            /**
+             * call select action
+             */
+            const groupedRecords = await Entry.count({
+                group: ['Entry.ProductCode'],
+                where: where,
+            });
+
+            let total = groupedRecords.length;
+
+            let entries = []
+            if(total > 0) {
+                entries = await Entry.findAll({
+                    attributes: [
+                        'ProductCode',
+                        'ProductNameLabel'
+                    ],
+                    group: ['Entry.ProductCode'],
+                    include: [
+                        { association: 'products', include: [{ association: 'product' }] },
+                        { association: 'product' },
+                    ],
+
+                    where: where,
+
+                    // paginate
+                    order: [
+                        [sequelize.literal('EntryDate'), 'DESC'],
+                        [sequelize.literal('id'), 'DESC']
+                    ],
+                    limit: limit,
+                    offset: offset,
+                });
+            }
+
+            let page = parseInt(req.query.page ?? 1)
+
+            return res.json(success({
+                items: entries,
+                total: total,
+                page: page,
+                page_count: Math.ceil(total / limit),
+                firstItem: entries.length ? (((page - 1) * limit) + 1) : 0,
+                lastItem: entries.length ? ((page * limit) <= total ? (page * limit) : total) : 0,
+            }));
+        } catch (err) {
+            return res.json(error(err.message, 501));
+        }
+    },
+
+    date: async (req, res) => {
+        try {
+            console.log(req.query)
+
+            /**
+             * set condition
+             */
+            const where = {}
+
+            if(req.query.ProductCode) {
+                where.ProductCode = { [Op.like]: `%${req.query.ProductCode}%` }
+            }
+
+            if(req.query.EntryCode) {
+                where.EntryCode = { [Op.like]: `%${req.query.EntryCode}%` }
+            }
+
+            if(req.query.EntryDateFrom) {
+                where.EntryDate = { ...where.EntryDate, [Op.gte]: `${req.query.EntryDateFrom}` }
+            }
+
+            if(req.query.EntryDateTo) {
+                where.EntryDate = { ...where.EntryDate, [Op.lte]: `${req.query.EntryDateTo}` }
+            }
+
+            /**
+             * order
+             */
+
+            /**
+             * page and limit a page
+             */
+            const limit = 50
+            let offset = req.query.page ? ((req.query.page - 1) * limit) : 0
+            
+            /**
+             * call select action
+             */
+            const groupedRecords = await Entry.count({
+                group: ['Entry.EntryDate'],
+                where: where,
+            });
+
+            let total = groupedRecords.length;
+
+            let entries = []
+            if(total > 0) {
+                entries = await Entry.findAll({
+                    attributes: [
+                        'EntryDate',
+                    ],
+                    group: ['Entry.EntryDate'],
+                    where: where,
+
+                    // paginate
+                    order: [
+                        [sequelize.literal('EntryDate'), 'DESC'],
+                        [sequelize.literal('id'), 'DESC']
+                    ],
+                    limit: limit,
+                    offset: offset,
+                }).then(async (dates) => {
+                    const EntryDates = dates.flatMap(date => date.EntryDate)
+                    return await Entry.findAll({
+                        attributes: [
+                            'EntryDate',
+                            'EntryCode',
+                        ],
+                        group: ['Entry.EntryCode'],
+                        where: {
+                            EntryDate: {
+                                [Op.in]: EntryDates
+                            }
+                        },
+                    }).then(async (codes) => {
+                        const EntryCodes = codes.flatMap(code => code.EntryCode)
+                        return await Entry.findAll({
+                            where: {
+                                EntryCode: {
+                                    [Op.in]: EntryCodes
+                                }
+                            },
+                            include: [{ association: 'product' }],
+                        }).then(async (entries) => {
+                            return dates.map(date => {
+                                // console.log(date.EntryDate)
+                                // console.log(codes.filter(item => {
+                                //     console.log(item)
+                                //     console.log(item.EntryDate)
+                                //     return item.EntryDate = date.EntryDate
+                                // }))
+                                return {
+                                    EntryDate: date.EntryDate,
+                                    codes: codes.filter(item => item.EntryDate == date.EntryDate).map(code => {
+                                        return {
+                                            EntryCode: code.EntryCode,
+                                            entries: entries.filter(item => item.EntryCode == code.EntryCode),
+                                        }
+                                    })
+                                }
+                            })
+                        })
+                    })
+
+                    return dates
+                });
+            }
+
+            let page = parseInt(req.query.page ?? 1)
+
+            return res.json(success({
+                items: entries,
+                total: total,
+                page: page,
+                page_count: Math.ceil(total / limit),
+                firstItem: entries.length ? (((page - 1) * limit) + 1) : 0,
+                lastItem: entries.length ? ((page * limit) <= total ? (page * limit) : total) : 0,
+            }));
+        } catch (err) {
+            return res.json(error(err.message, 501));
+        }
+    },
 };
 
 export default EntryController;

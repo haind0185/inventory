@@ -88,12 +88,12 @@ const menus = ref([
                 label: 'NK theo sản phẩm',
             },
             {
-                name: 'EntryProductExpiry',
-                label: 'NK theo HSD',
-            },
-            {
                 name: 'EntryDate',
                 label: 'NK theo ngày',
+            },
+            {
+                name: 'EntryProductExpiry',
+                label: 'NK theo HSD',
             },
         ],
         open: false,

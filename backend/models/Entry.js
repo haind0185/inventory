@@ -74,6 +74,13 @@ const Entry = sequelize.define('Entry', {
             return Qty * this.Price
         }
     },
+    ProductNameLabel: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            if(!this.product) return ''
+            return `[${this.product.ProductCode}] ${this.product.ProductName} [${this.product.LargeUnit}]` + (this.product.SmallUnit ? `[x${this.product.ConversionRate}][${this.product.SmallUnit}]` : '') + `[${this.product.Expire} ngày]`;
+        }
+    },
 }, {
     hooks: {
         afterBulkCreate: async (instances, options) => {
@@ -133,5 +140,9 @@ Entry.belongsTo(Product, { foreignKey: 'ProductCode', targetKey: 'ProductCode', 
 
 WarehouseEntry.hasMany(Entry, { foreignKey: 'EntryCode', sourceKey: 'EntryCode', as: 'entries' });
 Entry.belongsTo(WarehouseEntry, { foreignKey: 'EntryCode', targetKey: 'EntryCode', as: 'warehouseEntry' });
+
+Entry.hasMany(Entry, { foreignKey: 'ProductCode', sourceKey: 'ProductCode', as: 'products' });
+// Entry.hasMany(Entry, { foreignKey: 'EntryDate', sourceKey: 'EntryDate', as: 'dates' });
+// Entry.hasMany(Entry, { foreignKey: 'EntryCode', sourceKey: 'EntryCode', as: 'codes' });
 
 export default Entry;

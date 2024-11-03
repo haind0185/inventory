@@ -54,12 +54,10 @@
                 </thead>
                 <tbody>
                     <template v-for="item in entries.items">
-                        <tr style="background: rgb(210 221 245);">
-                            <td class="w-[2.5rem] text-center show-list" @click="item.show = !item.show">{{ item.entries.length }}<br>{{ item.show ? '-' : '+' }}</td>
-                            <td colspan="6" class="text-center">
-                                Mã nhập: {{ item.EntryCode }}
-                                <br>
-                                Ngày nhập: {{ item.EntryDate }}
+                        <tr style="background: #dfe6f5; cursor: pointer;" @click="item.show = !item.show">
+                            <td class="w-[2.5rem] text-center show-list">{{ item.entries.length }}</td>
+                            <td colspan="6" class="text-left">
+                                [{{ item.show ? '-' : '+' }}] [Mã nhập: {{ item.EntryCode }}] [Ngày nhập: {{ item.EntryDate }}]
                             </td>
                             <td class="text-right">
                                 {{ format_number(item.PriceQty) }}
@@ -95,7 +93,14 @@ import { productStore } from '@/store/product';
 import EntryAdd from './EntryAdd.vue';
 
 const showAdd = ref(false)
-const search = computed(() => entryStore.search)
+const search = computed({
+    get() {
+        return entryStore.search;
+    },
+    set(value) {
+        entryStore.search = value;
+    },
+})
 const entries = ref({})
 
 const onShowAdd = async () => {

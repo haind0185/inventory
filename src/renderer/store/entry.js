@@ -10,6 +10,24 @@ const searchInit = {
     sort_by: null,
     page: 1
 }
+const productSearchInit = {
+    ProductCode: null,
+    EntryCode: null,
+    EntryDateFrom: null,
+    EntryDateTo: null,
+    sort: null,
+    sort_by: null,
+    page: 1
+}
+const dateSearchInit = {
+    ProductCode: null,
+    EntryCode: null,
+    EntryDateFrom: null,
+    EntryDateTo: null,
+    sort: null,
+    sort_by: null,
+    page: 1
+}
 const entryInit = {
     ProductCode: null,
     ExpiryDate: null,
@@ -31,6 +49,12 @@ const createStore = defineStore('entry', {
         return {
             search: {
                 ...searchInit
+            },
+            productSearch: {
+                ...productSearchInit
+            },
+            dateSearch: {
+                ...dateSearchInit
             },
             payload: {
                 ...payloadInit
@@ -82,6 +106,32 @@ const createStore = defineStore('entry', {
                 })
         },
 
+        async product(params) {
+            store.setLoading(true)
+            return await api.get(`/entries/product`, { params: params })
+                .then((res) => {
+                    store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
+
+        async date(params) {
+            store.setLoading(true)
+            return await api.get(`/entries/date`, { params: params })
+                .then((res) => {
+                    store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
+
         // mutation
         setSearch() {
             this.search.sort = null
@@ -89,6 +139,20 @@ const createStore = defineStore('entry', {
         },
         resetSearch() {
             this.search = {...this.search, ...searchInit}
+        },
+        setProductSearch() {
+            this.productSearch.sort = null
+            this.productSearch.sort_by = 'asc'
+        },
+        resetProductSearch() {
+            this.productSearch = {...this.productSearch, ...productSearchInit}
+        },
+        setDateSearch() {
+            this.dateSearch.sort = null
+            this.dateSearch.sort_by = 'asc'
+        },
+        resetDateSearch() {
+            this.dateSearch = {...this.dateSearch, ...dateSearchInit}
         },
         add() {
             this.entries.push({...entryInit})

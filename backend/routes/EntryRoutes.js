@@ -10,6 +10,9 @@ router.post('/', EntryController.store);
 
 router.post('/import', upload.single('file'), setPermissions, EntryController.import);
 
+router.get('/product', EntryController.product);
+router.get('/date', EntryController.date);
+
 const EntryRouter = router;
 
 export default EntryRouter;

@@ -53,12 +53,10 @@
                 </thead>
                 <tbody>
                     <template v-for="item in exits.items">
-                        <tr style="background: rgb(210 221 245);">
-                            <td class="w-[2.5rem] text-center show-list" @click="item.show = !item.show">{{ item.exits.length }}<br>{{ item.show ? '-' : '+' }}</td>
-                            <td colspan="5" class="text-center">
-                                Mã xuất: {{ item.ExitCode }}
-                                <br>
-                                Ngày xuất: {{ item.ExitDate }}
+                        <tr style="background: #dfe6f5; cursor: pointer;" @click="item.show = !item.show">
+                            <td class="w-[2.5rem] text-center show-list">{{ item.exits.length }}</td>
+                            <td colspan="5" class="text-left">
+                                [{{ item.show ? '-' : '+' }}] [Mã xuất: {{ item.ExitCode }}] [Ngày xuất: {{ item.ExitDate }}]
                             </td>
                             <td class="text-right">
                                 {{ format_number(item.PriceQty) }}

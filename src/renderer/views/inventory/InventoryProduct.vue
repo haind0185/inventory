@@ -7,9 +7,6 @@
                         <legend>{{ $t("attr.inventory.ProductName") }}</legend>
                         <template v-if="products.length > 0">
                             <select2 class="form-control" required :options="products" v-model="search.ProductCode" label="ProductNameLabel" :reduce="item => item.ProductCode">
-                                <template #search="{attributes, events}">
-                                    <input class="vs__search" :required="!search.ProductCode" v-bind="attributes" v-on="events" />
-                                </template>
                             </select2>
                         </template>
                     </fieldset>
@@ -26,7 +23,7 @@
                 </div>
             </div>
             <div class="flex items-end gap-3">
-                <button type="submit" class="btn w-[6rem]">{{ $t("button.search") }}</button>
+                <button type="submit" class="btn w-[6rem]" :disabled="!search.ProductCode">{{ $t("button.search") }}</button>
             </div>
         </form>
 
