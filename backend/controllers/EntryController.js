@@ -461,12 +461,6 @@ const EntryController = {
                             include: [{ association: 'product' }],
                         }).then(async (entries) => {
                             return dates.map(date => {
-                                // console.log(date.EntryDate)
-                                // console.log(codes.filter(item => {
-                                //     console.log(item)
-                                //     console.log(item.EntryDate)
-                                //     return item.EntryDate = date.EntryDate
-                                // }))
                                 return {
                                     EntryDate: date.EntryDate,
                                     codes: codes.filter(item => item.EntryDate == date.EntryDate).map(code => {
@@ -479,8 +473,6 @@ const EntryController = {
                             })
                         })
                     })
-
-                    return dates
                 });
             }
 

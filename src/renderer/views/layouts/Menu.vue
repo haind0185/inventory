@@ -91,10 +91,10 @@ const menus = ref([
                 name: 'EntryDate',
                 label: 'NK theo ngày',
             },
-            {
-                name: 'EntryProductExpiry',
-                label: 'NK theo HSD',
-            },
+            // {
+            //     name: 'EntryProductExpiry',
+            //     label: 'NK theo HSD',
+            // },
         ],
         open: false,
     },

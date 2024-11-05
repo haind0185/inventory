@@ -69,6 +69,13 @@ const Exit = sequelize.define('Exit', {
             return Qty * this.Price
         }
     },
+    ProductNameLabel: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            if(!this.product) return ''
+            return `[${this.product.ProductCode}] ${this.product.ProductName} [${this.product.LargeUnit}]` + (this.product.SmallUnit ? `[x${this.product.ConversionRate}][${this.product.SmallUnit}]` : '') + `[${this.product.Expire} ngày]`;
+        }
+    },
 });
 
 Product.hasMany(Exit, { foreignKey: 'ProductCode', sourceKey: 'ProductCode', as: 'exits' });
@@ -76,5 +83,7 @@ Exit.belongsTo(Product, { foreignKey: 'ProductCode', targetKey: 'ProductCode', a
 
 WarehouseExit.hasMany(Exit, { foreignKey: 'ExitCode', sourceKey: 'ExitCode', as: 'exits' });
 Exit.belongsTo(WarehouseExit, { foreignKey: 'ExitCode', targetKey: 'ExitCode', as: 'warehouseExit' });
+
+Exit.hasMany(Exit, { foreignKey: 'ProductCode', sourceKey: 'ProductCode', as: 'products' });
 
 export default Exit;

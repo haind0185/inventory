@@ -354,6 +354,206 @@ const ExitController = {
             return res.json(error(err.message, 501));
         }
     },
+
+    product: async (req, res) => {
+        try {
+            console.log(req.query)
+
+            /**
+             * set condition
+             */
+            const where = {}
+
+            if(req.query.ProductCode) {
+                where.ProductCode = { [Op.like]: `%${req.query.ProductCode}%` }
+            }
+
+            if(req.query.ExitCode) {
+                where.ExitCode = { [Op.like]: `%${req.query.ExitCode}%` }
+            }
+
+            if(req.query.ExitDateFrom) {
+                where.ExitDate = { ...where.ExitDate, [Op.gte]: `${req.query.ExitDateFrom}` }
+            }
+
+            if(req.query.ExitDateTo) {
+                where.ExitDate = { ...where.ExitDate, [Op.lte]: `${req.query.ExitDateTo}` }
+            }
+
+            /**
+             * order
+             */
+
+            /**
+             * page and limit a page
+             */
+            const limit = 50
+            let offset = req.query.page ? ((req.query.page - 1) * limit) : 0
+            
+            /**
+             * call select action
+             */
+            const groupedRecords = await Exit.count({
+                group: ['Exit.ProductCode'],
+                where: where,
+            });
+
+            let total = groupedRecords.length;
+
+            let exits = []
+            if(total > 0) {
+                exits = await Exit.findAll({
+                    attributes: [
+                        'ProductCode',
+                        'ProductNameLabel'
+                    ],
+                    group: ['Exit.ProductCode'],
+                    include: [
+                        { association: 'products', include: [{ association: 'product' }] },
+                        { association: 'product' },
+                    ],
+
+                    where: where,
+
+                    // paginate
+                    order: [
+                        [sequelize.literal('ExitDate'), 'DESC'],
+                        [sequelize.literal('id'), 'DESC']
+                    ],
+                    limit: limit,
+                    offset: offset,
+                });
+            }
+
+            let page = parseInt(req.query.page ?? 1)
+
+            return res.json(success({
+                items: exits,
+                total: total,
+                page: page,
+                page_count: Math.ceil(total / limit),
+                firstItem: exits.length ? (((page - 1) * limit) + 1) : 0,
+                lastItem: exits.length ? ((page * limit) <= total ? (page * limit) : total) : 0,
+            }));
+        } catch (err) {
+            return res.json(error(err.message, 501));
+        }
+    },
+
+    date: async (req, res) => {
+        try {
+            console.log(req.query)
+
+            /**
+             * set condition
+             */
+            const where = {}
+
+            if(req.query.ProductCode) {
+                where.ProductCode = { [Op.like]: `%${req.query.ProductCode}%` }
+            }
+
+            if(req.query.ExitCode) {
+                where.ExitCode = { [Op.like]: `%${req.query.ExitCode}%` }
+            }
+
+            if(req.query.ExitDateFrom) {
+                where.ExitDate = { ...where.ExitDate, [Op.gte]: `${req.query.ExitDateFrom}` }
+            }
+
+            if(req.query.ExitDateTo) {
+                where.ExitDate = { ...where.ExitDate, [Op.lte]: `${req.query.ExitDateTo}` }
+            }
+
+            /**
+             * order
+             */
+
+            /**
+             * page and limit a page
+             */
+            const limit = 50
+            let offset = req.query.page ? ((req.query.page - 1) * limit) : 0
+            
+            /**
+             * call select action
+             */
+            const groupedRecords = await Exit.count({
+                group: ['Exit.ExitDate'],
+                where: where,
+            });
+
+            let total = groupedRecords.length;
+
+            let exits = []
+            if(total > 0) {
+                exits = await Exit.findAll({
+                    attributes: [
+                        'ExitDate',
+                    ],
+                    group: ['Exit.ExitDate'],
+                    where: where,
+
+                    // paginate
+                    order: [
+                        [sequelize.literal('ExitDate'), 'DESC'],
+                        [sequelize.literal('id'), 'DESC']
+                    ],
+                    limit: limit,
+                    offset: offset,
+                }).then(async (dates) => {
+                    const ExitDates = dates.flatMap(date => date.ExitDate)
+                    return await Exit.findAll({
+                        attributes: [
+                            'ExitDate',
+                            'ExitCode',
+                        ],
+                        group: ['Exit.ExitCode'],
+                        where: {
+                            ExitDate: {
+                                [Op.in]: ExitDates
+                            }
+                        },
+                    }).then(async (codes) => {
+                        const ExitCodes = codes.flatMap(code => code.ExitCode)
+                        return await Exit.findAll({
+                            where: {
+                                ExitCode: {
+                                    [Op.in]: ExitCodes
+                                }
+                            },
+                            include: [{ association: 'product' }],
+                        }).then(async (exits) => {
+                            return dates.map(date => {
+                                return {
+                                    ExitDate: date.ExitDate,
+                                    codes: codes.filter(item => item.ExitDate == date.ExitDate).map(code => {
+                                        return {
+                                            ExitCode: code.ExitCode,
+                                            exits: exits.filter(item => item.ExitCode == code.ExitCode),
+                                        }
+                                    })
+                                }
+                            })
+                        })
+                    })
+                });
+            }
+
+            let page = parseInt(req.query.page ?? 1)
+
+            return res.json(success({
+                items: exits,
+                total: total,
+                page: page,
+                page_count: Math.ceil(total / limit),
+                firstItem: exits.length ? (((page - 1) * limit) + 1) : 0,
+                lastItem: exits.length ? ((page * limit) <= total ? (page * limit) : total) : 0,
+            }));
+        } catch (err) {
+            return res.json(error(err.message, 501));
+        }
+    },
 };
 
 export default ExitController;
