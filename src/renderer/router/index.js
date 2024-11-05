@@ -2,7 +2,7 @@ import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router
 
 const routes = [
     {
-        path: '/',
+        path: '',
         redirect: '/dashboard',
         component: () => import("@/views/layouts/Master.vue"),
         meta: {
