@@ -260,6 +260,75 @@ const EntryController = {
         }
     },
 
+    delete: async (req, res) => {
+        const transaction = await sequelize.transaction();
+        try {
+            const { EntryCode } = req.body;
+
+            const updateInventory = async(EntryCode) => {
+                const entries = await Entry.findAll({
+                    where: {
+                        EntryCode: EntryCode
+                    },
+                    include: { association: 'product', required: true }
+                })
+    
+                if(entries.length < 0) {
+                    throw new Error(`Không tìm thấy đơn nhập này.`);
+                }
+    
+                for(const i in entries) {
+                    const entry = entries[i]
+                    let inventory = await Inventory.findOne({
+                        where: {
+                            ProductCode: entry.ProductCode,
+                            ExpiryDate: entry.ExpiryDate
+                        }
+                    })
+                    if(!inventory) {
+                        throw new Error(`Không tìm thấy [${entry.ProductCode}] có HSD [${entry.ExpiryDate}] trong kho.`);
+                    }
+    
+                    let inventQty = helper.unitQtyTransfer(inventory.LargeUnitQty, inventory.SmallUnitQty, entry.product)
+                    let entryQty = helper.unitQtyTransfer(entry.LargeUnitQty, entry.SmallUnitQty, entry.product)
+                    let newInventQty = inventQty - entryQty
+                    if(newInventQty < 0) {
+                        throw new Error(`Mã [${entry.ProductCode}] có HSD [${entry.ExpiryDate}] trong kho không đủ để xóa bỏ đơn này.`);
+                    }
+                    let qtyLS = helper.unitQtyLS(newInventQty, entry.product)
+                    console.log(entry.ProductCode, qtyLS.LargeUnitQty)
+                    inventory.LargeUnitQty = qtyLS.LargeUnitQty
+                    inventory.SmallUnitQty = qtyLS.SmallUnitQty
+                    await inventory.save({transaction: transaction})
+                }
+                
+                return true
+            }
+
+            await updateInventory(EntryCode).then(async (res) => {
+                return await transaction.commit().then(async (res) => {
+                    await Entry.destroy({
+                        where: {
+                            EntryCode: EntryCode
+                        }
+                    }).then(async (res) => {
+                        await WarehouseEntry.destroy({
+                            where: {
+                                EntryCode: EntryCode
+                            }
+                        }).then((res) => {
+                            return res
+                        })
+                    })
+                });
+            })
+            return res.json(success());
+        } catch (err) {
+            await transaction.rollback();
+            return res.json(error(err.message, 501));
+        }
+    },
+
     import: async (req, res) => {
         const transaction = await sequelize.transaction();
         try {

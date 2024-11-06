@@ -93,6 +93,18 @@ const createStore = defineStore('entry', {
                     return false
                 })
         },
+        async destroy(payload) {
+            store.setLoading(true)
+            return await api.post(`/entries/delete`, payload)
+                .then((res) => {
+                    store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
         async import(payload) {
             store.setLoading(true)
             return await api.post(`/entries/import`, payload)

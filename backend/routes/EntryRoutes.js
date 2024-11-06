@@ -8,6 +8,8 @@ router.get('/', EntryController.index);
 
 router.post('/', EntryController.store);
 
+router.post('/delete', EntryController.delete);
+
 router.post('/import', upload.single('file'), setPermissions, EntryController.import);
 
 router.get('/product', EntryController.product);

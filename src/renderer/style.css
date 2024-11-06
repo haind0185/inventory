@@ -382,3 +382,15 @@ input::-webkit-inner-spin-button {
     background: #344272;
     border-radius: 4px;
 }
+
+.link {
+    color: #408dfb;
+    text-decoration: underline;
+}
+.link:hover {
+    text-decoration-line: underline;
+    text-underline-offset: 3px;
+}
+.link.red {
+    color: red;
+}

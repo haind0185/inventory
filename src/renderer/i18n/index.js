@@ -59,6 +59,7 @@ const messages = {
             },
             entry: {
                 code_exists: 'Mã nhập kho đã tồn tại',
+                code_not_exists: 'Mã nhập kho này chưa có',
                 no_entry: 'Thêm mặt hàng để nhập kho',
             },
             exit: {
