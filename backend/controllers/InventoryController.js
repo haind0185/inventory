@@ -18,8 +18,8 @@ const InventoryController = {
             /**
              * set condition
              */
-            const where = {};
-            const productWhere = {};
+            let where = {};
+            let productWhere = {};
             if (req.query.ProductCode) {
                 where.ProductCode = { [Op.like]: `%${req.query.ProductCode}%` };
             }
@@ -27,6 +27,14 @@ const InventoryController = {
                 productWhere.ProductName = {
                     [Op.like]: `%${req.query.ProductName}%`,
                 };
+            }
+            if(!req.query.IsShowEmpty || req.query.IsShowEmpty == 'false') {
+                where = {...where, ...{
+                    [Op.or]: [
+                        {LargeUnitQty: {[Op.gt]: 0}},
+                        {SmallUnitQty: {[Op.gt]: 0}},
+                    ]
+                }}
             }
 
             /**
@@ -85,7 +93,7 @@ const InventoryController = {
                         ],
                     },
                     where: where,
-                    order: order,
+                    order: [...order, ['ExpirePercent', 'ASC']],
                     limit: limit,
                     offset: offset,
                     include: [{ association: 'product', where: productWhere }],

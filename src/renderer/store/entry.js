@@ -39,8 +39,6 @@ const entryInit = {
 const payloadInit = {
     EntryCode: null,
     EntryDate: null,
-    EntryDateFrom: null,
-    EntryDateTo: null,
     EntryType: false,
 }
 
@@ -81,9 +79,33 @@ const createStore = defineStore('entry', {
                     return false
                 })
         },
+        async show(params) {
+            store.setLoading(true)
+            return await api.get(`/entries/show`, { params: params })
+                .then((res) => {
+                    store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
         async store(payload) {
             store.setLoading(true)
             return await api.post(`/entries`, payload)
+                .then((res) => {
+                    store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
+        async update(payload) {
+            store.setLoading(true)
+            return await api.post(`/entries/update`, payload)
                 .then((res) => {
                     store.setLoading(false)
                     return res.data

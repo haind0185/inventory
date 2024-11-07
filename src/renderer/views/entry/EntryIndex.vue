@@ -61,7 +61,7 @@
                             </td>
                             <td colspan="1" style="cursor: default;">
                                 <div class="flex justify-end w-full">
-                                    <a href="javascript:void(0)" class="link red" @click="onDelete(item.EntryCode)">Xóa bỏ</a>
+                                    <a href="javascript:void(0)" class="link" @click="onShowDetail(item.EntryCode)">Chi tiết</a>
                                 </div>
                             </td>
                             <td @click="item.show = !item.show">
@@ -89,6 +89,13 @@
             @close="onCloseAdd($event)"
             @save="onSaveAdd($event)" />
 
+        <EntryDetail
+            v-if="showDetail.show"
+            :show="showDetail.show"
+            :data="showDetail.data"
+            @close="onCloseDetail($event)"
+            @save="onSaveDetail($event)" />
+
         <Confirm ref="confirm"></Confirm>
     </div>
 </template>
@@ -98,9 +105,14 @@ import { onMounted, onBeforeMount, computed, watch, ref } from 'vue'
 import { entryStore } from '@/store/entry';
 import { productStore } from '@/store/product';
 import EntryAdd from './EntryAdd.vue';
+import EntryDetail from './EntryDetail.vue';
 import { t } from '@/i18n'
 
 const showAdd = ref(false)
+const showDetail = ref({
+    show: false,
+    data: null
+})
 const search = computed({
     get() {
         return entryStore.search;
@@ -124,6 +136,30 @@ const onCloseAdd = (event) => {
 }
 const onSaveAdd = (event) => {
     showAdd.value = false
+    if(event) {
+        index()
+    }
+}
+
+const onShowDetail = async (EntryCode) => {
+    await list()
+    await entryStore.show({EntryCode: EntryCode}).then((res) => {
+        if(res && res.code == 200) {
+            showDetail.value.data = res.data
+            showDetail.value.show = true
+        }
+    })
+}
+const onCloseDetail = (event) => {
+    showDetail.value.show = false
+    showDetail.value.data = null
+    if(event) {
+        index()
+    }
+}
+const onSaveDetail = (event) => {
+    showDetail.value.show = false
+    showDetail.value.data = null
     if(event) {
         index()
     }

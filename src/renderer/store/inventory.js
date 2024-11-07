@@ -6,6 +6,7 @@ import { store } from '.'
 const initSearch = {
     ProductCode: null,
     ProductName: null,
+    IsShowEmpty: false,
     sort: null,
     sort_by: null,
     page: 1

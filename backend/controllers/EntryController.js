@@ -12,7 +12,7 @@ const Joi = require('joi');
 
 const EntryController = {
 
-    index: async (req, res) => {
+    index: async function (req, res) {
         try {
             console.log(req.query)
 
@@ -92,7 +92,32 @@ const EntryController = {
         }
     },
 
-    store: async (req, res) => {
+    show: async function (req, res) {
+        try {
+            console.log(req.query)
+
+            if (!req.query.EntryCode) {
+                throw new Error(`Thiếu EntryCode.`);
+            }
+
+            const entries = await WarehouseEntry.findOne({
+                where: {
+                    'EntryCode': req.query.EntryCode
+                },
+                include: { association: 'entries' }
+            })
+
+            if(!entries) {
+                throw new Error(`Không tìm thấy đơn nhập này.`);
+            }
+
+            return res.json(success(entries));
+        } catch (err) {
+            return res.json(error(err.message, 501));
+        }
+    },
+
+    store: async function (req, res) {
         const transaction = await sequelize.transaction();
         try {
             const { EntryCode, EntryDate, EntryType, entries } = req.body;
@@ -260,68 +285,57 @@ const EntryController = {
         }
     },
 
-    delete: async (req, res) => {
-        const transaction = await sequelize.transaction();
+    update: async function (req, res) {
+        const deleteTransaction = await sequelize.transaction();
+        const insertTransaction = await sequelize.transaction();
         try {
+
             const { EntryCode } = req.body;
 
-            const updateInventory = async(EntryCode) => {
-                const entries = await Entry.findAll({
-                    where: {
-                        EntryCode: EntryCode
-                    },
-                    include: { association: 'product', required: true }
-                })
-    
-                if(entries.length < 0) {
-                    throw new Error(`Không tìm thấy đơn nhập này.`);
-                }
-    
-                for(const i in entries) {
-                    const entry = entries[i]
-                    let inventory = await Inventory.findOne({
-                        where: {
-                            ProductCode: entry.ProductCode,
-                            ExpiryDate: entry.ExpiryDate
-                        }
-                    })
-                    if(!inventory) {
-                        throw new Error(`Không tìm thấy [${entry.ProductCode}] có HSD [${entry.ExpiryDate}] trong kho.`);
-                    }
-    
-                    let inventQty = helper.unitQtyTransfer(inventory.LargeUnitQty, inventory.SmallUnitQty, entry.product)
-                    let entryQty = helper.unitQtyTransfer(entry.LargeUnitQty, entry.SmallUnitQty, entry.product)
-                    let newInventQty = inventQty - entryQty
-                    if(newInventQty < 0) {
-                        throw new Error(`Mã [${entry.ProductCode}] có HSD [${entry.ExpiryDate}] trong kho không đủ để xóa bỏ đơn này.`);
-                    }
-                    let qtyLS = helper.unitQtyLS(newInventQty, entry.product)
-                    console.log(entry.ProductCode, qtyLS.LargeUnitQty)
-                    inventory.LargeUnitQty = qtyLS.LargeUnitQty
-                    inventory.SmallUnitQty = qtyLS.SmallUnitQty
-                    await inventory.save({transaction: transaction})
-                }
-                
-                return true
-            }
+            // step 1: validate
+            await EntryAction.validate(req)
+            
+            // step 2: delete old entry and commit deleteTransaction
+            await EntryAction.onDelete(req, deleteTransaction).then(async (res) => {
+                let createdAt = res
 
-            await updateInventory(EntryCode).then(async (res) => {
-                return await transaction.commit().then(async (res) => {
-                    await Entry.destroy({
-                        where: {
-                            EntryCode: EntryCode
-                        }
-                    }).then(async (res) => {
-                        await WarehouseEntry.destroy({
+                // step 3: insert new entry
+                await EntryAction.onStore(req, insertTransaction).then(async (res) => {
+                    return await insertTransaction.commit().then(async (res) => {
+                        // step 4: update createdAt
+                        return await Entry.update({
+                            createdAt: createdAt
+                        }, {
                             where: {
                                 EntryCode: EntryCode
                             }
-                        }).then((res) => {
-                            return res
+                        }).then(async (res) => {
+                            return await WarehouseEntry.update({
+                                createdAt: createdAt
+                            }, {
+                                where: {
+                                    EntryCode: EntryCode
+                                }
+                            })
+                        }).catch(async (error) => {
+                            console.log(error)
                         })
-                    })
-                });
+                    });
+                })
             })
+
+            return res.json(success());
+        } catch (err) {
+            await deleteTransaction.rollback();
+            await insertTransaction.rollback();
+            return res.json(error(err.message, 501));
+        }
+    },
+
+    delete: async function (req, res) {
+        const transaction = await sequelize.transaction();
+        try {
+            await EntryAction.onDelete(req, transaction)
             return res.json(success());
         } catch (err) {
             await transaction.rollback();
@@ -329,7 +343,7 @@ const EntryController = {
         }
     },
 
-    import: async (req, res) => {
+    import: async function (req, res) {
         const transaction = await sequelize.transaction();
         try {
             if (!req.file) {
@@ -360,7 +374,7 @@ const EntryController = {
         }
     },
 
-    product: async (req, res) => {
+    product: async function (req, res) {
         try {
             console.log(req.query)
 
@@ -445,7 +459,7 @@ const EntryController = {
         }
     },
 
-    date: async (req, res) => {
+    date: async function (req, res) {
         try {
             console.log(req.query)
 
@@ -560,5 +574,227 @@ const EntryController = {
         }
     },
 };
+
+const EntryAction = {
+    onStore: async function (req, transaction) {
+        const { EntryCode, EntryDate, EntryType, entries } = req.body;
+
+        const products = await Product.findAll({
+            where: {
+                ProductCode: {
+                    [Op.in]: entries.map(item => {
+                        return item.ProductCode
+                    })
+                }
+            }
+        }, {transaction: transaction})
+
+        let inventories = await Inventory.findAll({
+            attributes: [
+                'ProductCode',
+                [sequelize.fn('SUM', sequelize.col('LargeUnitQty')), 'LargeUnitQty'],
+                [sequelize.fn('SUM', sequelize.col('SmallUnitQty')), 'SmallUnitQty'],
+            ],
+            where: {
+                ProductCode: {
+                    [Op.in]: entries.map(item => {
+                        return item.ProductCode
+                    })
+                }
+            },
+            group: ['Inventory.ProductCode'],
+        }, {transaction: transaction});
+
+        const create = async (WarehouseEntry, entries) => {
+            let EntryModels = []
+
+            for(const i in entries) {
+                let entry = entries[i]
+
+                // Product check
+                let product = products.find(item => {
+                    return item.ProductCode == entry.ProductCode
+                })
+                if(!product) {
+                    throw new Error(`Mã sản phẩm [${entry.ProductCode}] không tồn tại.`);
+                }
+
+                // Inventory check
+                inventories = inventories.map(inventory => {
+                    let LargeUnitQty = inventory.LargeUnitQty
+                    let SmallUnitQty = inventory.SmallUnitQty
+
+                    LargeUnitQty += entry.LargeUnitQty
+                    SmallUnitQty += entry.SmallUnitQty
+
+                    // format
+                    let Qty = helper.unitQty(LargeUnitQty, SmallUnitQty, product)
+
+                    // set for Inventory
+                    inventory.LargeUnitQty = Qty.LargeUnitQty
+                    inventory.SmallUnitQty = Qty.SmallUnitQty
+
+                    // set for Entry
+                    entry.StockLargeUnitQty = inventory.LargeUnitQty
+                    entry.StockSmallUnitQty = inventory.SmallUnitQty
+
+                    return inventory
+                })
+
+                let inventory = inventories.find(item => {
+                    return item.ProductCode == entry.ProductCode
+                })
+
+                let StockLargeUnitQty = 0
+                let StockSmallUnitQty = 0
+                if(!inventory) {
+                    let Pre_LargeUnitQty = EntryModels.filter(item => item.ProductCode == entry.ProductCode).reduce((sum, item) => sum + item.LargeUnitQty, 0);
+                    let Pre_SmallUnitQty = EntryModels.filter(item => item.ProductCode == entry.ProductCode).reduce((sum, item) => sum + item.SmallUnitQty, 0);
+                    
+                    let Qty = helper.unitQty(Pre_LargeUnitQty + entry.LargeUnitQty, Pre_SmallUnitQty + entry.SmallUnitQty, product)
+                    StockLargeUnitQty = Qty.LargeUnitQty
+                    StockSmallUnitQty = Qty.SmallUnitQty
+                } else {
+                    StockLargeUnitQty = entry.StockLargeUnitQty
+                    StockSmallUnitQty = entry.StockSmallUnitQty
+                }
+
+                let EntryModel = {
+                    EntryCode        : WarehouseEntry.EntryCode,
+                    EntryDate        : WarehouseEntry.EntryDate,
+                    EntryType        : WarehouseEntry.EntryType,
+
+                    ProductCode      : entry.ProductCode,
+                    ExpiryDate       : entry.ExpiryDate,
+                    LargeUnitQty     : entry.LargeUnitQty,
+                    SmallUnitQty     : entry.SmallUnitQty,
+                    Price            : product.Price,
+
+                    StockLargeUnitQty: StockLargeUnitQty,
+                    StockSmallUnitQty: StockSmallUnitQty,
+                }
+
+                EntryModels.push(EntryModel)
+            }
+
+            await Entry.bulkCreate(EntryModels, {transaction: transaction});
+
+            return true
+        }
+
+        return await WarehouseEntry.create({
+            EntryCode: EntryCode,
+            EntryDate: EntryDate,
+            EntryType: EntryType,
+        }, {transaction: transaction}).then(async (WarehouseEntry) => {
+            return await create(WarehouseEntry, entries)
+        })
+    },
+
+    onDelete: async function (req, transaction) {
+        const { EntryCode } = req.body;
+        let createdAt = null;
+
+        const updateInventory = async(EntryCode) => {
+            const entries = await Entry.findAll({
+                where: {
+                    EntryCode: EntryCode
+                },
+                include: { association: 'product', required: true }
+            })
+
+            if(entries?.length < 0) {
+                throw new Error(`Không tìm thấy đơn nhập này.`);
+            } else {
+                createdAt = entries[0].createdAt
+            }
+
+            for(const i in entries) {
+                const entry = entries[i]
+                let inventory = await Inventory.findOne({
+                    where: {
+                        ProductCode: entry.ProductCode,
+                        ExpiryDate: entry.ExpiryDate
+                    }
+                })
+                if(!inventory) {
+                    throw new Error(`Không tìm thấy [${entry.ProductCode}] có HSD [${entry.ExpiryDate}] trong kho.`);
+                }
+
+                let inventQty = helper.unitQtyTransfer(inventory.LargeUnitQty, inventory.SmallUnitQty, entry.product)
+                let entryQty = helper.unitQtyTransfer(entry.LargeUnitQty, entry.SmallUnitQty, entry.product)
+                let newInventQty = inventQty - entryQty
+                if(newInventQty < 0) {
+                    throw new Error(`Mã [${entry.ProductCode}] có HSD [${entry.ExpiryDate}] trong kho không đủ để xóa bỏ đơn này.`);
+                }
+                let qtyLS = helper.unitQtyLS(newInventQty, entry.product)
+                console.log(entry.ProductCode, qtyLS.LargeUnitQty)
+                inventory.LargeUnitQty = qtyLS.LargeUnitQty
+                inventory.SmallUnitQty = qtyLS.SmallUnitQty
+                await inventory.save({transaction: transaction})
+            }
+            
+            return createdAt
+        }
+
+        return await updateInventory(EntryCode).then(async (res) => {
+            await transaction.commit().then(async (res) => {
+                return await Entry.destroy({
+                    where: {
+                        EntryCode: EntryCode
+                    }
+                }).then(async (res) => {
+                    return await WarehouseEntry.destroy({
+                        where: {
+                            EntryCode: EntryCode
+                        }
+                    }).then((res) => {
+                        return true
+                    })
+                })
+            });
+
+            return res
+        })
+    },
+
+    validate: async function (req) {
+        const { EntryCode, EntryDate, EntryType, entries } = req.body;
+
+        /**
+         * WarehouseEntry
+         */
+        const entrySchema = Joi.object({
+            EntryCode: Joi.string().required(),
+            EntryDate: Joi.string().required(),
+            EntryType: Joi.boolean().required(),
+        }).unknown()
+        let validation = entrySchema.validate({EntryCode: EntryCode, EntryDate: EntryDate, EntryType: EntryType});
+        if (validation.error) {
+            throw new Error(validation.error.details[0].message);
+        }
+
+        /**
+         * Entry
+         */
+        const schema = Joi.object({
+            ProductCode : Joi.string().required(),
+            ExpiryDate  : Joi.string().required(),
+            LargeUnitQty: Joi.number().required().min(0),
+            SmallUnitQty: Joi.number().required().min(0),
+        }).unknown();
+        if(entries.length <= 0) {
+            throw new Error(t('ctr.entry.no_entry'));
+        }
+        entries.forEach((entry, index) => {
+            let validation = schema.validate(entry);
+            if (validation.error) {
+                throw new Error(`[${index+1}] ${validation.error.details[0].message}`);
+            }
+        });
+
+        return true
+    }
+}
 
 export default EntryController;
