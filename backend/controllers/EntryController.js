@@ -709,8 +709,19 @@ const EntryAction = {
                 createdAt = entries[0].createdAt
             }
 
-            for(const i in entries) {
-                const entry = entries[i]
+            let entries_format = []
+            for (const entry of entries) {
+                let key = `${entry.ProductCode}${entry.ExpiryDate}`
+                if(entries_format[key]) {
+                    entries_format[key].LargeUnitQty += entry.LargeUnitQty
+                    entries_format[key].SmallUnitQty += entry.SmallUnitQty
+                } else {
+                    entries_format[key] = entry
+                }
+            }
+
+            for(const i in entries_format) {
+                const entry = entries_format[i]
                 let inventory = await Inventory.findOne({
                     where: {
                         ProductCode: entry.ProductCode,
@@ -728,7 +739,6 @@ const EntryAction = {
                     throw new Error(`Mã [${entry.ProductCode}] có HSD [${entry.ExpiryDate}] trong kho không đủ để xóa bỏ đơn này.`);
                 }
                 let qtyLS = helper.unitQtyLS(newInventQty, entry.product)
-                console.log(entry.ProductCode, qtyLS.LargeUnitQty)
                 inventory.LargeUnitQty = qtyLS.LargeUnitQty
                 inventory.SmallUnitQty = qtyLS.SmallUnitQty
                 await inventory.save({transaction: transaction})
