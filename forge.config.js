@@ -1,14 +1,21 @@
+// import { join } from 'path';
+
+const path = require('path');
+
 module.exports = {
     packagerConfig: {
         extraResource: [
             'icon.ico'
-        ]
+        ],
+        icon: path.join(__dirname, '../../icon'),
     },
     rebuildConfig: {},
     makers: [
         {
             name: '@electron-forge/maker-squirrel',
-            config: {}
+            config: {
+                icon: './icon.ico'
+            }
         },
         {
             name: '@electron-forge/maker-zip',

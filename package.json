@@ -1,16 +1,17 @@
 {
     "name": "inventory",
-    "productName": "inventory",
+    "productName": "thu_nghiem_inv",
     "version": "1.0.0",
-    "description": "Inventory app by haind0185.",
+    "description": "Staging Inventory app by haind0185.",
     "main": ".vite/build/main.js",
     "build": {
-        "appId": "haind0185.inventory.app",
+        "appId": "haind0185.staging_inventory.app",
         "win": {
             "target": [
                 "nsis",
                 "zip"
             ],
+            "icon": "icon.ico",
             "verifyUpdateCodeSignature": false,
             "publish": {
                 "provider": "github",
