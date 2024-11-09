@@ -3,7 +3,7 @@ import { join } from 'path';
 import server from '../backend/index';
 
 const startServer = () => {
-    const port = 5000
+    const port = 5001
     return server.listen(port, () => {
         console.log(`Express server is running at http://localhost:${port}`);
     });
