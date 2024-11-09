@@ -804,6 +804,222 @@ const InventoryController = {
             return res.json(error(err.message, 501));
         }
     },
+
+    safety: async (req, res) => {
+        try {
+            const { page, ProductCode } = req.query;
+            const RANGE_ENTRY_LATE = 1;
+            const ACCURACY = 3.09; //~99%
+            const where_inventory = ProductCode ? `WHERE Inventories.ProductCode = '${ProductCode}'` : ''
+            const and_where_exit = ProductCode ? `AND Exits.ProductCode = '${ProductCode}'` : ''
+            const and_where_entry = ProductCode ? `AND Entries.ProductCode = '${ProductCode}'` : ''
+            
+            // table 1
+            let Qty = `(CASE
+                            WHEN Products.SmallUnit IS NOT NULL
+                            THEN SUM(Inventories.LargeUnitQty) * Products.ConversionRate + SUM(Inventories.SmallUnitQty)
+                            ELSE SUM(Inventories.LargeUnitQty)
+                        END)`
+            let InventoryQty = `(
+                SELECT
+                    Inventories.ProductCode AS ProductCode,
+                    Products.ProductName AS ProductName,
+                    Products.Price AS Price,
+                    Products.Expire AS Expire,
+                    Products.ConversionRate AS ConversionRate,
+                    Products.SmallUnit AS SmallUnit,
+                    ${Qty} AS Qty,
+                    (${Qty} * Products.Price) AS QtyPrice
+                FROM
+                    Inventories
+                LEFT JOIN
+                    Products
+                    ON Inventories.ProductCode = Products.ProductCode
+                ${where_inventory}
+                GROUP BY
+                    Inventories.ProductCode
+            )`
+
+            // table 2
+            let ExitQty = `(
+                CASE
+                    WHEN Products.SmallUnit IS NOT NULL
+                    THEN SUM(Exits.LargeUnitQty) * Products.ConversionRate + SUM(Exits.SmallUnitQty)
+                    ELSE SUM(Exits.LargeUnitQty)
+                END
+            )`
+            let ExitProductQty = `(
+                SELECT
+                    Exits.ProductCode AS ProductCode,
+                    Exits.ExitDate AS ExitDate,
+                    ${ExitQty} AS Qty
+                FROM
+                    Exits
+                LEFT JOIN
+                    Products
+                    ON Exits.ProductCode = Products.ProductCode
+                WHERE 
+                    Exits.ExitDate >= DATE('now', '-' || Products.Expire || ' days')
+                    AND Exits.ExitType <> true
+                    ${and_where_exit}
+                GROUP BY
+                    Exits.ProductCode,
+                    Exits.ExitDate
+            )`
+            let MinMaxExitProduct = `(
+                SELECT 
+                    X1.ProductCode AS ProductCode,
+            
+                    (SELECT
+                        ExitDate
+                    FROM
+                        (SELECT
+                            MAX(X2.Qty), ExitDate
+                        FROM
+                            ${ExitProductQty} AS X2
+                        WHERE
+                            X2.ProductCode = X1.ProductCode
+                        GROUP BY
+                            X2.ProductCode)
+                    ) AS MaxExitDate,
+            
+                    MAX(X1.Qty) AS MaxQty,
+            
+                    (SELECT
+                        ExitDate
+                    FROM
+                        (SELECT
+                            MIN(X2.Qty), ExitDate
+                        FROM
+                            ${ExitProductQty} AS X2
+                        WHERE
+                            X2.ProductCode = X1.ProductCode
+                        GROUP BY
+                            X2.ProductCode)
+                    ) AS MinExitDate,
+            
+                    MIN(X1.Qty) AS MinQty,
+
+                    (MAX(X1.Qty) - MIN(X1.Qty)) AS ExitQtyRange,
+
+                    ceil((SELECT
+                        SUM(X2.Qty)
+                    FROM
+                        ${ExitProductQty} AS X2
+                    WHERE
+                        X2.ProductCode = X1.ProductCode
+                    GROUP BY
+                        X2.ProductCode
+                    ) / ROUND(JULIANDAY('now') - JULIANDAY(DATE(MIN(X1.ExitDate))))) AS ExitOneDayQty
+                        
+                FROM 
+                    ${ExitProductQty} AS X1
+                JOIN 
+                    Products ON X1.ProductCode = Products.ProductCode
+                GROUP BY 
+                    X1.ProductCode
+            )`
+
+            // table 3
+            let EntryProductDay = `(
+                SELECT
+                    Entries.ProductCode AS ProductCode,
+                    COUNT(DISTINCT Entries.EntryDate) AS EntryDay,
+                    ROUND(ROUND(JULIANDAY('now') - JULIANDAY(DATE(MIN(Entries.EntryDate)))) / COUNT(DISTINCT Entries.EntryDate)) AS EntryDayRange
+                FROM
+                    Entries
+                LEFT JOIN
+                    Products
+                    ON Entries.ProductCode = Products.ProductCode
+                WHERE 
+                    Entries.EntryDate >= DATE('now', '-' || Products.Expire || ' days')
+                    AND Entries.EntryType <> true
+                    ${and_where_entry}
+                GROUP BY
+                    Entries.ProductCode
+            )`
+
+            // selectTotal
+            let SafetyQty = `ceil( ${ACCURACY} * SQRT( (exit.ExitQtyRange * exit.ExitQtyRange * ${RANGE_ENTRY_LATE}) + (exit.ExitOneDayQty * exit.ExitOneDayQty * entry.EntryDayRange) ) )`
+            let stm = `(
+                SELECT
+                    inventory.ProductCode AS ProductCode,
+                    inventory.ProductName AS ProductName,
+                    inventory.Qty AS Qty,
+
+                    exit.ExitOneDayQty AS ExitOneDayQty,
+                    exit.ExitQtyRange AS ExitQtyRange,
+
+                    entry.EntryDayRange AS EntryDayRange,
+
+                    ${SafetyQty} AS SafetyQty,
+
+                    (inventory.Qty - ${SafetyQty}) AS SafetyQtyRange,
+
+                    (CASE
+                        WHEN inventory.SmallUnit IS NOT NULL
+                        THEN floor(${SafetyQty} / inventory.ConversionRate)
+                        ELSE ${SafetyQty}
+                    END) AS SafetyLargeUnitQty,
+
+                    (CASE
+                        WHEN inventory.SmallUnit IS NOT NULL
+                        THEN ${SafetyQty} % inventory.ConversionRate
+                        ELSE 0
+                    END) AS SafetySmallUnitQty
+
+                FROM
+                    ${InventoryQty} AS inventory
+                LEFT JOIN
+                    ${MinMaxExitProduct} AS exit
+                    ON exit.ProductCode = inventory.ProductCode
+                LEFT JOIN
+                    ${EntryProductDay} AS entry
+                    ON entry.ProductCode = inventory.ProductCode
+            )`
+
+            const limit = 50;
+            let offset = ((page ?? 1) - 1) * limit;
+            const order_list = [
+                'SafetyQtyRange',
+            ];
+            let order = '';
+            let sort_by = req.query.sort_by == 'desc' ? 'desc' : 'asc';
+            if (order_list.includes(req.query.sort)) {
+                order = `ORDER BY ${req.query.sort} ${sort_by}`;
+            }
+
+            const [result] = await sequelize.query(
+                `SELECT COUNT(DISTINCT ProductCode) AS total FROM Inventories ${where_inventory}`
+            );
+            let total = result[0].total;
+
+            const [results] = await sequelize.query(`
+                SELECT *
+                FROM ${stm}
+                ${order}
+                LIMIT ${limit}
+                OFFSET ${offset}
+            `);
+
+            return res.json(
+                success({
+                    items: results,
+                    total: total,
+                    page: page,
+                    page_count: Math.ceil(total / limit),
+                    firstItem: results.length ? (page - 1) * limit + 1 : 0,
+                    lastItem: results.length
+                        ? page * limit <= total
+                            ? page * limit
+                            : total
+                        : 0,
+                })
+            );
+        } catch (err) {
+            return res.json(error(err.message, 501));
+        }
+    }
 };
 
 export default InventoryController;

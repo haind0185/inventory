@@ -29,6 +29,13 @@ const initProductSearch = {
     page: 1
 }
 
+const initSafetySearch = {
+    ProductCode: null,
+    sort: null,
+    sort_by: null,
+    page: 1
+}
+
 const createStore = defineStore('inventory', {
     state: () => {
         return {
@@ -40,6 +47,9 @@ const createStore = defineStore('inventory', {
             },
             productSearch: {
                 ...initProductSearch
+            },
+            safetySearch: {
+                ...initSafetySearch
             },
             inventories: []
         }
@@ -99,6 +109,19 @@ const createStore = defineStore('inventory', {
         async product(params = {}) {
             store.setLoading(true)
             return await api.get(`/inventory/product`, { params: params })
+                .then((res) => {
+                    store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
+
+        async safety(params = {}) {
+            store.setLoading(true)
+            return await api.get(`/inventory/safety`, { params: params })
                 .then((res) => {
                     store.setLoading(false)
                     return res.data
@@ -188,6 +211,14 @@ const createStore = defineStore('inventory', {
         },
         setAttrProductSearch(attr = {}) {
             this.search =  {...this.search, ...attr}
+        },
+        setSafetySearch() {
+            this.safetySearch.sort = null
+            this.safetySearch.sort_by = 'asc'
+            this.safetySearch.page = 1
+        },
+        resetSafetySearch() {
+            this.safetySearch = {...this.safetySearch, ...initSafetySearch}
         },
     },
 })
