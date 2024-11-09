@@ -262,7 +262,7 @@ const onSave = async () => {
         cancelButton: t("button.back"),
     })
     if(ok) {
-
+        await confirm.value.close()
         payload.value.exits = exits.value
     
         const res = await exitStore.store(payload.value).then((res) => {

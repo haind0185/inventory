@@ -27,13 +27,19 @@ if (require('electron-squirrel-startup')) {
 }
 
 const createWindow = () => {
+    const iconPath = app.isPackaged
+    ? join(process.resourcesPath, 'icon.ico')
+    : join(__dirname, '../../icon.ico');
     const mainWindow = new BrowserWindow({
         width: 1280,
         height: 800,
         webPreferences: {
             preload: join(__dirname, 'preload.js'),
         },
+        icon: iconPath,
     });
+
+    console.log(iconPath)
 
     if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
         mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);

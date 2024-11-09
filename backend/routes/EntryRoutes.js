@@ -6,7 +6,13 @@ const router = express.Router();
 
 router.get('/', EntryController.index);
 
+router.get('/show', EntryController.show);
+
 router.post('/', EntryController.store);
+
+router.post('/update', EntryController.update);
+
+router.post('/delete', EntryController.delete);
 
 router.post('/import', upload.single('file'), setPermissions, EntryController.import);
 

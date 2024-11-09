@@ -54,12 +54,17 @@
                 </thead>
                 <tbody>
                     <template v-for="item in entries.items">
-                        <tr style="background: #dfe6f5; cursor: pointer;" @click="item.show = !item.show">
-                            <td class="w-[2.5rem] text-center show-list">{{ item.entries.length }}</td>
-                            <td colspan="6" class="text-left">
+                        <tr style="background: #dfe6f5; cursor: pointer;">
+                            <td class="w-[2.5rem] text-center show-list" @click="item.show = !item.show">{{ item.entries.length }}</td>
+                            <td colspan="5" class="text-left" @click="item.show = !item.show">
                                 [{{ item.show ? '-' : '+' }}] [Mã nhập: {{ item.EntryCode }}] [Ngày nhập: {{ item.EntryDate }}]
                             </td>
-                            <td class="text-right">
+                            <td colspan="1" style="cursor: default;">
+                                <div class="flex justify-end w-full">
+                                    <a href="javascript:void(0)" class="link" @click="onShowDetail(item.EntryCode)">Chi tiết</a>
+                                </div>
+                            </td>
+                            <td @click="item.show = !item.show">
                                 {{ format_number(item.PriceQty) }}
                             </td>
                         </tr>
@@ -83,6 +88,15 @@
             :show="showAdd"
             @close="onCloseAdd($event)"
             @save="onSaveAdd($event)" />
+
+        <EntryDetail
+            v-if="showDetail.show"
+            :show="showDetail.show"
+            :data="showDetail.data"
+            @close="onCloseDetail($event)"
+            @save="onSaveDetail($event)" />
+
+        <Confirm ref="confirm"></Confirm>
     </div>
 </template>
 
@@ -91,8 +105,14 @@ import { onMounted, onBeforeMount, computed, watch, ref } from 'vue'
 import { entryStore } from '@/store/entry';
 import { productStore } from '@/store/product';
 import EntryAdd from './EntryAdd.vue';
+import EntryDetail from './EntryDetail.vue';
+import { t } from '@/i18n'
 
 const showAdd = ref(false)
+const showDetail = ref({
+    show: false,
+    data: null
+})
 const search = computed({
     get() {
         return entryStore.search;
@@ -102,6 +122,7 @@ const search = computed({
     },
 })
 const entries = ref({})
+const confirm = ref(null)
 
 const onShowAdd = async () => {
     await list()
@@ -115,6 +136,30 @@ const onCloseAdd = (event) => {
 }
 const onSaveAdd = (event) => {
     showAdd.value = false
+    if(event) {
+        index()
+    }
+}
+
+const onShowDetail = async (EntryCode) => {
+    await list()
+    await entryStore.show({EntryCode: EntryCode}).then((res) => {
+        if(res && res.code == 200) {
+            showDetail.value.data = res.data
+            showDetail.value.show = true
+        }
+    })
+}
+const onCloseDetail = (event) => {
+    showDetail.value.show = false
+    showDetail.value.data = null
+    if(event) {
+        index()
+    }
+}
+const onSaveDetail = (event) => {
+    showDetail.value.show = false
+    showDetail.value.data = null
     if(event) {
         index()
     }
@@ -140,11 +185,21 @@ const setData = (data) => {
     })
 }
 
-const sort = async () => {
-    if (entries.value.total > 0) {
-        search.value.page = 1
-        await index()
+const onDelete = async (EntryCode) => {
+    const ok = await confirm.value.show({
+        title: t("title.confirm"),
+        message: `Cân nhắc kỹ trước khi khóa.<br>Xác nhận xóa đơn nhập kho có mã: ${EntryCode}`,
+        cancelButton: t("button.back"),
+    })
+    if(ok) {
+        await confirm.value.close()
+        await entryStore.destroy({EntryCode: EntryCode}).then(async (res) => {
+        if(res && res.code == 200) {
+            await index()
+        }
+    })
     }
+    
 }
 
 const pagination = (page) => {

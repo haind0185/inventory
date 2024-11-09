@@ -59,6 +59,7 @@ const messages = {
             },
             entry: {
                 code_exists: 'Mã nhập kho đã tồn tại',
+                code_not_exists: 'Mã nhập kho này chưa có',
                 no_entry: 'Thêm mặt hàng để nhập kho',
             },
             exit: {
@@ -83,11 +84,13 @@ const messages = {
             delete: 'Xóa bỏ',
             stock_report: 'Xuất file kiểm kho',
             stocktaking: 'Kiểm kho bằng file',
-            export: 'Xuất file'
+            export: 'Xuất file',
+            update: 'Thay đổi',
         },
         modal: {
             add_product: 'Thêm mặt hàng',
             add_entry: 'Nhập kho',
+            detail_entry: 'Chi tiết nhập kho',
             add_exit: 'Xuất kho',
             detail_product: 'Chi tiết mặt hàng',
             stocktaking: 'Danh sách kiểm kho',

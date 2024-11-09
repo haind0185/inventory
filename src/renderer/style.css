@@ -216,6 +216,10 @@ button.btn.red {
     background: red;
 }
 
+button.btn.yellow {
+    background: rgb(177, 84, 84);
+}
+
 button.btn[disabled] {
     background: #ccc;
     color: white;
@@ -381,4 +385,16 @@ input::-webkit-inner-spin-button {
 .setting {
     background: #344272;
     border-radius: 4px;
+}
+
+.link {
+    color: #408dfb;
+    text-decoration: underline;
+}
+.link:hover {
+    text-decoration-line: underline;
+    text-underline-offset: 3px;
+}
+.link.red {
+    color: red;
 }

@@ -12,6 +12,14 @@
                         <legend>{{ $t("attr.product.ProductName") }}</legend>
                         <input type="text" class="w-full form-control" v-model="search.ProductName">
                     </fieldset>
+
+                    <fieldset class="form-input w-[30%]">
+                        <div class="h-[22px]"></div>
+                        <label class="flex items-center gap-1 text-sm">
+                            <input type="checkbox" v-model="search.IsShowEmpty" >
+                            <span>Hiển thị cả sản phẩm trống</span>
+                        </label>
+                    </fieldset>
                 </div>
             </div>
             <div class="flex items-end gap-3">
