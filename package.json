@@ -1,6 +1,6 @@
 {
     "name": "inventory",
-    "productName": "thu_nghiem_inv",
+    "productName": "Thu_nghiem_inv",
     "version": "1.0.0",
     "description": "Staging Inventory app by haind0185.",
     "main": ".vite/build/main.js",

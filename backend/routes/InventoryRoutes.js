@@ -12,6 +12,7 @@ router.get('/list', InventoryController.list);
 router.get('/total', InventoryController.total);
 router.get('/totalPrice', InventoryController.totalPrice);
 router.get('/product', InventoryController.product);
+router.get('/safety', InventoryController.safety);
 
 router.get('/download-database', async (req, res) => {
     const databasePath = app.isPackaged
