@@ -29,6 +29,8 @@
                 </span>
             </div>
             <div class="flex justify-end w-[40%] gap-3">
+                <div class="w-[5rem] plus text-center">Thừa</div>
+                <div class="w-[5rem] minus text-center">Thiếu</div>
             </div>
         </div>
 
@@ -49,15 +51,15 @@
                             Độ lệch<br>mỗi lần xuất
                         </th>
                         <th>
-                            Chu kỳ<br>nhập hàng(ngày)
+                            Chu kỳ<br>nhập
                         </th>
-                        <th>
-                            Tồn kho<br>an toàn
+                        <th class="w-[5rem]">
+                            TKAT
                         </th>
-                        <th>
+                        <th class="w-[5rem]">
                             TKAT(đv1)
                         </th>
-                        <th>
+                        <th class="w-[5rem]">
                             TKAT(đv2)
                         </th>
                         <th class="w-[7rem]">
@@ -68,7 +70,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="item in data.items">
+                    <tr v-for="item in data.items" :class="{'plus': item.SafetyQtyRange > 0, 'minus': item.SafetyQtyRange < 0}">
                         <td class="text-left">{{ `[${item.ProductCode}] ${item.ProductName}`  }}</td>
                         <td class="text-right">{{ format_number(item.Qty) }}</td>
                         <td class="text-right">{{ format_number(item.ExitOneDayQty) }}</td>
@@ -88,8 +90,11 @@
 </template>
 
 <style>
-    .exit {
+    .plus {
         background-color: #edc4c4;
+    }
+    .minus {
+        background-color: aquamarine;
     }
 </style>
 
@@ -105,7 +110,7 @@ const products = computed(() => entryStore.products)
 const data = ref({})
 
 const submit = async () => {
-    inventoryStore.setSearch()
+    inventoryStore.setSafetySearch()
     await index()
 }
 
@@ -139,7 +144,7 @@ const sort = async () => {
 }
 
 const pagination = (page) => {
-    inventoryStore.setSafetySearch({page: page})
+    search.value.page = page
     index()
 }
 
