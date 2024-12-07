@@ -4,6 +4,7 @@
 import { createApp } from 'vue'
 import VueCookies from 'vue-cookies'
 import 'vue-select/dist/vue-select.css'
+import 'leaflet/dist/leaflet.css';
 
 import i18n from "@/i18n"
 import helpers from '@/helper'
