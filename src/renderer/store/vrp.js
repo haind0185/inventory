@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { initPinia } from '@/store/setup'
 import api from '@/api'
 import { store } from '.'
-import { UNIT } from '@/constant';
 
 const initSearch = {
     AgentCode: null,
@@ -13,26 +12,32 @@ const initSearch = {
     page: 1
 }
 
-const agentInit = {
-    AgentCode: null,
-    AgentName: null,
-    AgentAddress: null,
-    AgentLocationX: null,
-    AgentLocationY: null,
+const vehicleInit = {
+    VehicleCode: null,
+    VehicleCapacity: null,
 }
 
-const createStore = defineStore('agent', {
+const agentInit = {
+    AgentCode: null,
+    AgentDelivery: null,
+}
+
+const createStore = defineStore('vrp', {
     state: () => {
         return {
             search: {
                 ...initSearch
             },
-            agents: [
+            vehicles: [
             ],
             init: {
+                ...vehicleInit
+            },
+            agents: [
+            ],
+            initAgent: {
                 ...agentInit
             },
-            agentList: []
         }
     },
     getters: {
@@ -136,10 +141,6 @@ const createStore = defineStore('agent', {
                 })
         },
 
-        setAgentList(data) {
-            this.agentList = data
-        },
-
         // mutation
         setSearch() {
             this.search.sort = null
@@ -150,12 +151,26 @@ const createStore = defineStore('agent', {
             this.search = {...this.search, ...initSearch}
         },
         add() {
-            this.agents.push({...agentInit})
+            this.vehicles.push({...vehicleInit})
         },
         delete(index) {
-            this.agents = this.agents.filter((item, i) => i != index)
+            this.vehicles = this.vehicles.filter((item, i) => i != index)
         },
         reset() {
+            this.vehicles = []
+        },
+        setVehicle(vehicle) {
+            this.vehicles.push(vehicle)
+        },
+
+        // agents
+        addAgent() {
+            this.agents.push({...agentInit})
+        },
+        deleteAgent(index) {
+            this.agents = this.agents.filter((item, i) => i != index)
+        },
+        resetAgent() {
             this.agents = []
         },
         setAgent(agent) {
@@ -164,7 +179,7 @@ const createStore = defineStore('agent', {
     },
 })
 
-export const agentStore = createStore(initPinia)
-export const useAgentStore = () => {
-    return agentStore
+export const vrpStore = createStore(initPinia)
+export const useVrpStore = () => {
+    return vrpStore
 }

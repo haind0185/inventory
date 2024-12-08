@@ -125,6 +125,10 @@ const menus = ref([
         label: 'Phân tuyến',
         children: [
             {
+                name: 'VRPIndex',
+                label: 'Phân xe',
+            },
+            {
                 name: 'AgentIndex',
                 label: 'Đại lý',
             },
@@ -132,10 +136,7 @@ const menus = ref([
             //     name: 'VehicleIndex',
             //     label: 'Xe tải',
             // },
-            {
-                name: 'VRPIndex',
-                label: 'Phân xe',
-            },
+            
         ],
     },
 ])

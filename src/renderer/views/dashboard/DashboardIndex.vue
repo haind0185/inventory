@@ -24,8 +24,8 @@ import PolylineUtil from 'polyline-encoded'
 const vehicles = [
     // { "id": 1, "capacity": [80], "start": [106.660172, 10.762622], "end": [106.660172, 10.762622] },
     // { "id": 2, "capacity": [80], "start": [106.660172, 10.762622], "end": [106.660172, 10.762622] },
-    { "id": 1, "capacity": [50], "start": [106.660172, 10.762622] },
-    { "id": 2, "capacity": [60], "start": [106.660172, 10.762622] },
+    { "id": 1, "capacity": [60], "start": [106.660172, 10.762622] },
+    { "id": 2, "capacity": [50], "start": [106.660172, 10.762622] },
 ];
 
 // Tọa độ đại lý và kho
