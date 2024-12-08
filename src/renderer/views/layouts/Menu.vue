@@ -120,6 +120,20 @@ const menus = ref([
         name: 'Products',
         label: 'Mặt hàng'
     },
+    {
+        name: 'VRP',
+        label: 'Phân tuyến',
+        children: [
+            {
+                name: 'AgentIndex',
+                label: 'Đại lý',
+            },
+            {
+                name: 'VehicleIndex',
+                label: 'Xe tải',
+            },
+        ],
+    },
 ])
 
 const dashboard = ref([

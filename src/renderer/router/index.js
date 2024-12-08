@@ -93,6 +93,16 @@ const routes = [
                 ]
             },
             {
+                path: '/agents',
+                name: 'AgentIndex',
+                component: () => import("@/views/agents/AgentIndex.vue"),
+            },
+            {
+                path: '/vehicles',
+                name: 'VehicleIndex',
+                component: () => import("@/views/vehicles/VehicleIndex.vue"),
+            },
+            {
                 path: '/errors',
                 children: [
                     {

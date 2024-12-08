@@ -2,6 +2,7 @@ import ProductRoutes from './routes/ProductRoutes';
 import EntryRoutes from './routes/EntryRoutes';
 import ExitRoutes from './routes/ExitRoutes';
 import InventoryRoutes from './routes/InventoryRoutes';
+import AgentRoutes from './routes/AgentRoutes';
 import { migrator } from './migrations';
 const express = require('express');
 const cors = require('cors');
@@ -22,6 +23,7 @@ server.use('/products', ProductRoutes);
 server.use('/entries', EntryRoutes);
 server.use('/exits', ExitRoutes);
 server.use('/inventory', InventoryRoutes);
+server.use('/agents', AgentRoutes);
 
 /**
  * Migration

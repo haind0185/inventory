@@ -7,6 +7,8 @@ import { create_warehouse_exits } from './20241025104935_create_warehouse_exits_
 import { create_exits } from './20241025105215_create_exits_table'
 import { create_warehouse_orders } from './20241025111657_create_warehouse_orders_table'
 import { create_orders } from './20241025112015_create_orders_table'
+import { create_agents } from './20241208150355_create_agents_table'
+import { create_vehicles } from './20241208153814_create_vehicles_table'
 
 const { Umzug, SequelizeStorage } = require('umzug');
 
@@ -19,6 +21,8 @@ const migrations = [
     create_exits,
     create_warehouse_orders,
     create_orders,
+    create_agents,
+    create_vehicles,
 ]
 
 export const migrator = new Umzug({

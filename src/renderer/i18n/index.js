@@ -49,6 +49,12 @@ const messages = {
                 Price: 'Đơn giá',
                 QtyPrice: 'Tổng tiền',
             },
+            agent: {
+                AgentCode: 'Mã đại lý',
+                AgentName: 'Tên đại lý',
+                AgentAddress: 'Địa chỉ',
+                AgentLocation: 'Tọa độ',
+            },
         },
         ctr: {
             product: {
@@ -94,6 +100,8 @@ const messages = {
             add_exit: 'Xuất kho',
             detail_product: 'Chi tiết mặt hàng',
             stocktaking: 'Danh sách kiểm kho',
+            add_agent: 'Thêm đại lý',
+            detail_agent: 'Chi tiết đại lý',
         },
         title: {
             notify: 'Thông báo',
@@ -102,8 +110,8 @@ const messages = {
         },
         msg: {
             save_ok: 'Lưu thành công',
-            delete_product:
-                'Xác nhận xóa mặt hàng [{ProductCode}] {ProductName}',
+            delete_product: 'Xác nhận xóa mặt hàng [{ProductCode}] {ProductName}',
+            delete_agent: 'Xác nhận xóa đại lý [{AgentCode}] {AgentName}',
         },
     },
 };

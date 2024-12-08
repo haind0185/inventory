@@ -398,3 +398,7 @@ input::-webkit-inner-spin-button {
 .link.red {
     color: red;
 }
+
+textarea.form-control {
+    min-height: 4rem;
+}
