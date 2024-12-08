@@ -128,9 +128,13 @@ const menus = ref([
                 name: 'AgentIndex',
                 label: 'Đại lý',
             },
+            // {
+            //     name: 'VehicleIndex',
+            //     label: 'Xe tải',
+            // },
             {
-                name: 'VehicleIndex',
-                label: 'Xe tải',
+                name: 'VRPIndex',
+                label: 'Phân xe',
             },
         ],
     },

@@ -103,6 +103,11 @@ const routes = [
                 component: () => import("@/views/vehicles/VehicleIndex.vue"),
             },
             {
+                path: '/vrp',
+                name: 'VRPIndex',
+                component: () => import("@/views/vrp/VRPIndex.vue"),
+            },
+            {
                 path: '/errors',
                 children: [
                     {
