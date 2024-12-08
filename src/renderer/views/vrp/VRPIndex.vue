@@ -1,15 +1,13 @@
 <template>
-    <div class="flex flex-col justify-between gap-3 p-2">
-        <fieldset class="w-full form-input required box">
+    <form class="gap-3 p-2 wrapper-scroll" @submit.prevent="onVRP()">
+        <fieldset class="w-full form-input required box" style="max-height: 15rem;">
             <legend>Số lượng xe</legend>
-            <div>
-                <div>
-                    <div class="flex justify-end gap-3">
-                        <button type="button" class="btn green w-[6rem]" @click="addItem()">{{ $t('button.add_item') }}</button>
-                        <button type="button" class="btn silver w-[6rem]" @click="reset()">{{ $t('button.reset') }}</button>
-                    </div>
+            <div class="wrapper-scroll">
+                <div class="flex justify-end gap-3">
+                    <button type="button" class="btn green w-[6rem]" @click="addItem()">{{ $t('button.add_item') }}</button>
+                    <button type="button" class="btn silver w-[6rem]" @click="reset()">{{ $t('button.reset') }}</button>
                 </div>
-                <div class="flex gap-3">
+                <div class="flex gap-3 box-bottom">
                     <div class="w-[3rem] justify-center items-end flex">
                         <div class="w-[1rem]"></div>
                         <span class="w-[2rem] text-end text-sm">
@@ -23,9 +21,8 @@
                         <legend>{{ 'Doanh số' }}</legend>
                     </fieldset>
                 </div>
-                <div class="flex-1" style="overflow: auto; border-top: 1px solid gray; border-bottom: 1px solid gray;">
-                    <div class="flex-col p-1 d-flex">
-                        
+                <div class="parent-scroll">
+                    <div class="w-full">
                         <template v-for="(vehicle, index) in vehicles">
                             <div class="flex gap-3">
                                 <div class="flex items-center text-sm w-[3rem] gap-1" style="margin-bottom: -3px;">
@@ -40,7 +37,7 @@
                                     <input type="text" class="w-full text-center form-control" required v-model="vehicle.VehicleCode">
                                 </fieldset>
                                 <fieldset class="w-[20%] form-input required">
-                                    <input type="number" class="w-full text-center form-control" required v-model="vehicle.VehicleCapacity">
+                                    <input type="number" class="w-full text-center form-control" required v-model="vehicle.VehicleCapacity" min="0">
                                 </fieldset>
                             </div>
                         </template>
@@ -48,17 +45,16 @@
                 </div>
             </div>
         </fieldset>
-        <fieldset class="flex flex-col w-full form-input required">
+        
+        <fieldset class="w-full form-input required box parent-scroll" style="height: 98%;">
             <legend>Danh sách đại lý</legend>
-            <div class="">
-                <div>
-                    <div class="flex justify-end gap-3">
-                        <button type="button" class="btn green w-[6rem]" @click="addItemAgent()">{{ $t('button.add_item') }}</button>
-                        <button type="button" class="btn silver w-[6rem]" @click="openFile()">{{ $t('button.import') }}</button>
-                        <button type="button" class="btn silver w-[6rem]" @click="resetAgent()">{{ $t('button.reset') }}</button>
-                    </div>
+            <div class="wrapper-scroll">
+                <div class="flex justify-end gap-3">
+                    <button type="button" class="btn green w-[6rem]" @click="addItemAgent()">{{ $t('button.add_item') }}</button>
+                    <button type="button" class="btn silver w-[6rem]" @click="openFile()">{{ $t('button.import') }}</button>
+                    <button type="button" class="btn silver w-[6rem]" @click="resetAgent()">{{ $t('button.reset') }}</button>
                 </div>
-                <div class="flex gap-3">
+                <div class="flex gap-3 box-bottom">
                     <div class="w-[3rem] justify-center items-end flex">
                         <div class="w-[1rem]"></div>
                         <span class="w-[2rem] text-end text-sm">
@@ -72,9 +68,8 @@
                         <legend>{{ 'Doanh số' }}</legend>
                     </fieldset>
                 </div>
-                <div style="overflow: auto; border-top: 1px solid gray; border-bottom: 1px solid gray; min-height: 20rem;">
-                    <div class="flex-col p-1 d-flex">
-                        
+                <div class="parent-scroll">
+                    <div class="w-full view-scroll">
                         <template v-for="(agent, index) in agents">
                             <div class="flex gap-3">
                                 <div class="flex items-center text-sm w-[3rem] gap-1" style="margin-bottom: -3px;">
@@ -86,14 +81,14 @@
                                     </span>
                                 </div>
                                 <fieldset class="w-[40%] form-input required">
-                                    <select2 class="form-control" required :options="agentList" v-model="agent.AgentCode" label="AgentName" :reduce="item => item.AgentCode">
+                                    <select2 class="form-control" required :options="agentList" v-model="agent.AgentCode" label="AgentNameLabel" :reduce="item => item.AgentCode">
                                         <template #search="{attributes, events}">
                                             <input class="vs__search" :required="agent.AgentCode == null || agent.AgentCode == ''" v-bind="attributes" v-on="events" />
                                         </template>
                                     </select2>
                                 </fieldset>
                                 <fieldset class="w-[20%] form-input required">
-                                    <input type="number" class="w-full form-control" required v-model="agent.AgentDelivery">
+                                    <input type="number" class="w-full form-control" required v-model="agent.AgentDelivery" min="0">
                                 </fieldset>
                             </div>
                         </template>
@@ -101,23 +96,39 @@
                 </div>
             </div>
         </fieldset>
-    </div>
+
+        <div class="flex justify-around w-full">
+            <button type="button" class="btn silver w-[6rem]" @click="onClose()">{{ $t("button.cancel") }}</button>
+            <button type="submit" class="btn w-[6rem]">{{ $t("button.save") }}</button>
+        </div>
+    </form>
+
+    <VRPResult
+        v-if="showVRP"
+        :show="showVRP"
+        :data="vrpProp"
+        @close="onCloseVRP($event)"
+        @save="onSaveVRP($event)" />
 </template>
 <script setup>
 import { onMounted, ref, watch, computed } from 'vue'
 import { t } from '@/i18n'
 import { agentStore } from '@/store/agent';
 import { vrpStore } from '@/store/vrp';
+import VRPResult from './VRPResult.vue'
 
-const props = defineProps(['show'])
-const emit = defineEmits(['close', 'save'])
-
+const showVRP = ref(false)
 const confirm = ref(null)
 const reload = ref(false)
 const file = ref(null)
 const agentList = computed(() => agentStore.agentList)
 const agents = computed(() => vrpStore.agents)
 const vehicles = computed(() => vrpStore.vehicles)
+const vrpProp = ref({
+    vehicles: [],
+    jobs: [],
+    warehouse: [22.422278, 104.026379]
+})
 
 const addItem = () => {
     vrpStore.add()
@@ -153,6 +164,49 @@ const getAgentList = async () => {
     await agentStore.list().then((res) => {
         if(res && res.code == 200) {
             agentStore.setAgentList(res.data.items)
+        }
+    })
+}
+
+const onVRP = () => {
+    vrpProp.value.vehicles = getVehicles()
+    vrpProp.value.jobs = getJobs()
+
+    showVRP.value = true
+    // console.log(vrpProp.value)
+}
+
+const onCloseVRP = (event) => {
+    showVRP.value = false
+    if(event) {
+        // index()
+    }
+}
+const onSaveVRP = (event) => {
+    showVRP.value = false
+    if(event) {
+        // index()
+    }
+}
+
+const getVehicles = () => {
+    return vehicles.value.map((item, index) => {
+        return {
+            "id": index,
+            "capacity": [item.VehicleCapacity],
+            "start": [vrpProp.value.warehouse[1], vrpProp.value.warehouse[0]],
+        }
+    })
+}
+
+const getJobs = () => {
+    return agents.value.map((item, index) => {
+        let agent = agentList.value.find(i => i.AgentCode == item.AgentCode)
+        return {
+            "id": index,
+            "name": `${agent.AgentNameLabel}`,
+            "location": [Math.round(agent.AgentLocationY * 1e4) / 1e4, Math.round(agent.AgentLocationX * 1e4) / 1e4],
+            "delivery": [item.AgentDelivery],
         }
     })
 }

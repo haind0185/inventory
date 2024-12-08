@@ -23,6 +23,14 @@ const Agent = sequelize.define('Agent', {
         type: DataTypes.FLOAT,
         allowNull: false,
     },
+
+    // get attribute
+    AgentNameLabel: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            return `[${this.AgentCode}] ${this.AgentName}`;
+        }
+    }
 });
 
 export default Agent;

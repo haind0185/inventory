@@ -39,6 +39,7 @@ body {
 
 .main {
     padding: 0.5rem;
+    max-height: calc(100vh - 3rem);
 }
 
 .footer {
@@ -47,10 +48,11 @@ body {
 
 .main-layout {
     width: 100%;
-    min-height: 100vh;
-    height: 100%;
+    min-height: calc(100vh);
+    height: calc(100%);
     display: grid;
     grid-template-rows: 3rem 1fr;
+    max-height: calc(100vh);
 }
 
 ul.menus {
@@ -407,4 +409,10 @@ textarea.form-control {
     padding: 8px;
     border: 1px solid gray;
     border-radius: 8px;
+}
+
+.box-bottom {
+    border-bottom: 1px solid gray;
+    border-radius: 5px;
+    margin-bottom: 4px;
 }
