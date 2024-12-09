@@ -68,7 +68,7 @@
                         <td class="text-center">{{ item.AgentCode }}</td>
                         <td class="text-left">{{ item.AgentName }}</td>
                         <td class="text-left">{{ item.AgentAddress }}</td>
-                        <td class="text-center">{{ `${item.AgentLocationX}, ${item.AgentLocationY}` }}</td>
+                        <td class="text-left">{{ `${item.AgentLocationX}, ${item.AgentLocationY}` }}</td>
                         <td class="text-center">
                             <a href="javascript:void(0)" class="a-detail" @click="onShowDetail(item.AgentCode)">🃪</a>
                         </td>

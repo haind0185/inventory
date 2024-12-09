@@ -3,6 +3,7 @@ import EntryRoutes from './routes/EntryRoutes';
 import ExitRoutes from './routes/ExitRoutes';
 import InventoryRoutes from './routes/InventoryRoutes';
 import AgentRoutes from './routes/AgentRoutes';
+import VRPRoutes from './routes/VRPRoutes';
 import { migrator } from './migrations';
 const express = require('express');
 const cors = require('cors');
@@ -25,6 +26,7 @@ server.use('/entries', EntryRoutes);
 server.use('/exits', ExitRoutes);
 server.use('/inventory', InventoryRoutes);
 server.use('/agents', AgentRoutes);
+server.use('/vrp', VRPRoutes);
 
 /**
  * Migration

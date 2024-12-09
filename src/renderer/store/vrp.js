@@ -82,7 +82,7 @@ const createStore = defineStore('vrp', {
         },
         async import(payload) {
             store.setLoading(true)
-            return await api.post(`/agents/import`, payload)
+            return await api.post(`/vrp/import`, payload)
                 .then((res) => {
                     store.setLoading(false)
                     return res.data

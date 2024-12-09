@@ -60,6 +60,7 @@
                     </fieldset>
                     <div class="flex justify-end gap-3">
                         <button type="button" class="btn green w-[6rem]" @click="addItemAgent()">{{ $t('button.add_item') }}</button>
+                        <input id="file" ref="file" type="file" @change="onFileChange($event)" class="hidden">
                         <button type="button" class="btn silver w-[6rem]" @click="openFile()">{{ $t('button.import') }}</button>
                         <button type="button" class="btn silver w-[6rem]" @click="resetAgent()">{{ $t('button.reset') }}</button>
                     </div>
@@ -167,6 +168,40 @@ const deleteItemAgent = (index) => {
 
 const resetAgent = () => {
     vrpStore.resetAgent()
+}
+
+const openFile = () => {
+    file.value.value = null
+    file.value.click()
+}
+
+const setAgents = (data) => {
+    vrpStore.resetAgent()
+    for(const i in data) {
+        let agent = {...vrpStore.initAgent}
+
+        if(data[i].AgentCode) {
+            agent.AgentCode = data[i].AgentCode
+        }
+        if(data[i].AgentDelivery) {
+            agent.AgentDelivery = data[i].AgentDelivery
+        }
+        
+        vrpStore.setAgent(agent)
+    }
+}
+
+const onFileChange = async (e) => {
+    let file = e.target.files ? e.target.files[0] : null
+    if(file) {
+        let formData = new FormData();
+        formData.append('file', file);
+        await vrpStore.import(formData).then((res) => {
+            if(res && res.code == 200) {
+                setAgents(res.data)
+            }
+        })
+    }
 }
 
 /**
