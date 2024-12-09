@@ -157,6 +157,12 @@ const AgentController = {
                 }
             })
 
+            data = data.sort((a, b) => {
+                if (!a.AgentLocationX || a.AgentLocationX === "") return -1;
+                if (!b.AgentLocationX || b.AgentLocationX === "") return 1;
+                return 0;
+            });
+
             await transaction.commit();
             return res.json(success(data));
         } catch (err) {

@@ -416,3 +416,108 @@ textarea.form-control {
     border-radius: 5px;
     margin-bottom: 4px;
 }
+
+.marker {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%; 
+    background-color: #3498DB;
+    border: 3px solid #FFFFFF;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.marker::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 10px solid #3498DB;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.marker.red {
+    background-color: #db3434;
+}
+.marker.red::after {
+    border-top: 10px solid #db3434;
+}
+
+.marker.black {
+    background-color: #000000;
+}
+.marker.black::after {
+    border-top: 10px solid #000000;
+}
+
+.marker.F39C12 {
+    background-color: #F39C12;
+}
+.marker.F39C12::after {
+    border-top: 10px solid #F39C12;
+}
+
+.marker.E498DB {
+    background-color: #E498DB;
+}
+.marker.E498DB::after {
+    border-top: 10px solid #E498DB;
+}
+
+.marker.E2CC71 {
+    background-color: #E2CC71;
+}
+.marker.E2CC71::after {
+    border-top: 10px solid #E2CC71;
+}
+
+.marker.B959B6 {
+    background-color: #B959B6;
+}
+.marker.B959B6::after {
+    border-top: 10px solid #B959B6;
+}
+
+.marker.E74C3C {
+    background-color: #E74C3C;
+}
+.marker.E74C3C::after {
+    border-top: 10px solid #E74C3C;
+}
+
+.marker.A1BC9C {
+    background-color: #A1BC9C;
+}
+.marker.A1BC9C::after {
+    border-top: 10px solid #A1BC9C;
+}
+
+.marker.E4495E {
+    background-color: #E4495E;
+}
+.marker.E4495E::after {
+    border-top: 10px solid #E4495E;
+}
+
+.marker.B4595E {
+    background-color: #B4595E;
+}
+.marker.B4595E::after {
+    border-top: 10px solid #B4595E;
+}
+
+.marker.E8495E {
+    background-color: #E8495E;
+}
+.marker.E8495E::after {
+    border-top: 10px solid #E8495E;
+}

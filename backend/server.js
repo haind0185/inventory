@@ -14,7 +14,8 @@ var server = express();
 
 // Enable CORS (Cross-Origin Resource Sharing)
 server.use(cors());
-server.use(express.json());  // For parsing application/json
+server.use(express.json({ limit: '10mb' })); // Tăng giới hạn lên 10MB
+server.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 /**
  * Define router
