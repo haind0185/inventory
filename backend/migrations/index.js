@@ -10,6 +10,10 @@ import { create_orders } from './20241025112015_create_orders_table'
 import { create_agents } from './20241208150355_create_agents_table'
 import { create_vehicles } from './20241208153814_create_vehicles_table'
 
+import { create_vrps } from './20241210190855_create_vrps_table'
+import { create_vrp_routes } from './20241210191188_create_vrp_routes_table'
+import { create_vrp_unassigneds } from './20241210191953_create_vrp_unassigneds_table'
+
 const { Umzug, SequelizeStorage } = require('umzug');
 
 const migrations = [
@@ -23,6 +27,9 @@ const migrations = [
     create_orders,
     create_agents,
     create_vehicles,
+    create_vrps,
+    create_vrp_routes,
+    create_vrp_unassigneds,
 ]
 
 export const migrator = new Umzug({

@@ -78,6 +78,9 @@
                     <fieldset class="w-[20%] form-input required">
                         <legend>{{ 'Doanh số' }}</legend>
                     </fieldset>
+                    <fieldset class="w-[25%] form-input">
+                        <legend>{{ 'Chuyển cho xe' }}</legend>
+                    </fieldset>
                 </div>
                 <div class="parent-scroll">
                     <div class="w-full view-scroll">
@@ -100,6 +103,9 @@
                                 </fieldset>
                                 <fieldset class="w-[20%] form-input required">
                                     <input type="number" class="w-full text-right form-control" required v-model="agent.AgentDelivery" min="0">
+                                </fieldset>
+                                <fieldset class="w-[15%] form-input required">
+                                    <input type="text" class="w-full text-right form-control" v-model="agent.AgentSkill">
                                 </fieldset>
                             </div>
                         </template>
@@ -259,11 +265,23 @@ const getVehicles = () => {
 const getJobs = () => {
     return agents.value.map((item, index) => {
         let agent = agentList.value.find(i => i.AgentCode == item.AgentCode)
+        let skills = []
+        let skill = null
+        if(item.AgentSkill) {
+            skill = vehicles.value.findIndex(veh => veh.VehicleCode == item.AgentSkill);
+        }
+
+        if(skill) {
+            skills.push(skill)
+        }
+        
         return {
             "id": index,
             "name": `${agent.AgentNameLabel}`,
             "location": [agent.AgentLocationX, agent.AgentLocationY],
+            "code": item.AgentCode,
             "delivery": [item.AgentDelivery],
+            "skills": skills,
         }
     })
 }

@@ -20,6 +20,7 @@ const vehicleInit = {
 const agentInit = {
     AgentCode: null,
     AgentDelivery: null,
+    AgentSkill: null,
 }
 
 const createStore = defineStore('vrp', {

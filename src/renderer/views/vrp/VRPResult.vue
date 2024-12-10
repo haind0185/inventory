@@ -9,6 +9,7 @@
                 <input type="checkbox" v-model="isShowAgent" @click="isShowAgent = !isShowAgent; drawMap()">
                 Hiển thị đại lý
             </label>
+            <a href="javascript:void(0)" class="underline" @click="showVRP()">Bảng kết quả</a>
         </div>
         <div class="w-full h-full" style="height: calc(100vh - 8rem);" id="map-container" >
             <div id="map" style="height: 100%; width: 100%;"></div>
@@ -16,6 +17,14 @@
     </Modal>
 
     <Confirm ref="confirm"></Confirm>
+
+    <VRPTable
+        v-if="showVRPTable"
+        :show="showVRPTable"
+        :routes="VRPTableData.routes"
+        :unassigned="VRPTableData.unassigned"
+        :payload="VRPTableData.payload"
+        @close="showVRPTable = false" />
 </template>
 
 <style>
@@ -27,9 +36,16 @@ import { onMounted, ref, watch } from 'vue'
 import { t } from '@/i18n'
 import L from 'leaflet';
 import PolylineUtil from 'polyline-encoded'
+import VRPTable from './VRPTable.vue';
 
 const { show, data } = defineProps(['show', 'data'])
 const emit = defineEmits(['close', 'save'])
+const VRPTableData = ref({
+    routes: [],
+    unassigned: [],
+    payload: {}
+})
+const showVRPTable = ref(false)
 console.log(data)
 
 const colors = ['E74C3C', 'A1BC9C', 'E4495E', 'B4595E', 'E8495E', 'F39C12', 'E498DB', 'E2CC71', 'B959B6'];
@@ -135,5 +151,47 @@ onMounted(async () => {
     await calculate()
 })
 
+const showVRP = () => {
+    VRPTableData.value = {
+        routes: getRoutes(),
+        unassigned: getUnassigned(),
+        payload: data
+    }
+    showVRPTable.value = true
+}
+
+const getRoutes = () => {
+    let VrpRoutes = []
+    routes.value.forEach((route, index) => {
+        VrpRoutes.push({
+            VrpVehicleCode: getVehicle(route.vehicle).code ?? 0,
+            VrpCapacity: getVehicle(route.vehicle).capacity[0] ?? 0,
+            VrpDelivery: route.delivery[0] ?? 0,
+            VrpGeometry: route.geometry
+        })
+    })
+
+    return VrpRoutes
+}
+
+const getUnassigned = () => {
+    let VrpUnassigned = []
+    unassigned.value.forEach((item, index) => {
+        VrpUnassigned.push({
+            VrpAgentCode: getJob(item.id).code ?? 0,
+            VrpDelivery: getJob(item.id).delivery[0] ?? 0,
+        })
+    })
+
+    return VrpUnassigned
+}
+
+const getVehicle = (id) => {
+    return data.vehicles.find(item => item.id == id)
+}
+
+const getJob = (id) => {
+    return data.jobs.find(item => item.id == id)
+}
 
 </script>
