@@ -48,7 +48,7 @@ const VRPTableData = ref({
 const showVRPTable = ref(false)
 console.log(data)
 
-const colors = ['E74C3C', 'A1BC9C', 'E4495E', 'B4595E', 'E8495E', 'F39C12', 'E498DB', 'E2CC71', 'B959B6'];
+const colors = ['E74C3C', 'A1BC9C', 'F39C12', 'B4595E', 'E8495E', 'F39C12', 'E498DB', 'E2CC71', 'B959B6'];
 const isShowVehicle = ref(false)
 const isShowAgent = ref(false)
 const routes = ref([])
@@ -167,7 +167,8 @@ const getRoutes = () => {
             VrpVehicleCode: getVehicle(route.vehicle).code ?? 0,
             VrpCapacity: getVehicle(route.vehicle).capacity[0] ?? 0,
             VrpDelivery: route.delivery[0] ?? 0,
-            VrpGeometry: route.geometry
+            VrpGeometry: route.geometry,
+            VrpSteps: route.steps
         })
     })
 

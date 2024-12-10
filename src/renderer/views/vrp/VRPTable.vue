@@ -1,7 +1,23 @@
 <template>
     <Modal :show="show" :title="'Bảng kết quả phân phối xe'" maxWidth="max-w-6xl" @close="onClose()" class="">
-        <div class="p-2">
-            
+        <div class="gap-1 p-2 wrapper-scroll" style="height: 40rem;">
+            <div class="parent-scroll">
+                Danh sách tuyến
+                <table class="view-scroll t-border">
+                    <thead>
+                        <tr>
+                            <th>Xe</th>
+                            <th>Doanh số xe</th>
+                            <th>Doanh số đã giao</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>12</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </Modal>
 

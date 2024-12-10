@@ -32,7 +32,7 @@ const VRPController = {
 
             data = data.map(item => {
                 return {
-                    AgentCode    : item.AgentCode,
+                    AgentCode    : item.AgentCode.substring(0, 3) ?? null,
                     AgentDelivery: item.AgentDelivery,
                 }
             })
