@@ -126,7 +126,11 @@ const dashboard = ref([
     {
         name: 'Dashboard',
         label: 'Dashboard',
-    }
+    },
+    {
+        name: 'Compare',
+        label: 'So sánh file',
+    },
 ])
 
 const setting = ref([
@@ -138,7 +142,7 @@ const setting = ref([
                 
             })
         }
-    }
+    },
 ])
 
 </script>

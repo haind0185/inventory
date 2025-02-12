@@ -73,6 +73,7 @@
         "vue-router": "^4.4.5",
         "vue-select": "^4.0.0-beta.6",
         "vuejs-paginate-next": "^1.0.2",
-        "xlsx": "^0.18.5"
+        "xlsx": "^0.18.5",
+        "xlsx-style": "^0.8.13"
     }
 }

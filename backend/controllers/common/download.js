@@ -2,6 +2,7 @@ const { app, dialog } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const XLSX = require('xlsx');
+const XLSXStyle = require('xlsx-style');
 
 // Sample file name
 // const filename = sampleData.xlsx
@@ -59,7 +60,39 @@ const copy = async (serverPath, filename) => {
     return localPath;
 };
 
+const downloadStyle = async (workbook, filename) => {
+    // Ghi workbook vào buffer
+    const buffer = XLSXStyle.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+    // Xác định đường dẫn lưu file
+    const directory = app.isPackaged
+        ? path.join(process.resourcesPath, 'downloads')
+        : path.join(__dirname, 'downloads');
+
+    const filePath = path.join(directory, filename);
+
+    if (!fs.existsSync(directory)) {
+        console.log('Directory:', filePath);
+        fs.mkdirSync(directory, { recursive: true });
+    }
+
+    console.log('Server path:', filePath);
+    // Lưu file vào hệ thống server
+    const resSave = fs.writeFile(filePath, buffer, async (err) => {
+        if (err) {
+            console.log(err);
+            throw new Error(`Lỗi đường dẫn: ${filePath}`);
+        } else {
+            // Copy file từ server vào local
+            return await copy(filePath, filename);
+        }
+    });
+
+    return resSave
+};
+
 export const Service = {
     download: download,
+    downloadStyle: downloadStyle,
     copy: copy,
 };
