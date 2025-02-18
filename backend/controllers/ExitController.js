@@ -116,7 +116,7 @@ const ExitController = {
                 ProductCode : Joi.string().required(),
                 LargeUnitQty: Joi.number().required().min(0),
                 SmallUnitQty: Joi.number().required().min(0),
-                Note        : Joi.string(),
+                Note        : Joi.string().allow(null, '').min(0).max(200),
             }).unknown();
             if(exits.length <= 0) {
                 throw new Error(t('ctr.exit.no_exit'));

@@ -92,7 +92,7 @@
                             <input type="text" class="w-[7rem] text-right form-control" v-model="entry.PriceQtyLabel" disabled>
                         </fieldset>
                         <fieldset class="w-[7rem] form-input flex items-center">
-                            <input type="text" class="w-[7rem] form-control" v-model="entry.Note">
+                            <input type="text" class="w-[7rem] form-control" v-model="entry.Note" maxlength="200">
                         </fieldset>
                     </div>
                 </template>
