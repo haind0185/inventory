@@ -3,6 +3,7 @@ import EntryRoutes from './routes/EntryRoutes';
 import ExitRoutes from './routes/ExitRoutes';
 import InventoryRoutes from './routes/InventoryRoutes';
 import CompareRoutes from './routes/CompareRoutes';
+import StickyNoteRoutes from './routes/StickyNoteRoutes';
 import { migrator } from './migrations';
 const express = require('express');
 const cors = require('cors');
@@ -24,6 +25,7 @@ server.use('/entries', EntryRoutes);
 server.use('/exits', ExitRoutes);
 server.use('/inventory', InventoryRoutes);
 server.use('/compares', CompareRoutes);
+server.use('/sticky-note', StickyNoteRoutes);
 
 /**
  * Migration

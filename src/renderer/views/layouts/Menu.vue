@@ -2,7 +2,7 @@
     <div>
         <ul class="menus">
             <template v-for="menu in dashboard">
-                <li :active="route.name == menu.name">
+                <li :active="route.name == menu.name" class="item">
                     <router-link :to="{name: menu.name}" class="menu-item"><span>{{ menu.label }}</span></router-link>
                 </li>
             </template>

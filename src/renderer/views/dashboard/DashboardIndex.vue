@@ -69,7 +69,7 @@ const bringToFront = (id) => {
 // Hàm lấy màu ngẫu nhiên
 const getRandomColor = () => {
     // const colors = ["#FFEB3B", "#FFC107", "#FF9800", "#FF5722", "#4CAF50", "#2196F3", "#9C27B0"];
-    const colors = ["#FFF7D1"];
+    const colors = ["#ffdb34"];
     return colors[Math.floor(Math.random() * colors.length)];
 };
 </script>
