@@ -51,6 +51,9 @@
                 <fieldset class="w-[7rem] form-input">
                     <legend>{{ $t("attr.entry.PriceQty") }}</legend>
                 </fieldset>
+                <fieldset class="w-[7rem] form-input">
+                    <legend>{{ $t("attr.entry.Note") }}</legend>
+                </fieldset>
             </div>
 
             <div class="flex-1 px-1 py-2" style="overflow: auto; border-top: 1px solid gray; border-bottom: 1px solid gray;">
@@ -87,6 +90,9 @@
                         </fieldset>
                         <fieldset class="w-[7rem] form-input flex items-center">
                             <input type="text" class="w-[7rem] text-right form-control" v-model="entry.PriceQtyLabel" disabled>
+                        </fieldset>
+                        <fieldset class="w-[7rem] form-input flex items-center">
+                            <input type="text" class="w-[7rem] form-control" v-model="entry.Note" maxlength="200">
                         </fieldset>
                     </div>
                 </template>
@@ -273,6 +279,7 @@ const onSave = async () => {
     })
     if(ok) {
         payload.value.entries = entries.value
+        console.log(payload.value)
         const res = await entryStore.store(payload.value).then((res) => {
             if(res && res.code == 200) {
                 reload.value = true

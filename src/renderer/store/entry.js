@@ -35,6 +35,7 @@ const entryInit = {
     SmallUnitQty: 0,
     Price: 0,
     PriceQty: 0,
+    Note: null,
 }
 const payloadInit = {
     EntryCode: null,

@@ -43,10 +43,13 @@
                     <legend>{{ $t("attr.exit.SmallUnitQty") }}</legend>
                 </fieldset>
                 <fieldset class="w-[5rem] form-input">
-                    <legend>{{ $t("attr.entry.Price") }}</legend>
+                    <legend>{{ $t("attr.exit.Price") }}</legend>
                 </fieldset>
                 <fieldset class="w-[7rem] form-input">
-                    <legend>{{ $t("attr.entry.PriceQty") }}</legend>
+                    <legend>{{ $t("attr.exit.PriceQty") }}</legend>
+                </fieldset>
+                <fieldset class="w-[7rem] form-input">
+                    <legend>{{ $t("attr.exit.Note") }}</legend>
                 </fieldset>
             </div>
             
@@ -81,6 +84,9 @@
                         </fieldset>
                         <fieldset class="w-[7rem] form-input flex items-center">
                             <input type="text" class="w-[7rem] text-right form-control" v-model="exit.PriceQtyLabel" disabled>
+                        </fieldset>
+                        <fieldset class="w-[7rem] form-input flex items-center">
+                            <input type="text" class="w-[7rem] form-control" v-model="exit.Note" maxlength="200">
                         </fieldset>
                     </div>
                 </template>

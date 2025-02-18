@@ -60,6 +60,7 @@
                         <th class="">{{ $t("attr.exit.Qty") }}</th>
                         <th class="">{{ $t("attr.exit.Price") }}</th>
                         <th class="">{{ $t("attr.exit.PriceQty") }}</th>
+                        <th class="">{{ $t("attr.exit.Note") }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -79,6 +80,24 @@
                             <td class="text-right">{{ format_number(exit.Qty) }}</td>
                             <td class="text-right">{{ format_number(exit.Price) }}</td>
                             <td class="text-right">{{ format_number(exit.PriceQty) }}</td>
+                            <td class="text-left">{{ exit.Note }}</td>
+                        </tr>
+                        <tr v-show="item.show">
+                            <td colspan="3" class="!font-bold text-right">Tổng cộng: </td>
+                            <td class="!font-bold text-right">
+                                {{ format_number(item.products.reduce((sum, item) => sum + item.LargeUnitQty, 0)) }}
+                            </td>
+                            <td class="!font-bold text-right">
+                                {{ format_number(item.products.reduce((sum, item) => sum + item.SmallUnitQty, 0)) }}
+                            </td>
+                            <td></td>
+                            <td class="!font-bold text-right">
+                                {{ format_number(item.products.reduce((sum, item) => sum + item.Qty, 0)) }}
+                            </td>
+                            <td class="!font-bold text-right">
+                                {{ format_number(item.products.reduce((sum, item) => sum + item.PriceQty, 0)) }}
+                            </td>
+                            <td></td>
                         </tr>
                     </template>
                 </tbody>

@@ -142,6 +142,7 @@ const EntryController = {
                 ExpiryDate  : Joi.string().required(),
                 LargeUnitQty: Joi.number().required().min(0),
                 SmallUnitQty: Joi.number().required().min(0),
+                Note        : Joi.string().allow(null, '').min(0).max(200),
             }).unknown();
             if(entries.length <= 0) {
                 throw new Error(t('ctr.entry.no_entry'));
@@ -258,6 +259,7 @@ const EntryController = {
                         LargeUnitQty     : entry.LargeUnitQty,
                         SmallUnitQty     : entry.SmallUnitQty,
                         Price            : product.Price,
+                        Note             : entry.Note,
 
                         StockLargeUnitQty: StockLargeUnitQty,
                         StockSmallUnitQty: StockSmallUnitQty,
@@ -669,6 +671,7 @@ const EntryAction = {
                     LargeUnitQty     : entry.LargeUnitQty,
                     SmallUnitQty     : entry.SmallUnitQty,
                     Price            : product.Price,
+                    Note             : entry.Note,
 
                     StockLargeUnitQty: StockLargeUnitQty,
                     StockSmallUnitQty: StockSmallUnitQty,
@@ -792,6 +795,7 @@ const EntryAction = {
             ExpiryDate  : Joi.string().required(),
             LargeUnitQty: Joi.number().required().min(0),
             SmallUnitQty: Joi.number().required().min(0),
+            Note        : Joi.string().allow(null, '').min(0).max(200),
         }).unknown();
         if(entries.length <= 0) {
             throw new Error(t('ctr.entry.no_entry'));

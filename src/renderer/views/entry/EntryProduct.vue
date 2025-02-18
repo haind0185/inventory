@@ -61,13 +61,14 @@
                         <th class="">{{ $t("attr.entry.Price") }}</th>
                         <th class="">{{ $t("attr.entry.Qty") }}</th>
                         <th class="">{{ $t("attr.entry.PriceQty") }}</th>
+                        <th class="">{{ $t("attr.entry.Note") }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <template v-for="item in entries.items">
                         <tr style="background: #dfe6f5; cursor: pointer;" @click="item.show = !item.show">
                             <td class="w-[2.5rem] text-center show-list">{{ item.products.length }}</td>
-                            <td colspan="8" class="text-left">
+                            <td colspan="9" class="text-left">
                                 [{{ item.show ? '-' : '+' }}] {{ item.ProductNameLabel }}
                             </td>
                         </tr>
@@ -81,6 +82,24 @@
                             <td class="text-right">{{ format_number(entry.Price) }}</td>
                             <td class="text-right">{{ format_number(entry.Qty) }}</td>
                             <td class="text-right">{{ format_number(entry.PriceQty) }}</td>
+                            <td class="text-left">{{ entry.Note }}</td>
+                        </tr>
+                        <tr v-show="item.show">
+                            <td colspan="4" class="!font-bold text-right">Tổng cộng: </td>
+                            <td class="!font-bold text-right">
+                                {{ format_number(item.products.reduce((sum, item) => sum + item.LargeUnitQty, 0)) }}
+                            </td>
+                            <td class="!font-bold text-right">
+                                {{ format_number(item.products.reduce((sum, item) => sum + item.SmallUnitQty, 0)) }}
+                            </td>
+                            <td></td>
+                            <td class="!font-bold text-right">
+                                {{ format_number(item.products.reduce((sum, item) => sum + item.Qty, 0)) }}
+                            </td>
+                            <td class="!font-bold text-right">
+                                {{ format_number(item.products.reduce((sum, item) => sum + item.PriceQty, 0)) }}
+                            </td>
+                            <td></td>
                         </tr>
                     </template>
                 </tbody>
