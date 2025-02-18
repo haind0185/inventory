@@ -35,10 +35,10 @@ const addNote = () => {
         id: Date.now(),
         title: "Ghi chú",
         text: "",
-        x: 100,
+        x: 50,
         y: 100,
-        width: 200,
-        height: 150,
+        width: 250,
+        height: 350,
         color: getRandomColor(),
         zIndex: highestZIndex.value,
     });
@@ -75,7 +75,7 @@ const getRandomColor = () => {
 
 <template>
     <div class="app">
-        <button class="add-btn" @click="addNote">➕ Thêm Ghi Chú</button>
+        <button class="add-btn" @click="addNote">+ Thêm ghi chú</button>
         
         <StickyNote v-for="note in notes"
         :key="note.id"
@@ -90,17 +90,17 @@ const getRandomColor = () => {
 <style>
 .app {
     position: relative;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     background-color: #f0f0f0;
-    overflow: hidden;
+    overflow: auto;
 }
 
 .add-btn {
     position: absolute;
     top: 10px;
     left: 10px;
-    padding: 10px 15px;
+    padding: 10px 10px;
     background: #007bff;
     color: white;
     border: none;

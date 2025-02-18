@@ -30,8 +30,9 @@ const startDrag = (event) => {
 // Xử lý kéo
 const drag = (event) => {
     if (!dragging.value) return;
-    note.value.x = event.clientX - offsetX.value;
-    note.value.y = event.clientY - offsetY.value;
+    console.log(event.clientX, event.clientY)
+    note.value.x = Math.max(0, event.clientX - offsetX.value);
+    note.value.y = Math.max(0, event.clientY - offsetY.value);
 };
 
 // Dừng kéo
@@ -158,7 +159,7 @@ watch(
 
 /* Xóa nút */
 .delete-btn {
-    background: red;
+    background: transparent;
     color: white;
     border: none;
     cursor: pointer;
@@ -176,7 +177,7 @@ watch(
     background: transparent;
     resize: none;
     outline: none;
-    font-size: 14px;
+    font-size: 18px;
     padding: 5px;
 }
 
