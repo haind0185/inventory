@@ -30,7 +30,6 @@ const startDrag = (event) => {
 // Xử lý kéo
 const drag = (event) => {
     if (!dragging.value) return;
-    console.log(event.clientX, event.clientY)
     note.value.x = Math.max(0, event.clientX - offsetX.value);
     note.value.y = Math.max(0, event.clientY - offsetY.value);
 };
@@ -146,9 +145,9 @@ watch(
 
 /* Header để kéo */
 .note-header {
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.3);
     padding: 5px;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: bold;
     cursor: grab;
     display: flex;
@@ -177,7 +176,8 @@ watch(
     background: transparent;
     resize: none;
     outline: none;
-    font-size: 18px;
+    font-size: 17px;
+    font-weight: 500;
     padding: 5px;
 }
 
@@ -187,11 +187,13 @@ watch(
     background-color: transparent;
     border: none;
     color: white;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: bold;
-    padding: 5px;
+    padding: 2px;
     outline: none;
     text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
 /* Góc kéo để resize */

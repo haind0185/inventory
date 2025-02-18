@@ -35,8 +35,8 @@ const addNote = () => {
         id: Date.now(),
         title: "Ghi chú",
         text: "",
-        x: 50,
-        y: 100,
+        x: Math.floor(Math.random() * (60 - 50 + 1)) + 50,
+        y: Math.floor(Math.random() * (100 - 50 + 1)) + 90,
         width: 250,
         height: 350,
         color: getRandomColor(),
@@ -68,7 +68,8 @@ const bringToFront = (id) => {
 
 // Hàm lấy màu ngẫu nhiên
 const getRandomColor = () => {
-    const colors = ["#FFEB3B", "#FFC107", "#FF9800", "#FF5722", "#4CAF50", "#2196F3", "#9C27B0"];
+    // const colors = ["#FFEB3B", "#FFC107", "#FF9800", "#FF5722", "#4CAF50", "#2196F3", "#9C27B0"];
+    const colors = ["#FFF7D1"];
     return colors[Math.floor(Math.random() * colors.length)];
 };
 </script>
