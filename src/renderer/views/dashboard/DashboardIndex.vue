@@ -3,15 +3,20 @@ import { ref, onMounted, watch } from "vue";
 import StickyNote from "./StickyNote.vue";
 
 const notes = ref([]);
+const highestZIndex = ref(1); // Theo dõi z-index cao nhất
 
 // Lấy dữ liệu từ localStorage
 onMounted(() => {
     const savedNotes = JSON.parse(localStorage.getItem("stickyNotes")) || [];
     notes.value = savedNotes.map(note => ({
         ...note,
-        width: note.width || 200, // Giá trị mặc định
-        height: note.height || 150
+        width: note.width || 200,
+        height: note.height || 150,
+        zIndex: note.zIndex || 1 // Đảm bảo có zIndex
     }));
+
+    // Xác định z-index cao nhất khi khởi động
+    highestZIndex.value = Math.max(1, ...notes.value.map(n => n.zIndex || 1));
 });
 
 // Lưu vào localStorage khi notes thay đổi
@@ -25,14 +30,17 @@ watch(
 
 // Thêm một ghi chú mới
 const addNote = () => {
+    highestZIndex.value++; // Ghi chú mới sẽ có z-index cao nhất
     notes.value.push({
         id: Date.now(),
-        text: "New Note",
+        title: "Ghi chú",
+        text: "",
         x: 100,
         y: 100,
         width: 200,
         height: 150,
         color: getRandomColor(),
+        zIndex: highestZIndex.value,
     });
 };
 
@@ -49,6 +57,15 @@ const updateNote = (updatedNote) => {
     }
 };
 
+// Khi focus vào một note, đặt nó lên trên cùng
+const bringToFront = (id) => {
+    highestZIndex.value++;
+    const note = notes.value.find(n => n.id === id);
+    if (note) {
+        note.zIndex = highestZIndex.value;
+    }
+};
+
 // Hàm lấy màu ngẫu nhiên
 const getRandomColor = () => {
     const colors = ["#FFEB3B", "#FFC107", "#FF9800", "#FF5722", "#4CAF50", "#2196F3", "#9C27B0"];
@@ -59,7 +76,14 @@ const getRandomColor = () => {
 <template>
     <div class="app">
         <button class="add-btn" @click="addNote">➕ Thêm Ghi Chú</button>
-        <StickyNote v-for="note in notes" :key="note.id" :note="note" :onDelete="deleteNote" :onUpdate="updateNote" />
+        
+        <StickyNote v-for="note in notes"
+        :key="note.id"
+        :note="note"
+        :onDelete="deleteNote"
+        :onUpdate="updateNote"
+        :onFocus="bringToFront"
+        />
     </div>
 </template>
 

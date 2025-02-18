@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch } from "vue";
 
-const props = defineProps(["note", "onDelete", "onUpdate"]);
+const props = defineProps(["note", "onDelete", "onUpdate", "onFocus"]);
 
 const note = ref({ ...props.note });
 const dragging = ref(false);
@@ -10,6 +10,13 @@ const offsetX = ref(0);
 const offsetY = ref(0);
 const startWidth = ref(0);
 const startHeight = ref(0);
+const isEditing = ref(false); // Theo dõi trạng thái chỉnh sửa tên
+const newHeaderText = ref(note.value.title); // Lưu tên header mới khi chỉnh sửa
+
+// Khi focus vào note, đặt nó lên trên
+const focusNote = () => {
+    props.onFocus(note.value.id);
+};
 
 // Bắt đầu kéo
 const startDrag = (event) => {
@@ -63,11 +70,32 @@ const stopResize = () => {
     props.onUpdate(note.value);
 };
 
+// Kích hoạt chế độ chỉnh sửa tên
+const enableEditing = () => {
+    isEditing.value = true;
+    newHeaderText.value = note.value.title; // Gán lại tên header ban đầu
+};
+
+// Khi chỉnh sửa xong, lưu tên mới
+const saveHeader = () => {
+    note.value.title = newHeaderText.value; // Lưu vào title, không phải text
+    isEditing.value = false; // Tắt chế độ chỉnh sửa
+    props.onUpdate(note.value); // Cập nhật note lên App.vue
+};
+
 // Theo dõi thay đổi để cập nhật vào localStorage
 watch(
     () => note.value,
     (newVal) => {
         props.onUpdate(newVal);
+    },
+    { deep: true }
+);
+watch(
+    () => props.note,
+    (newNote) => {
+        note.value.title = newNote.title; // Dùng title thay vì text
+        note.value.zIndex = newNote.zIndex; // Quan trọng: cập nhật z-index
     },
     { deep: true }
 );
@@ -79,16 +107,26 @@ watch(
         left: note.x + 'px',
         width: note.width + 'px',
         height: note.height + 'px',
-        backgroundColor: note.color
-    }">
+        backgroundColor: note.color,
+        zIndex: note.zIndex
+    }" @mousedown="focusNote" @dblclick="enableEditing">
         <!-- Header để kéo -->
-        <div class="note-header" @mousedown="startDrag">
-            <span>📌 Ghi chú</span>
+        <div class="note-header" @mousedown="startDrag" @dblclick="enableEditing">
+            <span>📌</span>
+            <span v-if="!isEditing">{{ note.title }}</span>
+            <input
+                v-if="isEditing"
+                v-model="newHeaderText"
+                @blur="saveHeader"
+                @keyup.enter="saveHeader"
+                class="header-input"
+                autofocus
+            />
             <button class="delete-btn" @click="onDelete(note.id)">❌</button>
         </div>
 
         <!-- Nội dung -->
-        <textarea v-model="note.text" class="note-content"></textarea>
+        <textarea v-model="note.text" class="note-content" placeholder="Type ..."></textarea>
 
         <!-- Góc kéo để resize -->
         <div class="resize-handle" @mousedown="startResize"></div>
@@ -140,6 +178,19 @@ watch(
     outline: none;
     font-size: 14px;
     padding: 5px;
+}
+
+/* Input chỉnh sửa tên */
+.header-input {
+    width: 100%;
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 5px;
+    outline: none;
+    text-align: center;
 }
 
 /* Góc kéo để resize */
