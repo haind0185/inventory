@@ -58,14 +58,14 @@
                         </tr>
                         <template v-for="(code, i) in item.codes">
                             <tr style="background: #c3bfc554; cursor: pointer;" @click="code.show = !code.show" v-if="item.show">
-                                <td class="w-[2rem]" v-if="i == 0" :rowspan="item.codes.length + item.codes.filter(item => item.show == true).reduce((sum, item) => {return sum + item.exits.length}, 0)"></td>
+                                <td class="w-[2rem]" v-if="i == 0" :rowspan="item.codes.length + item.codes.filter(item => item.show == true).reduce((sum, item) => {return sum + item.exits.length + 1}, 0)"></td>
                                 <td class="text-center show-list row-left" colspan="2">{{ code.exits.length }}</td>
                                 <td colspan="7" class="text-left w-[94%]">
                                     [{{ code.show ? '-' : '+' }}] {{ code.ExitCode }}
                                 </td>
                             </tr>
                             <tr v-for="(exit, index) in code.exits" v-if="code.show && item.show">
-                                <td class="w-[2rem] row-left" v-if="index == 0" :rowspan="code.exits.length"></td>
+                                <td class="w-[2rem] row-left" v-if="index == 0" :rowspan="code.exits.length + 1"></td>
                                 <td class="text-center w-[2rem] row-left">{{ index+1 }}</td>
                                 <td class="text-left">{{ exit.ProductNameLabel }}</td>
                                 <td class="text-right">{{ format_number(exit.LargeUnitQty) }}</td>
@@ -74,6 +74,24 @@
                                 <td class="text-right">{{ format_number(exit.Price) }}</td>
                                 <td class="text-right">{{ format_number(exit.PriceQty) }}</td>
                                 <td class="text-left">{{ exit.Note }}</td>
+                            </tr>
+                            <tr v-show="code.show && item.show">
+                                <td class="w-[2rem] row-left" :rowspan="1"></td>
+                                <td colspan="1" class="!font-bold text-right">Tổng cộng: </td>
+                                <td class="!font-bold text-right">
+                                    {{ format_number(code.exits.reduce((sum, item) => sum + item.LargeUnitQty, 0)) }}
+                                </td>
+                                <td class="!font-bold text-right">
+                                    {{ format_number(code.exits.reduce((sum, item) => sum + item.SmallUnitQty, 0)) }}
+                                </td>
+                                <td></td>
+                                <td class="!font-bold text-right">
+                                    {{ format_number(code.exits.reduce((sum, item) => sum + item.Qty, 0)) }}
+                                </td>
+                                <td class="!font-bold text-right">
+                                    {{ format_number(code.exits.reduce((sum, item) => sum + item.PriceQty, 0)) }}
+                                </td>
+                                <td></td>
                             </tr>
                         </template>
                     </template>
