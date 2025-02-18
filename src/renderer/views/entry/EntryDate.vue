@@ -60,13 +60,14 @@
                         <th class="w-[5rem]">{{ $t("attr.entry.Price") }}</th>
                         <th class="w-[5rem]">{{ $t("attr.entry.Qty") }}</th>
                         <th class="w-[5rem]">{{ $t("attr.entry.PriceQty") }}</th>
+                        <th class="w-[5rem]">{{ $t("attr.entry.Note") }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <template v-for="item in entries.items">
                         <tr style="background: #dfe6f5; cursor: pointer;" @click="item.show = !item.show">
                             <td class="text-center show-list w-[2rem]" colspan="3">{{ item.codes.length }}</td>
-                            <td colspan="7" class="text-left w-[94%]">
+                            <td colspan="8" class="text-left w-[94%]">
                                 [{{ item.show ? '-' : '+' }}] {{ item.EntryDate }}
                             </td>
                         </tr>
@@ -74,7 +75,7 @@
                             <tr style="background: #c3bfc554; cursor: pointer;" @click="code.show = !code.show" v-if="item.show">
                                 <td class="w-[2rem]" v-if="i == 0" :rowspan="item.codes.length + item.codes.filter(item => item.show == true).reduce((sum, item) => {return sum + item.entries.length}, 0)"></td>
                                 <td class="text-center show-list row-left" colspan="2">{{ code.entries.length }}</td>
-                                <td colspan="7" class="text-left w-[94%]">
+                                <td colspan="8" class="text-left w-[94%]">
                                     [{{ code.show ? '-' : '+' }}] {{ code.EntryCode }}
                                 </td>
                             </tr>
@@ -89,6 +90,7 @@
                                 <td class="text-right">{{ format_number(entry.Price) }}</td>
                                 <td class="text-right">{{ format_number(entry.Qty) }}</td>
                                 <td class="text-right">{{ format_number(entry.PriceQty) }}</td>
+                                <td class="text-left">{{ entry.Note }}</td>
                             </tr>
                         </template>
                     </template>

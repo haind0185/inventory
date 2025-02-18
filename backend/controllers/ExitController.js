@@ -116,6 +116,7 @@ const ExitController = {
                 ProductCode : Joi.string().required(),
                 LargeUnitQty: Joi.number().required().min(0),
                 SmallUnitQty: Joi.number().required().min(0),
+                Note        : Joi.string(),
             }).unknown();
             if(exits.length <= 0) {
                 throw new Error(t('ctr.exit.no_exit'));
@@ -218,15 +219,16 @@ const ExitController = {
                     })
 
                     let ExitModel = {
-                        ExitCode        : WarehouseExit.ExitCode,
-                        ExitDate        : WarehouseExit.ExitDate,
-                        ExitType        : WarehouseExit.ExitType,
+                        ExitCode         : WarehouseExit.ExitCode,
+                        ExitDate         : WarehouseExit.ExitDate,
+                        ExitType         : WarehouseExit.ExitType,
 
                         ProductCode      : exit.ProductCode,
                         LargeUnitQty     : exit.LargeUnitQty,
                         SmallUnitQty     : exit.SmallUnitQty,
                         Price            : product.Price,
-
+                        Note             : exit.Note,
+                        
                         StockLargeUnitQty: exit.StockLargeUnitQty,
                         StockSmallUnitQty: exit.StockSmallUnitQty,
                     }

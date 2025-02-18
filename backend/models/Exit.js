@@ -54,6 +54,11 @@ const Exit = sequelize.define('Exit', {
         allowNull: false,
         default: 0,
     },
+    Note: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        default: null,
+    },
     Qty: {
         type: DataTypes.VIRTUAL,
         get() {

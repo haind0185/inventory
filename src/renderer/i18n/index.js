@@ -24,6 +24,7 @@ const messages = {
                 Price: 'Đơn giá',
                 Qty: 'Tổng SL',
                 PriceQty: 'Tổng tiền',
+                Note: 'Ghi chú',
             },
             exit: {
                 ExitCode: 'Mã xuất kho',
@@ -36,6 +37,7 @@ const messages = {
                 Price: 'Đơn giá',
                 Qty: 'Tổng SL',
                 PriceQty: 'Tổng tiền',
+                Note: 'Ghi chú',
             },
             inventory: {
                 ProductCode: 'Mã MH',

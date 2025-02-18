@@ -49,6 +49,7 @@
                         <th class="w-[6rem]">{{ $t("attr.exit.Price") }}</th>
                         <th class="w-[6rem]">{{ $t("attr.exit.Qty") }}</th>
                         <th class="w-[7rem]">{{ $t("attr.exit.PriceQty") }}</th>
+                        <th class="w-[7rem]">{{ $t("attr.exit.Note") }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -61,6 +62,7 @@
                             <td class="text-right">
                                 {{ format_number(item.PriceQty) }}
                             </td>
+                            <td></td>
                         </tr>
                         <tr v-for="(exit, index) in item.exits" v-show="item.show">
                             <td class="text-center">{{ index+1 }}</td>
@@ -70,6 +72,7 @@
                             <td class="text-right">{{ format_number(exit.Price) }}</td>
                             <td class="text-right">{{ format_number(exit.Qty) }}</td>
                             <td class="text-right">{{ format_number(exit.PriceQty) }}</td>
+                            <td class="text-left">{{ exit.Note }}</td>
                         </tr>
                     </template>
                 </tbody>

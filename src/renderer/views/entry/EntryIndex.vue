@@ -50,6 +50,7 @@
                         <th class="w-[6rem]">{{ $t("attr.entry.Price") }}</th>
                         <th class="w-[6rem]">{{ $t("attr.entry.Qty") }}</th>
                         <th class="w-[7rem]">{{ $t("attr.entry.PriceQty") }}</th>
+                        <th class="w-[7rem]">{{ $t("attr.entry.Note") }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -64,9 +65,10 @@
                                     <a href="javascript:void(0)" class="link" @click="onShowDetail(item.EntryCode)">Chi tiết</a>
                                 </div>
                             </td>
-                            <td @click="item.show = !item.show">
+                            <td @click="item.show = !item.show" class="text-right">
                                 {{ format_number(item.PriceQty) }}
                             </td>
+                            <td></td>
                         </tr>
                         <tr v-for="(entry, index) in item.entries" v-show="item.show">
                             <td class="text-center">{{ index+1 }}</td>
@@ -77,6 +79,7 @@
                             <td class="text-right">{{ format_number(entry.Price) }}</td>
                             <td class="text-right">{{ format_number(entry.Qty) }}</td>
                             <td class="text-right">{{ format_number(entry.PriceQty) }}</td>
+                            <td class="text-left">{{ entry.Note }}</td>
                         </tr>
                     </template>
                 </tbody>

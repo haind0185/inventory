@@ -45,13 +45,14 @@
                         <th class="w-[5rem]">{{ $t("attr.exit.Qty") }}</th>
                         <th class="w-[5rem]">{{ $t("attr.exit.Price") }}</th>
                         <th class="w-[5rem]">{{ $t("attr.exit.PriceQty") }}</th>
+                        <th class="w-[5rem]">{{ $t("attr.exit.Note") }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <template v-for="item in exits.items">
                         <tr style="background: #dfe6f5; cursor: pointer;" @click="item.show = !item.show">
                             <td class="text-center show-list w-[2rem]" colspan="3">{{ item.codes.length }}</td>
-                            <td colspan="6" class="text-left w-[94%]">
+                            <td colspan="7" class="text-left w-[94%]">
                                 [{{ item.show ? '-' : '+' }}] {{ item.ExitDate }}
                             </td>
                         </tr>
@@ -59,7 +60,7 @@
                             <tr style="background: #c3bfc554; cursor: pointer;" @click="code.show = !code.show" v-if="item.show">
                                 <td class="w-[2rem]" v-if="i == 0" :rowspan="item.codes.length + item.codes.filter(item => item.show == true).reduce((sum, item) => {return sum + item.exits.length}, 0)"></td>
                                 <td class="text-center show-list row-left" colspan="2">{{ code.exits.length }}</td>
-                                <td colspan="6" class="text-left w-[94%]">
+                                <td colspan="7" class="text-left w-[94%]">
                                     [{{ code.show ? '-' : '+' }}] {{ code.ExitCode }}
                                 </td>
                             </tr>
@@ -72,6 +73,7 @@
                                 <td class="text-right">{{ format_number(exit.Qty) }}</td>
                                 <td class="text-right">{{ format_number(exit.Price) }}</td>
                                 <td class="text-right">{{ format_number(exit.PriceQty) }}</td>
+                                <td class="text-left">{{ exit.Note }}</td>
                             </tr>
                         </template>
                     </template>

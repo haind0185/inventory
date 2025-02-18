@@ -60,6 +60,7 @@
                         <th class="">{{ $t("attr.exit.Qty") }}</th>
                         <th class="">{{ $t("attr.exit.Price") }}</th>
                         <th class="">{{ $t("attr.exit.PriceQty") }}</th>
+                        <th class="">{{ $t("attr.exit.Note") }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -79,6 +80,7 @@
                             <td class="text-right">{{ format_number(exit.Qty) }}</td>
                             <td class="text-right">{{ format_number(exit.Price) }}</td>
                             <td class="text-right">{{ format_number(exit.PriceQty) }}</td>
+                            <td class="text-left">{{ exit.Note }}</td>
                         </tr>
                     </template>
                 </tbody>
