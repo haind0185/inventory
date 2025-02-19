@@ -52,7 +52,7 @@ watch(
 );
 
 // Thêm một ghi chú mới
-const addNote = () => {
+const addNote = async () => {
     highestZIndex.value++; // Ghi chú mới sẽ có z-index cao nhất
     let idRand = Math.floor(Math.random() * (100 - 1 + 1)) + 1
     notes.value.push({
@@ -66,11 +66,16 @@ const addNote = () => {
         color: getRandomColor(),
         zIndex: highestZIndex.value,
     });
+
+    localStorage.setItem("stickyNotes", JSON.stringify(notes.value))
+    await stickyStore.syncData()
 };
 
 // Xóa ghi chú
-const deleteNote = (id) => {
+const deleteNote = async (id) => {
     notes.value = notes.value.filter((note) => note.id !== id);
+    localStorage.setItem("stickyNotes", JSON.stringify(notes.value))
+    await stickyStore.deleteData(id)
 };
 
 // Cập nhật ghi chú

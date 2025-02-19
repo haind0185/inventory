@@ -30,6 +30,22 @@ const createStore = defineStore("sticky", {
             }
         },
 
+        async deleteData(id) {
+            try {
+                const notes = localStorage.getItem("stickyNotes") == 'undefined' ? [] : JSON.parse(localStorage.getItem("stickyNotes"))
+
+                const response = await api.post(`/sticky-note/delete`, { notes: notes, id: id });
+
+                if (response.status === 200) {
+                    this.notes = response.data.data;
+                    localStorage.setItem("stickyNotes", JSON.stringify(this.notes));
+                    console.log("Xóa dư liệu note thành công!");
+                }
+            } catch (error) {
+                console.error("Lỗi xóa dư liệu note:", error);
+            }
+        },
+
         startSync() {
             if (this.syncInterval) return; // Tránh thiết lập nhiều lần
 

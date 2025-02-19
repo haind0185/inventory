@@ -229,6 +229,84 @@ const StickyNoteController = {
             await transaction.rollback();
             return res.json(error(err.message, 501));
         }
+    },
+
+    delete: async (req, res) => {
+        const transaction = await sequelize.transaction();
+        try {
+            const { notes, id } = req.body;
+            console.log(notes)
+
+            for (const i in notes) {
+                let note = notes[i]
+
+                const schema = Joi.object({
+                    id    : Joi.string().required().max(200),
+                    title : Joi.string().required().max(200),
+                    text  : Joi.string().allow(null, ''),
+                    x     : Joi.number().required().min(0),
+                    y     : Joi.number().required().min(0),
+                    width : Joi.number().required().min(0),
+                    height: Joi.number().required().min(0),
+                    color : Joi.string().required().max(200),
+                    zIndex: Joi.number().required().min(1),
+                }).unknown()
+
+                let validation = schema.validate({
+                    id    : note.title,
+                    title : note.title,
+                    text  : note.text,
+                    x     : note.x,
+                    y     : note.y,
+                    width : note.width,
+                    height: note.height,
+                    color : note.color,
+                    zIndex: note.zIndex,
+                });
+                if (validation.error) {
+                    continue;
+                }
+
+                await StickyNote.upsert({
+                    id    : note.id,
+                    title : note.title,
+                    text  : note.text,
+                    x     : note.x,
+                    y     : note.y,
+                    width : note.width,
+                    height: note.height,
+                    color : note.color,
+                    zIndex: note.zIndex,
+                }, {
+                    transaction: transaction,
+                    conflictFields: ['id']
+                });
+            }
+
+            if(id) {
+                const note = await StickyNote.findOne({
+                    where: {
+                        id: id
+                    }
+                }, { transaction: transaction })
+
+                if(note) {
+                    await note.destroy({ transaction: transaction })
+                }
+            }
+
+            await transaction.commit();
+
+            let data = []
+            data = await StickyNote.findAll({
+                order: [['createdAt', 'desc']],
+            });
+
+            return res.json(success(data));
+        } catch (err) {
+            await transaction.rollback();
+            return res.json(error(err.message, 501));
+        }
     }
 };
 

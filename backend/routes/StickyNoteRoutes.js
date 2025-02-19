@@ -10,6 +10,8 @@ router.put('/', StickyNoteController.update);
 
 router.post('/sync', StickyNoteController.async);
 
+router.post('/delete', StickyNoteController.delete);
+
 const StickyNoteRouter = router;
 
 export default StickyNoteRouter;
