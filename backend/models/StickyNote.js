@@ -2,6 +2,11 @@ import sequelize from './index';
 const { DataTypes } = require('sequelize');
 
 const StickyNote = sequelize.define('StickyNote', {
+    id: {
+        type: DataTypes.STRING,
+        primaryKey: true,
+        allowNull: false,
+    },
     title: {
         type: DataTypes.STRING,
         allowNull: false,

@@ -1,12 +1,35 @@
-<script setup>
-import { ref, onMounted, watch } from "vue";
-import StickyNote from "./StickyNote.vue";
+<template>
+    <div class="app">
+        <button class="add-btn" @click="addNote">+ Thêm ghi chú</button>
+        
+        <StickyNote v-for="note in notes"
+        :key="note.id"
+        :note="note"
+        :onDelete="deleteNote"
+        :onUpdate="updateNote"
+        :onFocus="bringToFront"
+        />
+    </div>
+</template>
 
-const notes = ref([]);
+<script setup>
+import { ref, onMounted, watch, computed } from "vue";
+import StickyNote from "./StickyNote.vue";
+import { stickyStore } from '@/store/sticky'
+
+const notes = computed({
+    get: () => stickyStore.notes, // Lấy dữ liệu từ store
+    set: (value) => {
+        stickyStore.notes = value; // Cập nhật store khi component thay đổi
+    },
+});
+
+
 const highestZIndex = ref(1); // Theo dõi z-index cao nhất
 
 // Lấy dữ liệu từ localStorage
-onMounted(() => {
+onMounted(async () => {
+    await stickyStore.syncData()
     const savedNotes = JSON.parse(localStorage.getItem("stickyNotes")) || [];
     notes.value = savedNotes.map(note => ({
         ...note,
@@ -31,8 +54,9 @@ watch(
 // Thêm một ghi chú mới
 const addNote = () => {
     highestZIndex.value++; // Ghi chú mới sẽ có z-index cao nhất
+    let idRand = Math.floor(Math.random() * (100 - 1 + 1)) + 1
     notes.value.push({
-        id: Date.now(),
+        id: Date.now()+idRand,
         title: "Ghi chú",
         text: "",
         x: Math.floor(Math.random() * (60 - 50 + 1)) + 50,
@@ -73,20 +97,6 @@ const getRandomColor = () => {
     return colors[Math.floor(Math.random() * colors.length)];
 };
 </script>
-
-<template>
-    <div class="app">
-        <button class="add-btn" @click="addNote">+ Thêm ghi chú</button>
-        
-        <StickyNote v-for="note in notes"
-        :key="note.id"
-        :note="note"
-        :onDelete="deleteNote"
-        :onUpdate="updateNote"
-        :onFocus="bringToFront"
-        />
-    </div>
-</template>
 
 <style>
 .app {

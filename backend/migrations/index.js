@@ -10,6 +10,7 @@ import { create_orders } from './20241025112015_create_orders_table'
 import { add_note_entries } from './20250218013456_add_note_for_entries_table'
 import { add_note_exits } from './20250218013457_add_note_for_exits_table'
 import { create_sticky_notes } from './20250218013458_create_sticky_notes_table'
+import { add_new_id_sticky_notes } from './20250219013415_add_new_id_for_sticky_notes_table'
 
 const { Umzug, SequelizeStorage } = require('umzug');
 
@@ -25,6 +26,7 @@ const migrations = [
     add_note_entries,
     add_note_exits,
     create_sticky_notes,
+    add_new_id_sticky_notes,
 ]
 
 export const migrator = new Umzug({

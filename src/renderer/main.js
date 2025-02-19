@@ -10,6 +10,7 @@ import helpers from '@/helper'
 import App from './App.vue'
 import router from './router'
 import { initPinia } from '@/store/setup'
+import { stickyStore } from '@/store/sticky'
 import './style.css'
 
 import Modal from '@/views/component/layout/Modal.vue'
@@ -40,3 +41,6 @@ app.component('Modal', Modal)
     .component('select2', vSelect)
 
 app.mount('#app')
+
+
+stickyStore.startSync()
