@@ -1,7 +1,7 @@
 /**
  * Vue setup
  */
-import { createApp } from 'vue'
+import { createApp, onMounted } from 'vue'
 import VueCookies from 'vue-cookies'
 import 'vue-select/dist/vue-select.css'
 
@@ -44,3 +44,16 @@ app.mount('#app')
 
 
 stickyStore.startSync()
+
+console.log(window.electron)
+
+window.electron.onSyncBeforeQuit(async () => {
+    console.log("Bắt đầu đồng bộ trước khi thoát...")
+    try {
+        await stickyStore.syncData()
+        console.log("Đồng bộ xong, gửi sự kiện sync-done")
+        window.electron.syncDone() // Gửi lại sự kiện để Main Process thoát ứng dụng
+    } catch (error) {
+        console.error("Lỗi đồng bộ:", error)
+    }
+});

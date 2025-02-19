@@ -1,6 +1,8 @@
-import { app, BrowserWindow, globalShortcut } from 'electron';
+import { app, BrowserWindow, globalShortcut, ipcMain } from 'electron';
 import { join } from 'path';
 import server from '../backend/index';
+
+let isSyncingBeforeQuit = false; // Biến để kiểm tra trạng thái đồng bộ
 
 const startServer = () => {
     const port = 5000
@@ -50,7 +52,23 @@ const createWindow = () => {
     globalShortcut.register('CommandOrControl+E', () => {
         restartServer()
     })
+
+    mainWindow.on("close", (event) => {
+        if (!isSyncingBeforeQuit) {
+            event.preventDefault(); // Ngăn chặn thoát ngay lập tức
+            isSyncingBeforeQuit = true; // Đánh dấu là đang đồng bộ trước khi thoát
+            console.log("Yêu cầu đồng bộ trước khi thoát...");
+            mainWindow.webContents.send("sync-before-quit"); // Gửi sự kiện xuống renderer
+        } else {
+            app.quit();
+        }
+    });
 };
+
+ipcMain.on("sync-done", () => {
+    console.log("Sync xong, ứng dụng sẽ thoát.");
+    app.quit();
+});
 
 app.on('ready', createWindow);
 
