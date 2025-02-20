@@ -52,15 +52,15 @@
                 <thead>
                     <tr>
                         <th class="">{{ 'SL' }}</th>
-                        <th class="">{{ $t("attr.exit.ExitDate") }}</th>
-                        <th class="">{{ $t("attr.exit.ExitCode") }}</th>
+                        <th class="w-[8rem]">{{ $t("attr.exit.ExitDate") }}</th>
+                        <th class="w-[8rem]">{{ $t("attr.exit.ExitCode") }}</th>
 
-                        <th class="">{{ $t("attr.exit.LargeUnitQty") }}</th>
-                        <th class="">{{ $t("attr.exit.SmallUnitQty") }}</th>
-                        <th class="">{{ $t("attr.exit.Qty") }}</th>
-                        <th class="">{{ $t("attr.exit.Price") }}</th>
-                        <th class="">{{ $t("attr.exit.PriceQty") }}</th>
-                        <th class="">{{ $t("attr.exit.Note") }}</th>
+                        <th class="w-[4rem]">{{ $t("attr.exit.LargeUnitQty") }}</th>
+                        <th class="w-[4rem]">{{ $t("attr.exit.SmallUnitQty") }}</th>
+                        <th class="w-[5rem]">{{ $t("attr.exit.Qty") }}</th>
+                        <th class="w-[6rem]">{{ $t("attr.exit.Price") }}</th>
+                        <th class="w-[7rem]">{{ $t("attr.exit.PriceQty") }}</th>
+                        <th class="w-[12rem]">{{ $t("attr.exit.Note") }}</th>
                     </tr>
                 </thead>
                 <tbody>

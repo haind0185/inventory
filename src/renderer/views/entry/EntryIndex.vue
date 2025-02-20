@@ -44,20 +44,20 @@
                 <thead>
                     <tr>
                         <th class="" colspan="2">{{ $t("attr.entry.ProductNameLabel") }}</th>
-                        <th class="w-[7rem]">{{ $t("attr.entry.ExpiryDate") }}</th>
-                        <th class="w-[5rem]">{{ $t("attr.entry.LargeUnitQty") }}</th>
-                        <th class="w-[5rem]">{{ $t("attr.entry.SmallUnitQty") }}</th>
-                        <th class="w-[6rem]">{{ $t("attr.entry.Price") }}</th>
-                        <th class="w-[6rem]">{{ $t("attr.entry.Qty") }}</th>
+                        <th class="w-[6rem]">{{ $t("attr.entry.ExpiryDate") }}</th>
+                        <th class="w-[4rem]">{{ $t("attr.entry.LargeUnitQty") }}</th>
+                        <th class="w-[4rem]">{{ $t("attr.entry.SmallUnitQty") }}</th>
+                        <th class="w-[5rem]">{{ $t("attr.entry.Price") }}</th>
+                        <th class="w-[5rem]">{{ $t("attr.entry.Qty") }}</th>
                         <th class="w-[7rem]">{{ $t("attr.entry.PriceQty") }}</th>
-                        <th class="w-[7rem]">{{ $t("attr.entry.Note") }}</th>
+                        <th class="w-[12rem]">{{ $t("attr.entry.Note") }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <template v-for="item in entries.items">
                         <tr style="background: #dfe6f5; cursor: pointer;">
                             <td class="w-[2.5rem] text-center show-list" @click="item.show = !item.show">{{ item.entries.length }}</td>
-                            <td colspan="5" class="text-left" @click="item.show = !item.show">
+                            <td colspan="5" class="text-xs text-left" @click="item.show = !item.show">
                                 [{{ item.show ? '-' : '+' }}] [Mã nhập: {{ item.EntryCode }}] [Ngày nhập: {{ item.EntryDate }}]
                             </td>
                             <td colspan="1" style="cursor: default;">
@@ -79,7 +79,7 @@
                             <td class="text-right">{{ format_number(entry.Price) }}</td>
                             <td class="text-right">{{ format_number(entry.Qty) }}</td>
                             <td class="text-right">{{ format_number(entry.PriceQty) }}</td>
-                            <td class="text-left">{{ entry.Note }}</td>
+                            <td class="!text-xs text-left">{{ entry.Note }}</td>
                         </tr>
                         <tr v-show="item.show">
                             <td colspan="3" class="!font-bold text-right">Tổng cộng: </td>

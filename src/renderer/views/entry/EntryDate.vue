@@ -52,15 +52,15 @@
                 <thead>
                     <tr>
                         <th class="" colspan="3">{{ 'SL' }}</th>
-                        <th class="w-[50%]">{{ $t("attr.entry.ProductNameLabel") }}</th>
+                        <th class="">{{ $t("attr.entry.ProductNameLabel") }}</th>
                         <th class="w-[6rem]">{{ $t("attr.entry.ExpiryDate") }}</th>
 
-                        <th class="w-[5rem]">{{ $t("attr.entry.LargeUnitQty") }}</th>
-                        <th class="w-[5rem]">{{ $t("attr.entry.SmallUnitQty") }}</th>
+                        <th class="w-[4rem]">{{ $t("attr.entry.LargeUnitQty") }}</th>
+                        <th class="w-[4rem]">{{ $t("attr.entry.SmallUnitQty") }}</th>
                         <th class="w-[5rem]">{{ $t("attr.entry.Price") }}</th>
-                        <th class="w-[5rem]">{{ $t("attr.entry.Qty") }}</th>
-                        <th class="w-[5rem]">{{ $t("attr.entry.PriceQty") }}</th>
-                        <th class="w-[5rem]">{{ $t("attr.entry.Note") }}</th>
+                        <th class="w-[6rem]">{{ $t("attr.entry.Qty") }}</th>
+                        <th class="w-[7rem]">{{ $t("attr.entry.PriceQty") }}</th>
+                        <th class="w-[12rem]">{{ $t("attr.entry.Note") }}</th>
                     </tr>
                 </thead>
                 <tbody>

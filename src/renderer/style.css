@@ -274,6 +274,7 @@ table.t-border td {
     word-break: break-all;
     font-size: 14px;
     font-weight: 400;
+    white-space: nowrap;
 }
 
 table.t-border-top td {

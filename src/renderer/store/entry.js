@@ -6,6 +6,8 @@ import { store } from '.'
 const searchInit = {
     EntryCode: null,
     EntryDate: null,
+    EntryDateFrom: null,
+    EntryDateTo: null,
     sort: null,
     sort_by: null,
     page: 1
@@ -174,6 +176,7 @@ const createStore = defineStore('entry', {
         },
         resetSearch() {
             this.search = {...this.search, ...searchInit}
+            console.log(this.search)
         },
         setProductSearch() {
             this.productSearch.sort = null

@@ -45,7 +45,6 @@ app.mount('#app')
 
 stickyStore.startSync()
 
-console.log(window.electron)
 
 window.electron.onSyncBeforeQuit(async () => {
     console.log("Bắt đầu đồng bộ trước khi thoát...")
