@@ -54,6 +54,16 @@ const createStore = defineStore('app', {
         },
         openPageSearch() {
             this.pageSearch.isOpen = true
+        },
+        closePageSearch() {
+            this.pageSearch.isOpen = false
+        },
+        switchPareSearch() {
+            if(this.pageSearch.isOpen) {
+                this.closePageSearch()
+            } else {
+                this.openPageSearch()
+            }
         }
     },
 })

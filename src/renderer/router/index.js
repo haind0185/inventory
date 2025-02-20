@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router'
+import { store } from '@/store'
 
 const routes = [
     {
@@ -123,6 +124,7 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
+    store.closePageSearch()
     next()
 })
 

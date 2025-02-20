@@ -56,7 +56,6 @@ const createWindow = () => {
 
     globalShortcut.register('CommandOrControl+F', () => {
         mainWindow.webContents.send('on-find')
-        // mainWindow.webContents.findInPage('yyy')
     });
 
     mainWindow.on("close", (event) => {
@@ -76,8 +75,16 @@ ipcMain.on("sync-done", () => {
     app.quit();
 });
 
-ipcMain.on("search", (text) => {
-    mainWindow.webContents.findInPage(text)
+ipcMain.on("on-search", async (event, text) => {
+    if(text) {
+        mainWindow.webContents.findInPage(text)
+    } else {
+        mainWindow.webContents.stopFindInPage("clearSelection")
+    }
+});
+
+ipcMain.on("on-clear", () => {
+    mainWindow.webContents.stopFindInPage("clearSelection")
 });
 
 app.on('ready', createWindow);

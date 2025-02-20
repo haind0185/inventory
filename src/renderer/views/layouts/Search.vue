@@ -1,6 +1,11 @@
 <template>
     <div class="page-search-container" v-if="pageSearch.isOpen">
-        <input type="text" class="form-control page-search" v-model="pageSearch.text" v-select-on-focus ref="pageSearchInput">
+        <input type="text" class="form-control page-search"
+            v-model="pageSearch.text"
+            v-select-on-focus
+            ref="pageSearchInput"
+            @keyup.enter="onSearch()"
+            >
         <span class="page-search-close" @click="closePageSearch()">❌</span>
     </div>
 </template>
@@ -20,6 +25,11 @@ const pageSearch = computed({
 
 const closePageSearch = () => {
     pageSearch.value.isOpen = false
+    window.electron.onClear()
+}
+
+const onSearch = async () => {
+    await window.electron.onSearch(pageSearch.value.text)
 }
 
 onMounted(() => {
@@ -32,10 +42,11 @@ onMounted(() => {
 
 <style scoped>
 .page-search-container {
-    position: absolute;
+    position: fixed;
     top: 4px;
     right: 4px;
     width: 12rem;
+    z-index: 9999;
 }
 .page-search {
     background: #e0e0e0;

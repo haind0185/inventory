@@ -9,5 +9,8 @@ contextBridge.exposeInMainWorld("versions", {
 contextBridge.exposeInMainWorld("electron", {
     onSyncBeforeQuit: (callback) => ipcRenderer.on("sync-before-quit", callback),
     onFind: (callback) => ipcRenderer.on("on-find", callback),
+
+    onSearch: (text) => ipcRenderer.send("on-search", text),
+    onClear: () => ipcRenderer.send("on-clear"),
     syncDone: () => ipcRenderer.send("sync-done"),
 });

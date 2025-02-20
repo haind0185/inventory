@@ -66,5 +66,5 @@ window.electron.onSyncBeforeQuit(async () => {
 });
 
 window.electron.onFind(async () => {
-    store.openPageSearch()
+    store.switchPareSearch()
 });
