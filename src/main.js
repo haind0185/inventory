@@ -28,11 +28,12 @@ if (require('electron-squirrel-startup')) {
     app.quit();
 }
 
+let mainWindow = null
 const createWindow = () => {
     const iconPath = app.isPackaged
     ? join(process.resourcesPath, 'icon.ico')
     : join(__dirname, '../../icon.ico');
-    const mainWindow = new BrowserWindow({
+    mainWindow = new BrowserWindow({
         width: 1280,
         height: 800,
         webPreferences: {
@@ -53,6 +54,11 @@ const createWindow = () => {
         restartServer()
     })
 
+    globalShortcut.register('CommandOrControl+F', () => {
+        mainWindow.webContents.send('on-find')
+        // mainWindow.webContents.findInPage('yyy')
+    });
+
     mainWindow.on("close", (event) => {
         if (!isSyncingBeforeQuit) {
             event.preventDefault(); // Ngăn chặn thoát ngay lập tức
@@ -68,6 +74,10 @@ const createWindow = () => {
 ipcMain.on("sync-done", () => {
     console.log("Sync xong, ứng dụng sẽ thoát.");
     app.quit();
+});
+
+ipcMain.on("search", (text) => {
+    mainWindow.webContents.findInPage(text)
 });
 
 app.on('ready', createWindow);

@@ -11,6 +11,7 @@ import App from './App.vue'
 import router from './router'
 import { initPinia } from '@/store/setup'
 import { stickyStore } from '@/store/sticky'
+import { store } from '@/store'
 import './style.css'
 
 import Modal from '@/views/component/layout/Modal.vue'
@@ -62,4 +63,8 @@ window.electron.onSyncBeforeQuit(async () => {
     } catch (error) {
         console.error("Lỗi đồng bộ:", error)
     }
+});
+
+window.electron.onFind(async () => {
+    store.openPageSearch()
 });

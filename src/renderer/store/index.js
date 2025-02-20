@@ -13,7 +13,11 @@ const createStore = defineStore('app', {
                 type: 3,
             },
             master: {},
-            numberModal: 90
+            numberModal: 90,
+            pageSearch: {
+                isOpen: false,
+                text: '',
+            }
         }
     },
     getters: {
@@ -48,6 +52,9 @@ const createStore = defineStore('app', {
         subIndex() {
             this.numberModal -= 1
         },
+        openPageSearch() {
+            this.pageSearch.isOpen = true
+        }
     },
 })
 
