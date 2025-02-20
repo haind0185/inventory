@@ -20,10 +20,10 @@
             </div>
 
             <div class="flex justify-end gap-3">
-                <button type="button" class="btn green w-[6rem]" @click="addItem()">{{ t('button.add_item') }}</button>
+                <button type="button" class="btn green w-[6rem]" @click="addItem()" tabindex="-1">{{ t('button.add_item') }}</button>
                 <input id="file" ref="file" type="file" @change="onFileChange($event)" class="hidden">
-                <button type="button" class="btn silver w-[6rem]" @click="openFile()">{{ $t('button.import') }}</button>
-                <button type="button" class="btn silver w-[6rem]" @click="reset()">{{ t('button.reset') }}</button>
+                <button type="button" class="btn silver w-[6rem]" @click="openFile()" tabindex="-1">{{ $t('button.import') }}</button>
+                <button type="button" class="btn silver w-[6rem]" @click="reset()" tabindex="-1">{{ t('button.reset') }}</button>
             </div>
 
             <div class="flex gap-3 p-1 entry-item">
@@ -72,11 +72,11 @@
                             </select2>
                         </fieldset>
                         <fieldset class="w-[8rem] form-input flex items-center">
-                            <input type="number" class="w-[5rem] text-right form-control" v-model="exit.LargeUnitQty" min="0">
+                            <input type="number" class="w-[5rem] text-right form-control" v-model="exit.LargeUnitQty" min="0" v-select-on-focus>
                             <span class="w-[3rem] text-sm pl-1">{{ getLargeUnit(exit.ProductCode) }}</span>
                         </fieldset>
                         <fieldset class="w-[8rem] form-input flex items-center">
-                            <input type="number" class="w-[5rem] text-right form-control" v-model="exit.SmallUnitQty" min="0" :disabled="smallUnitDisable(exit.ProductCode)">
+                            <input type="number" class="w-[5rem] text-right form-control" v-model="exit.SmallUnitQty" min="0" :disabled="smallUnitDisable(exit.ProductCode)" v-select-on-focus>
                             <span class="w-[3rem] text-sm pl-1">{{ getSmallUnit(exit.ProductCode) }}</span>
                         </fieldset>
                         <fieldset class="w-[5rem] form-input flex items-center">
@@ -95,8 +95,8 @@
             <div class="">
                 <div class="flex justify-end h-6 px-5">Tổng: {{ PriceQtyTotal() }}</div>
                 <div class="flex justify-around w-full">
-                    <button type="button" class="btn silver w-[6rem]" @click="onClose()">{{ $t("button.cancel") }}</button>
-                    <button type="submit" class="btn w-[6rem]" :disabled="exits.length <= 0">{{ $t("button.save") }}</button>
+                    <button type="button" class="btn silver w-[6rem]" @click="onClose()" tabindex="-1">{{ $t("button.cancel") }}</button>
+                    <button type="submit" class="btn w-[6rem]" :disabled="exits.length <= 0" tabindex="-1">{{ $t("button.save") }}</button>
                 </div>
             </div>
         </form>

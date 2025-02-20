@@ -1,6 +1,6 @@
 <template>
     <Paginate :page-range="3" :margin-pages="0" :prev-text="'<'" :next-text="'>'" :container-class="'pagination'"
-        :page-class="'page-item'" :first-last-button="true" :first-button-text="'<<'" :last-button-text="'>>'">
+        :page-class="'page-item'" :first-last-button="true" :first-button-text="'<<'" :last-button-text="'>>'" tabindex="-1">
     </Paginate>
 </template>
 <script setup>

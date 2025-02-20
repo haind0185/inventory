@@ -18,7 +18,8 @@ import Confirm from '@/views/component/Confirm.vue'
 import Sort from '@/views/component/Sort.vue'
 import Pagination from '@/views/component/Pagination.vue'
 import Date from '@/views/component/Date.vue'
-import vSelect from 'vue-select'
+import vSelect from '@/views/component/Select2.vue'
+// import vSelect from 'vue-select'
 
 /**
  * Vue install
@@ -41,6 +42,12 @@ app.component('Modal', Modal)
     .component('select2', vSelect)
 
 app.mount('#app')
+
+app.directive("select-on-focus", {
+    mounted(el) {
+        el.addEventListener("focus", () => el.select());
+    },
+});
 
 
 stickyStore.startSync()

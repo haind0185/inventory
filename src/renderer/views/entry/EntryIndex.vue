@@ -19,8 +19,8 @@
                 </div>
             </div>
             <div class="flex items-end gap-3">
-                <button type="submit" class="btn w-[6rem]">{{ $t("button.search") }}</button>
-                <button type="button" class="btn silver w-[6rem]" @click="clear()">{{ $t("button.clear") }}</button>
+                <button type="submit" class="btn w-[6rem]" tabindex="-1">{{ $t("button.search") }}</button>
+                <button type="button" class="btn silver w-[6rem]" @click="clear()" tabindex="-1">{{ $t("button.clear") }}</button>
             </div>
         </form>
 
@@ -35,7 +35,7 @@
                 </span>
             </div>
             <div class="flex justify-end w-[40%] gap-3">
-                <button type="button" class="btn green w-[6rem]" @click="onShowAdd()">{{ $t("button.add") }}</button>
+                <button type="button" class="btn green w-[6rem]" @click="onShowAdd()" tabindex="-1">{{ $t("button.add") }}</button>
             </div>
         </div>
 
@@ -62,7 +62,7 @@
                             </td>
                             <td colspan="1" style="cursor: default;">
                                 <div class="flex justify-end w-full">
-                                    <a href="javascript:void(0)" class="link" @click="onShowDetail(item.EntryCode)">Chi tiết</a>
+                                    <a href="javascript:void(0)" class="link" @click="onShowDetail(item.EntryCode)" tabindex="-1">Chi tiết</a>
                                 </div>
                             </td>
                             <td @click="item.show = !item.show" class="text-right">

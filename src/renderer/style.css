@@ -314,6 +314,9 @@ table.t-border tbody tr.selected {
 .vs__selected {
     margin: 0;
     padding: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .vs__selected-options {
@@ -398,4 +401,8 @@ input::-webkit-inner-spin-button {
 }
 .link.red {
     color: red;
+}
+
+input.form-control:focus {
+    user-select: all;
 }

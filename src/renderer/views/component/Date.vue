@@ -1,6 +1,21 @@
 <template>
-    <Datepicker :enableTimePicker="false" :class="class" v-model="value" :format="format" locale="en" cancelText=""
-        selectText="" auto-apply keep-action-row :close-on-auto-apply="true" :position="position">
+    <Datepicker
+        :enableTimePicker="false"
+        :class="class"
+        v-model="value"
+        :format="format"
+        locale="en"
+        cancelText=""
+        selectText=""
+        auto-apply
+        keep-action-row
+        :close-on-auto-apply="true"
+        :position="position"
+        @focus="openDatepicker"
+        @keydown.tab.prevent="focusNextInput"
+        @closed="focusNextInput"
+        ref="datepicker"
+        :input-id="id">
     </Datepicker>
 </template>
 <script setup>
@@ -19,7 +34,8 @@ export default {
     emits: ['update:modelValue'],
     data: function () {
         return {
-            value: null
+            value: null,
+            id: Date.now() + '-' + Math.round(Math.random() * 1E9)
         }
     },
     computed: {},
@@ -33,6 +49,39 @@ export default {
     },
     created: function () {
         this.value = this.modelValue
+    },
+    mounted() {
+        this.setDatepickerId()
+    },
+    methods: {
+        openDatepicker: function () {
+            this.$refs.datepicker.openMenu()
+        },
+        focusNextInput: function (event) {
+            if(event) {
+                event.preventDefault()
+            }
+            if (this.$refs.datepicker) {
+                this.$refs.datepicker.closeMenu()
+            }
+
+            setTimeout(() => {
+                let focusableElements = Array.from(document.querySelectorAll("input"))
+                let currentIndex = focusableElements.findIndex(el => el.id === this.id)
+                
+                if (currentIndex !== -1 && currentIndex < focusableElements.length - 1) {
+                    focusableElements[currentIndex + 1].focus()
+                }
+            }, 100)
+        },
+        setDatepickerId: function () {
+            if (this.$refs.datepicker && this.$refs.datepicker.$el) {
+                let inputElement = this.$refs.datepicker.$el.querySelector("input.dp__input")
+                if (inputElement) {
+                    inputElement.id = this.id
+                }
+            }
+        },
     }
 }
 </script>
