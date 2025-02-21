@@ -65,6 +65,9 @@ window.electron.onSyncBeforeQuit(async () => {
     }
 });
 
-window.electron.onFind(async () => {
-    store.switchPareSearch()
-});
+window.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        e.preventDefault()
+        store.switchPareSearch()
+    }
+})

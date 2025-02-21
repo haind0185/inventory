@@ -54,8 +54,8 @@ import Paginate from "vuejs-paginate-next";
     z-index: 2;
     color: #fff;
     cursor: default;
-    background-color: #21263c;
-    border-color: #21263c;
+    background-color: var(--theme-color);
+    border-color: var(--theme-color);
 }
 
 .pagination a {

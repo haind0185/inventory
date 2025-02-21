@@ -54,9 +54,9 @@ const createWindow = () => {
         restartServer()
     })
 
-    globalShortcut.register('CommandOrControl+F', () => {
-        mainWindow.webContents.send('on-find')
-    });
+    // globalShortcut.register('CommandOrControl+F', () => {
+    //     mainWindow.webContents.send('on-find')
+    // });
 
     mainWindow.on("close", (event) => {
         if (!isSyncingBeforeQuit) {

@@ -45,7 +45,7 @@
 }
 .header-modal{
   padding: 0.5rem;
-  background-color: #21263c;
+  background-color: var(--theme-color);
   color: white;
   font-weight: 300;
   font-size: 16px;

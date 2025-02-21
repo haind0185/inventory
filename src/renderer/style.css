@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 :root {
-    --theme-color: #21263c;
-    --bg-side-bar: #21263c;
-    --bg-logo: #181c2e;
+    --theme-color: #1593e5;
+    --bg-side-bar: #ffdb34;
+    --bg-logo: rgb(153, 131, 31);
     --border-table: 1px solid var(--border-color);
     --border-color: rgba(180, 220, 220, 1);
     --table-hover-color: rgba(234, 244, 255, 0.4);
@@ -29,7 +29,7 @@ body {
     padding: 0;
     margin: 0;
     background: var(--bg-side-bar);
-    color: white;
+    color: black;
 }
 
 .header {
@@ -81,15 +81,15 @@ ul li.item:last-child {
 }
 
 ul li.item:hover {
-    background: #181c2e;
+    background: rgb(0, 0, 0, 0.4);
 }
 
 ul li.item:active {
-    background: #a6c2e9;
+    background: rgb(0, 0, 0, 0.6);
 }
 
 ul li.item[active="true"] {
-    background: #408dfb;
+    background: rgb(0, 0, 0, 0.4);
 }
 
 .menu-item {
@@ -98,7 +98,7 @@ ul li.item[active="true"] {
     text-decoration: none;
     font-size: 14px;
     font-weight: 400;
-    color: white;
+    color: black;
     width: 100%;
     height: 100%;
     padding: 0.3rem 0.5rem;
@@ -121,7 +121,7 @@ ul li.item[active="true"] {
 }
 
 .item-parent.active {
-    background: #344272;
+    background: rgb(0, 0, 0, 0.3);
     padding-bottom: 5px;
     border-radius: 4px;
     height: auto;
@@ -387,7 +387,7 @@ input::-webkit-inner-spin-button {
 }
 
 .setting {
-    background: #344272;
+    background: rgb(0, 0, 0, 0.4);
     border-radius: 4px;
 }
 
