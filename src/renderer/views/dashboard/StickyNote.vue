@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 
 const props = defineProps(["note", "onDelete", "onUpdate", "onFocus"]);
 
@@ -12,6 +12,9 @@ const startWidth = ref(0);
 const startHeight = ref(0);
 const isEditing = ref(false); // Theo dõi trạng thái chỉnh sửa tên
 const newHeaderText = ref(note.value.title); // Lưu tên header mới khi chỉnh sửa
+const isOpenColor = ref(false)
+const colors = ref(["#FF5733", "#FF8C42", "#FFDB34", "#E4F9E0", "#FFE4F1", "#06D6A0", "#00B4D8", "#2196F3", "#A29BFE", "#9C27B0"])
+const noteColor = ref(null)
 
 // Khi focus vào note, đặt nó lên trên
 const focusNote = () => {
@@ -83,6 +86,25 @@ const saveHeader = () => {
     props.onUpdate(note.value); // Cập nhật note lên App.vue
 };
 
+const openColor = () => {
+    isOpenColor.value = !isOpenColor.value
+}
+
+const setColor = (color) => {
+    note.value.color = color
+    isOpenColor.value = false
+}
+
+const handleClickOutside = (event) => {
+    if (noteColor.value && !noteColor.value.contains(event.target) && !event.target.closest(".color-btn")) {
+        isOpenColor.value = false
+    }
+
+    if (isEditing.value && !event.target.closest(".header-input")) {
+        saveHeader()
+    }
+}
+
 // Theo dõi thay đổi để cập nhật vào localStorage
 watch(
     () => note.value,
@@ -99,6 +121,9 @@ watch(
     },
     { deep: true }
 );
+onMounted(() => {
+    document.addEventListener("click", handleClickOutside)
+})
 </script>
 
 <template>
@@ -112,17 +137,25 @@ watch(
     }" @mousedown="focusNote" @dblclick="enableEditing">
         <!-- Header để kéo -->
         <div class="note-header" @mousedown="startDrag" @dblclick="enableEditing">
-            <span>📌</span>
-            <span v-if="!isEditing">{{ note.title }}</span>
+            <span class="w-[30%]">📌</span>
+            <span v-if="!isEditing" class="w-[40%] text-center">{{ note.title }}</span>
             <input
                 v-if="isEditing"
                 v-model="newHeaderText"
-                @blur="saveHeader"
+                
                 @keyup.enter="saveHeader"
-                class="header-input"
+                class="header-input w-[40%]"
                 autofocus
+                :style="{'background': note.color}"
             />
-            <button class="delete-btn" @click="onDelete(note.id)">❌</button>
+            <div class="flex items-center justify-end gap-2 w-[30%]">
+                <button class="color-btn" @click="openColor()">⋯</button>
+                <button class="delete-btn" @click="onDelete(note.id)">❌</button>
+            </div>
+        </div>
+
+        <div class="note-color" v-if="isOpenColor" ref="noteColor">
+            <div v-for="color in colors" :style="{'background-color': color}" @click="setColor(color)"></div>
         </div>
 
         <!-- Nội dung -->
@@ -140,7 +173,7 @@ watch(
     min-height: 100px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
     border-radius: 10px;
-    overflow: hidden;
+    /* overflow: visible; */
 }
 
 /* Header để kéo */
@@ -151,9 +184,12 @@ watch(
     font-weight: bold;
     cursor: grab;
     display: flex;
+    gap: 2px;
     justify-content: space-between;
     align-items: center;
     user-select: none;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
 }
 
 /* Xóa nút */
@@ -161,11 +197,31 @@ watch(
     background: transparent;
     color: white;
     border: none;
-    cursor: pointer;
     border-radius: 50%;
     width: 20px;
     height: 20px;
     font-size: 12px;
+    cursor: auto;
+}
+
+.delete-btn:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.color-btn {
+    background: transparent;
+    color: black;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: auto;
+}
+
+.color-btn:hover {
+    background: rgba(0, 0, 0, 0.2);
 }
 
 /* Nội dung */
@@ -184,16 +240,17 @@ watch(
 /* Input chỉnh sửa tên */
 .header-input {
     width: 100%;
-    background-color: transparent;
+    /* background-color: transparent; */
     border: none;
-    color: white;
+    color: black;
     font-size: 16px;
     font-weight: bold;
     padding: 2px;
     outline: none;
     text-align: center;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 3px;
+    height: 24px;
 }
 
 /* Góc kéo để resize */
@@ -205,5 +262,23 @@ watch(
     bottom: 0;
     right: 0;
     cursor: nwse-resize;
+    border-bottom-right-radius: 10px;
+}
+
+.note-color {
+    position: absolute;
+    top: -31px;
+    left: 0;
+    display: flex;
+    width: 100%;
+    border: 1px solid #ccc;
+}
+.note-color div {
+    height: 30px;
+    width: calc(100% / 6);
+}
+
+.note-color div:hover {
+    border: 1px solid #ccc;
 }
 </style>
