@@ -62,7 +62,6 @@ const createWindow = () => {
         if (!isSyncingBeforeQuit) {
             event.preventDefault(); // Ngăn chặn thoát ngay lập tức
             isSyncingBeforeQuit = true; // Đánh dấu là đang đồng bộ trước khi thoát
-            console.log("Yêu cầu đồng bộ trước khi thoát...");
             mainWindow.webContents.send("sync-before-quit"); // Gửi sự kiện xuống renderer
         } else {
             app.quit();

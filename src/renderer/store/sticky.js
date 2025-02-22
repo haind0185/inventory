@@ -23,7 +23,6 @@ const createStore = defineStore("sticky", {
                 if (response.status === 200) {
                     this.notes = response.data.data;
                     localStorage.setItem("stickyNotes", JSON.stringify(this.notes));
-                    console.log("Đồng bộ dữ liệu thành công!");
                 }
             } catch (error) {
                 console.error("Lỗi đồng bộ dữ liệu:", error);
@@ -52,15 +51,12 @@ const createStore = defineStore("sticky", {
             this.syncInterval = setInterval(() => {
                 this.syncData();
             }, this.syncTime);
-
-            console.log("Bắt đầu đồng bộ dữ liệu mỗi 10s.");
         },
 
         stopSync() {
             if (this.syncInterval) {
                 clearInterval(this.syncInterval);
                 this.syncInterval = null;
-                console.log("Dừng đồng bộ dữ liệu.");
             }
         },
     },

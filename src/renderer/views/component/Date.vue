@@ -13,7 +13,8 @@
         :position="position"
         @focus="openDatepicker"
         @keydown.tab.prevent="focusNextInput"
-        @closed="focusNextInput"
+        @closed="isOpen = false; focusNextInput();"
+        @open="isOpen = true"
         ref="datepicker"
         :input-id="id">
     </Datepicker>
@@ -35,7 +36,8 @@ export default {
     data: function () {
         return {
             value: null,
-            id: Date.now() + '-' + Math.round(Math.random() * 1E9)
+            id: Date.now() + '-' + Math.round(Math.random() * 1E9),
+            isOpen: false
         }
     },
     computed: {},
@@ -45,6 +47,9 @@ export default {
         },
         'modelValue': function () {
             this.value = this.modelValue
+            if(this.value) {
+                this.focusNextInput()
+            }
         }
     },
     created: function () {
@@ -55,7 +60,11 @@ export default {
     },
     methods: {
         openDatepicker: function () {
-            this.$refs.datepicker.openMenu()
+            setTimeout(() => {
+                if (!this.isOpen) {
+                    this.$refs.datepicker.openMenu()
+                }
+            }, 100)
         },
         focusNextInput: function (event) {
             if(event) {
@@ -65,14 +74,17 @@ export default {
                 this.$refs.datepicker.closeMenu()
             }
 
-            setTimeout(() => {
-                let focusableElements = Array.from(document.querySelectorAll("input"))
-                let currentIndex = focusableElements.findIndex(el => el.id === this.id)
-                
-                if (currentIndex !== -1 && currentIndex < focusableElements.length - 1) {
-                    focusableElements[currentIndex + 1].focus()
-                }
-            }, 100)
+            if(this.value) {
+                setTimeout(() => {
+                    let focusableElements = Array.from(document.querySelectorAll("input"))
+                    let currentIndex = focusableElements.findIndex(el => el.id === this.id)
+                    
+                    if (currentIndex !== -1 && currentIndex < focusableElements.length - 1) {
+                        focusableElements[currentIndex + 1].focus()
+                    }
+                }, 100)
+            }
+
         },
         setDatepickerId: function () {
             if (this.$refs.datepicker && this.$refs.datepicker.$el) {
