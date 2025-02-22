@@ -36,10 +36,10 @@
                 <fieldset class="flex-1 form-input required">
                     <legend>{{ $t("attr.exit.ProductCode") }}</legend>
                 </fieldset>
-                <fieldset class="w-[8rem] form-input">
+                <fieldset class="w-[7rem] form-input">
                     <legend>{{ $t("attr.exit.LargeUnitQty") }}</legend>
                 </fieldset>
-                <fieldset class="w-[8rem] form-input">
+                <fieldset class="w-[7rem] form-input">
                     <legend>{{ $t("attr.exit.SmallUnitQty") }}</legend>
                 </fieldset>
                 <fieldset class="w-[5rem] form-input">
@@ -48,7 +48,7 @@
                 <fieldset class="w-[7rem] form-input">
                     <legend>{{ $t("attr.exit.PriceQty") }}</legend>
                 </fieldset>
-                <fieldset class="w-[7rem] form-input">
+                <fieldset class="w-[11rem] form-input">
                     <legend>{{ $t("attr.exit.Note") }}</legend>
                 </fieldset>
             </div>
@@ -71,12 +71,12 @@
                                 </template>
                             </select2>
                         </fieldset>
-                        <fieldset class="w-[8rem] form-input flex items-center">
-                            <input type="number" class="w-[5rem] text-right form-control" v-model="exit.LargeUnitQty" min="0" v-select-on-focus>
+                        <fieldset class="w-[7rem] form-input flex items-center">
+                            <input type="number" class="w-[4rem] text-right form-control" v-model="exit.LargeUnitQty" min="0" v-select-on-focus>
                             <span class="w-[3rem] text-sm pl-1">{{ getLargeUnit(exit.ProductCode) }}</span>
                         </fieldset>
-                        <fieldset class="w-[8rem] form-input flex items-center">
-                            <input type="number" class="w-[5rem] text-right form-control" v-model="exit.SmallUnitQty" min="0" :disabled="smallUnitDisable(exit.ProductCode)" v-select-on-focus>
+                        <fieldset class="w-[7rem] form-input flex items-center">
+                            <input type="number" class="w-[4rem] text-right form-control" v-model="exit.SmallUnitQty" min="0" :disabled="smallUnitDisable(exit.ProductCode)" v-select-on-focus>
                             <span class="w-[3rem] text-sm pl-1">{{ getSmallUnit(exit.ProductCode) }}</span>
                         </fieldset>
                         <fieldset class="w-[5rem] form-input flex items-center">
@@ -85,8 +85,8 @@
                         <fieldset class="w-[7rem] form-input flex items-center">
                             <input type="text" class="w-[7rem] text-right form-control" v-model="exit.PriceQtyLabel" disabled>
                         </fieldset>
-                        <fieldset class="w-[7rem] form-input flex items-center">
-                            <input type="text" class="w-[7rem] form-control" v-model="exit.Note" maxlength="200">
+                        <fieldset class="w-[11rem] form-input flex items-center">
+                            <input type="text" class="w-[11rem] form-control" v-model="exit.Note" maxlength="200">
                         </fieldset>
                     </div>
                 </template>

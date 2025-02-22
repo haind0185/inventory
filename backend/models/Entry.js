@@ -83,7 +83,7 @@ const Entry = sequelize.define('Entry', {
         type: DataTypes.VIRTUAL,
         get() {
             if(!this.product) return ''
-            return `[${this.product.ProductCode}] ${this.product.ProductName} [${this.product.LargeUnit}]` + (this.product.SmallUnit ? `[x${this.product.ConversionRate}][${this.product.SmallUnit}]` : '') + `[${this.product.Expire} ngày]`;
+            return `[${this.product.ProductCode}] ${this.product.ProductName} ` + `[${this.product.Expire} ngày]`;
         }
     },
 }, {
