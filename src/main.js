@@ -1,17 +1,118 @@
-import { app, BrowserWindow, globalShortcut, ipcMain } from 'electron';
+import { app, BrowserWindow, globalShortcut, ipcMain, dialog, autoUpdater } from 'electron';
+const log = require("electron-log");
+const net = require('net');
 import { join } from 'path';
+const { updateElectronApp, UpdateSourceType } = require('update-electron-app')
 import server from '../backend/index';
+
+let mainWindow = null
+
+log.transports.file.resolvePath = () => `${app.getPath("userData")}/logs/main.log`;
+log.transports.file.level = "debug";
+
+updateElectronApp({
+    updateSource: {
+        type: UpdateSourceType.ElectronPublicUpdateService,
+        repo: 'haind0185/inventory'
+    },
+    logger: require('electron-log'),
+    notifyUser: false
+})
+autoUpdater.autoDownload = false;
+autoUpdater.on('update-available', async () => {
+    const result = await dialog.showMessageBox({
+        type: 'question',
+        buttons: ['Cập nhật', 'Bỏ qua'],
+        title: 'Bản cập nhật mới',
+        message: 'Đã có bản cập nhật mới! Bạn có muốn tải về ngay bây giờ?'
+    });
+
+    if (result.response === 0) {
+        // Bắt đầu tải về nếu người dùng đồng ý
+        autoUpdater.downloadUpdate();
+
+        // Hiển thị thông báo tiến trình (tuỳ chọn)
+        showDownloadProgress();
+    }
+});
+// Xử lý khi tải về hoàn tất
+autoUpdater.on('update-downloaded', async () => {
+    const result = await dialog.showMessageBox({
+        type: 'question',
+        buttons: ['Khởi động lại', 'Để sau'],
+        title: 'Cập nhật hoàn tất',
+        message: 'Đã tải xong bản cập nhật! Khởi động lại ứng dụng để áp dụng thay đổi?'
+    });
+
+    if (result.response === 0) {
+        // Khởi động lại ứng dụng
+        autoUpdater.quitAndInstall();
+    }
+});
+// Hàm hiển thị tiến trình tải về (tuỳ chọn)
+function showDownloadProgress() {
+    autoUpdater.on('download-progress', (progress) => {
+        // Gửi tiến trình tới renderer process để hiển thị
+        log.info("download-progress...");
+        mainWindow.webContents.send('download-progress', progress.percent);
+    });
+}
+
+// Thiết lập Single Instance Lock để ngăn chạy nhiều instance
+app.requestSingleInstanceLock();
+app.on('second-instance', () => {
+    if (mainWindow) {
+        if (mainWindow.isMinimized()) mainWindow.restore();
+        mainWindow.focus();
+    }
+});
+
+// let progress = 0;
+
+// function startFakeDownload() {
+//     const interval = setInterval(() => {
+//         if (progress >= 100) {
+//             clearInterval(interval);
+//             return;
+//         }
+//         progress++;
+//         mainWindow.webContents.send('download-progress', progress);
+//     }, 100);
+// }
+
+
 
 let isSyncingBeforeQuit = false; // Biến để kiểm tra trạng thái đồng bộ
 
-const startServer = () => {
+function checkPort(port) {
+    return new Promise((resolve) => {
+        const tester = net.createServer()
+            .once('error', (err) => {
+                if (err.code === 'EADDRINUSE') resolve(false);
+                else resolve(false);
+            })
+            .once('listening', () => {
+                tester.once('close', () => resolve(true)).close()
+            })
+            .listen(port);
+    });
+}
+
+const startServer = async () => {
     const port = 5000
+    const isPortAvailable = await checkPort(5000);
+  
+    if (!isPortAvailable) {
+        log.error("🛑 Port 5000 is already in use. Exit application...");
+        app.quit();
+        return;
+    }
     return server.listen(port, () => {
         console.log(`Express server is running at http://localhost:${port}`);
     });
 }
 
-var  sv = startServer()
+var sv = startServer()
 
 const restartServer = () => {
     if (sv) {
@@ -28,7 +129,6 @@ if (require('electron-squirrel-startup')) {
     app.quit();
 }
 
-let mainWindow = null
 const createWindow = () => {
     const iconPath = app.isPackaged
     ? join(process.resourcesPath, 'icon.ico')
@@ -42,8 +142,6 @@ const createWindow = () => {
         icon: iconPath,
     });
 
-    console.log(iconPath)
-
     if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
         mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
     } else {
@@ -54,9 +152,9 @@ const createWindow = () => {
         restartServer()
     })
 
-    // globalShortcut.register('CommandOrControl+F', () => {
-    //     mainWindow.webContents.send('on-find')
-    // });
+    mainWindow.webContents.once('did-finish-load', () => {
+        // startFakeDownload();
+    });
 
     mainWindow.on("close", (event) => {
         if (!isSyncingBeforeQuit) {
@@ -70,7 +168,7 @@ const createWindow = () => {
 };
 
 ipcMain.on("sync-done", () => {
-    console.log("Sync xong, ứng dụng sẽ thoát.");
+    console.log("Sync completed.");
     app.quit();
 });
 

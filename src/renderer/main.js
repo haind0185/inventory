@@ -59,7 +59,7 @@ window.electron.onSyncBeforeQuit(async () => {
         await stickyStore.syncData()
         window.electron.syncDone() // Gửi lại sự kiện để Main Process thoát ứng dụng
     } catch (error) {
-        console.error("Lỗi đồng bộ:", error)
+        console.error("Sync error:", error)
     }
 });
 
@@ -69,3 +69,16 @@ window.addEventListener('keydown', (e) => {
         store.switchPareSearch()
     }
 })
+
+window.electron.onDownloadProgress(async (sender, value) => {
+    try {
+        console.log(value)
+        if(value >= 100) {
+            store.stopProgress()
+        } else {
+            store.setProgress(value)
+        }
+    } catch (error) {
+        console.error(error)
+    }
+});

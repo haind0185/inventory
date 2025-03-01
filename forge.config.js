@@ -1,3 +1,4 @@
+require('dotenv').config();
 module.exports = {
     packagerConfig: {
         extraResource: [
@@ -9,7 +10,12 @@ module.exports = {
         {
             name: '@electron-forge/maker-squirrel',
             config: {
-                setupIcon: 'icon.ico'
+                setupIcon: 'icon.ico',
+                authors: 'Haind',
+                certificateFile: './cert.pfx',
+                certificatePassword: process.env.CERT_PASSWORD,
+                // Kích hoạt tính năng auto-update
+                setupExe: 'inventory-1.0.7-Setup.exe',
             }
         },
         {
@@ -33,7 +39,10 @@ module.exports = {
                     owner: 'haind0185',
                     name: 'inventory'
                 },
-                prerelease: false
+                authToken: process.env.GITHUB_TOKEN, // Token GitHub có quyền repo
+                prerelease: false,
+                // Tạo release và upload files
+                draft: false,
             }
         }
     ],

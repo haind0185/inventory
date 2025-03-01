@@ -17,6 +17,10 @@ const createStore = defineStore('app', {
             pageSearch: {
                 isOpen: false,
                 text: '',
+            },
+            progress: {
+                isShow: false,
+                value: 0,
             }
         }
     },
@@ -64,7 +68,16 @@ const createStore = defineStore('app', {
             } else {
                 this.openPageSearch()
             }
+        },
+        setProgress(value) {
+            this.progress.isShow = true
+            this.progress.value = value
+        },
+        stopProgress() {
+            this.progress.isShow = false
+            this.progress.value = 0
         }
+
     },
 })
 
