@@ -9,12 +9,15 @@
         :onUpdate="updateNote"
         :onFocus="bringToFront"
         />
+
+        <GiftLetter ></GiftLetter>
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
 import StickyNote from "./StickyNote.vue";
+import GiftLetter from "./GiftLetter.vue";
 import { stickyStore } from '@/store/sticky'
 
 const notes = computed({
