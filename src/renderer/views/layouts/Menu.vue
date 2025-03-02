@@ -41,6 +41,17 @@
                 </ul>
             </li>
         </ul>
+        <ul class="menus" v-if="isUpdateAvailable">
+            <li class="flex flex-col gap-2 p-3 active setting">
+                <ul style="padding-right: 5px;" class="flex flex-col gap-1">
+                    <template v-for="item in update">
+                        <li class="item">
+                            <a href="javascript:void(0)" class="justify-center menu-item" @click="item.action">{{ item.label }}</a>
+                        </li>
+                    </template>
+                </ul>
+            </li>
+        </ul>
     </div>
 </template>
 
@@ -48,9 +59,10 @@
 import { onMounted, onBeforeMount, computed, watch, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { inventoryStore } from '@/store/inventory';
+import { store } from '@/store'
 
 const route = useRoute()
-
+const isUpdateAvailable = computed(() => store.isUpdateAvailable)
 const menus = ref([
     {
         name: 'Inventories',
@@ -141,6 +153,16 @@ const setting = ref([
             await inventoryStore.database().then((res) => {
                 
             })
+        }
+    },
+])
+
+const update = ref([
+    {
+        name: 'UpdateVersion',
+        label: 'Có cập nhật!',
+        action: async () => {
+            await store.setUpdateDownloaded()
         }
     },
 ])

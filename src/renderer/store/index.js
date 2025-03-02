@@ -12,6 +12,20 @@ const createStore = defineStore('app', {
                 message: '',
                 type: 3,
             },
+            updateModel: {
+                active: false,
+                title: '',
+                message: '',
+                type: 0,
+            },
+            downloadModel: {
+                active: false,
+                title: '',
+                message: '',
+                type: 0,
+            },
+            isUpdateAvailable: false,
+            isUpdateDownloading: false,
             master: {},
             numberModal: 90,
             pageSearch: {
@@ -50,6 +64,22 @@ const createStore = defineStore('app', {
             this.errorModal.message = value
             this.errorModal.active = true
         },
+        initUpdateModel() {
+            this.updateModel = {
+                active: false,
+                title: '',
+                message: '',
+                type: 0,
+            }
+        },
+        initDownloadModel() {
+            this.downloadModel = {
+                active: false,
+                title: '',
+                message: '',
+                type: 0,
+            }
+        },
         addIndex() {
             this.numberModal += 1
         },
@@ -76,8 +106,29 @@ const createStore = defineStore('app', {
         stopProgress() {
             this.progress.isShow = false
             this.progress.value = 0
-        }
+        },
+        onUpdateAvailable() {
+            this.isUpdateAvailable = true
+            this.isUpdateDownloading = true
+        },
+        onUpdateDownloaded() {
+            this.isUpdateDownloading = false
+            this.setUpdateDownloaded()
 
+        },
+        setUpdateDownloaded() {
+            if(this.isUpdateAvailable) {
+                this.downloadModel.active = false
+                this.downloadModel.title = 'Cập nhật hoàn tất'
+                this.downloadModel.message = 'Đã tải xong bản cập nhật! Khởi động lại ứng dụng để áp dụng thay đổi?'
+                this.downloadModel.active = true
+            }
+        },
+        quitAndInstall() {
+            this.isUpdateDownloading = false
+            this.isUpdateAvailable = false
+            window.electron.quitAndInstall()
+        }
     },
 })
 

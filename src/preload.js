@@ -8,14 +8,12 @@ contextBridge.exposeInMainWorld("versions", {
 
 contextBridge.exposeInMainWorld("electron", {
     onSyncBeforeQuit: (callback) => ipcRenderer.on("sync-before-quit", callback),
-    onDownloadProgress: (callback) => ipcRenderer.on("download-progress", callback),
-
+    
     onSearch: (text) => ipcRenderer.send("on-search", text),
     onClear: () => ipcRenderer.send("on-clear"),
     syncDone: () => ipcRenderer.send("sync-done"),
+    
+    onUpdateAvailable: (callback) => ipcRenderer.on("update-available", callback), // 1
+    onUpdateDownloaded: (callback) => ipcRenderer.on("update-downloaded", callback),  // 2
+    quitAndInstall: () => ipcRenderer.send("on-update-downloaded"),  // 3
 });
-
-// ipcRenderer.on('download-progress', (event, progress) => {
-//     console.log(`Download progress: ${Math.floor(progress)}%`);
-//     // Cập nhật UI tại đây
-// });

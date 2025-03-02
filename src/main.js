@@ -1,15 +1,14 @@
 import { app, BrowserWindow, globalShortcut, ipcMain, dialog, autoUpdater } from 'electron';
+import { join } from 'path';
+import server from '../backend/index';
 const log = require("electron-log");
 const net = require('net');
-import { join } from 'path';
 const { updateElectronApp, UpdateSourceType } = require('update-electron-app')
-import server from '../backend/index';
 
 let mainWindow = null
-
 log.transports.file.resolvePath = () => `${app.getPath("userData")}/logs/main.log`;
 log.transports.file.level = "debug";
-
+  
 updateElectronApp({
     updateSource: {
         type: UpdateSourceType.ElectronPublicUpdateService,
@@ -18,45 +17,23 @@ updateElectronApp({
     logger: require('electron-log'),
     notifyUser: false
 })
+
 autoUpdater.autoDownload = false;
+
 autoUpdater.on('update-available', async () => {
-    const result = await dialog.showMessageBox({
-        type: 'question',
-        buttons: ['Cập nhật', 'Bỏ qua'],
-        title: 'Bản cập nhật mới',
-        message: 'Đã có bản cập nhật mới! Bạn có muốn tải về ngay bây giờ?'
-    });
-
-    if (result.response === 0) {
-        // Bắt đầu tải về nếu người dùng đồng ý
-        autoUpdater.downloadUpdate();
-
-        // Hiển thị thông báo tiến trình (tuỳ chọn)
-        showDownloadProgress();
-    }
+    log.info("1. update-available");
+    await mainWindow.webContents.send('update-available');
 });
-// Xử lý khi tải về hoàn tất
+
 autoUpdater.on('update-downloaded', async () => {
-    const result = await dialog.showMessageBox({
-        type: 'question',
-        buttons: ['Khởi động lại', 'Để sau'],
-        title: 'Cập nhật hoàn tất',
-        message: 'Đã tải xong bản cập nhật! Khởi động lại ứng dụng để áp dụng thay đổi?'
-    });
-
-    if (result.response === 0) {
-        // Khởi động lại ứng dụng
-        autoUpdater.quitAndInstall();
-    }
+    log.info("2. update-downloaded");
+    await mainWindow.webContents.send('update-downloaded');
 });
-// Hàm hiển thị tiến trình tải về (tuỳ chọn)
-function showDownloadProgress() {
-    autoUpdater.on('download-progress', (progress) => {
-        // Gửi tiến trình tới renderer process để hiển thị
-        log.info("download-progress...");
-        mainWindow.webContents.send('download-progress', progress.percent);
-    });
-}
+
+ipcMain.on("on-update-downloaded", () => {
+    log.info("3. quitAndInstall");
+    autoUpdater.quitAndInstall();
+});
 
 // Thiết lập Single Instance Lock để ngăn chạy nhiều instance
 app.requestSingleInstanceLock();
@@ -66,21 +43,6 @@ app.on('second-instance', () => {
         mainWindow.focus();
     }
 });
-
-// let progress = 0;
-
-// function startFakeDownload() {
-//     const interval = setInterval(() => {
-//         if (progress >= 100) {
-//             clearInterval(interval);
-//             return;
-//         }
-//         progress++;
-//         mainWindow.webContents.send('download-progress', progress);
-//     }, 100);
-// }
-
-
 
 let isSyncingBeforeQuit = false; // Biến để kiểm tra trạng thái đồng bộ
 
@@ -152,9 +114,13 @@ const createWindow = () => {
         restartServer()
     })
 
+    // globalShortcut.register('CommandOrControl+L', () => {
+    //     mainWindow.webContents.send('update-available');
+    // })
+
     mainWindow.webContents.once('did-finish-load', () => {
-        // startFakeDownload();
     });
+
 
     mainWindow.on("close", (event) => {
         if (!isSyncingBeforeQuit) {

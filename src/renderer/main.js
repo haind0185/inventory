@@ -70,14 +70,17 @@ window.addEventListener('keydown', (e) => {
     }
 })
 
-window.electron.onDownloadProgress(async (sender, value) => {
+window.electron.onUpdateAvailable(async () => {
     try {
-        console.log(value)
-        if(value >= 100) {
-            store.stopProgress()
-        } else {
-            store.setProgress(value)
-        }
+        await store.onUpdateAvailable()
+    } catch (error) {
+        console.error(error)
+    }
+});
+
+window.electron.onUpdateDownloaded(async () => {
+    try {
+        await store.onUpdateDownloaded()
     } catch (error) {
         console.error(error)
     }
