@@ -61,11 +61,11 @@ function checkPort(port) {
 }
 
 const startServer = async () => {
-    const port = 5000
-    const isPortAvailable = await checkPort(5000);
+    const port = 1603
+    const isPortAvailable = await checkPort(1603);
   
     if (!isPortAvailable) {
-        log.error("🛑 Port 5000 is already in use. Exit application...");
+        log.error("🛑 Port 1603 is already in use. Exit application...");
         app.quit();
         return;
     }
