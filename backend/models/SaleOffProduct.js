@@ -2,11 +2,6 @@ import sequelize from './index';
 const { DataTypes } = require('sequelize');
 
 const SaleOffProduct = sequelize.define('SaleOffProduct', {
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        allowNull: false,
-    },
     ProductCode: {
         type: DataTypes.STRING,
         allowNull: false,
