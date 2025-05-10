@@ -12,6 +12,17 @@ import { add_note_exits } from './20250218013457_add_note_for_exits_table'
 import { create_sticky_notes } from './20250218013458_create_sticky_notes_table'
 import { add_new_id_sticky_notes } from './20250219013415_add_new_id_for_sticky_notes_table'
 
+// Sale off migration
+import { create_sale_off_products } from './20250510123456_create_sale_off_products_table'
+import { create_sale_staffs } from './20250510123457_create_sale_staffs_table'
+import { create_delivery_staffs } from './20250510123458_create_delivery_staffs_table'
+import { create_customers } from './20250510123459_create_customers_table'
+import { create_sale_off_orders } from './20250510123460_create_sale_off_orders_table'
+import { create_sale_off_order_items } from './20250510123461_create_sale_off_order_items_table'
+import { create_sale_off_order_stock_ins } from './20250510123462_create_sale_off_stock_ins_table'
+import { create_sale_off_stock_in_items } from './20250510123463_create_sale_off_stock_in_items_table'
+import { create_sale_off_stocks } from './20250510123464_create_sale_off_stocks_table'
+
 const { Umzug, SequelizeStorage } = require('umzug');
 
 const migrations = [
@@ -27,6 +38,17 @@ const migrations = [
     add_note_exits,
     create_sticky_notes,
     add_new_id_sticky_notes,
+
+    // Sale off migration
+    create_sale_off_products,
+    create_sale_staffs,
+    create_delivery_staffs,
+    create_customers,
+    create_sale_off_orders,
+    create_sale_off_order_items,
+    create_sale_off_order_stock_ins,
+    create_sale_off_stock_in_items,
+    create_sale_off_stocks
 ]
 
 export const migrator = new Umzug({
