@@ -20,6 +20,7 @@ export const create_sale_staffs = {
             },
             SaleStaffActive: {
                 type: DataTypes.BOOLEAN,
+                allowNull: false,
                 default: true
             },
 

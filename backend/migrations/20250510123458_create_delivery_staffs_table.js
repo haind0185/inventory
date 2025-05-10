@@ -20,6 +20,7 @@ export const create_delivery_staffs = {
             },
             DeliveryStaffActive: {
                 type: DataTypes.BOOLEAN,
+                allowNull: false,
                 default: true
             },
 

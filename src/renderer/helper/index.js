@@ -1,7 +1,7 @@
 import moment from 'moment'
 
 const functions = {
-    format_number: (value, decimals, currency ) => {
+    format_number: (value, decimals, currency) => {
         value = parseFloat(value)
         if (!isFinite(value) || (!value && value !== 0)) return ''
         currency = currency != null ? currency : ''
@@ -54,7 +54,11 @@ const functions = {
             return null
         }
         let date = new Date('01/01/1970 ' + string)
-        return { hours: date.getHours(), minutes: date.getMinutes(), seconds: date.getSeconds() }
+        return {
+            hours: date.getHours(),
+            minutes: date.getMinutes(),
+            seconds: date.getSeconds(),
+        }
     },
     timeToString: (object, format = 'YYYY-MM-DD') => {
         if (!object || typeof object !== 'object') return object
@@ -93,7 +97,10 @@ const functions = {
     },
     formatBeforeRequest: (object) => {
         for (const key in { ...object }) {
-            if (typeof object[key] === 'object' && typeof object[key]?.['getFullYear'] === 'function') {
+            if (
+                typeof object[key] === 'object' &&
+                typeof object[key]?.['getFullYear'] === 'function'
+            ) {
                 object[key] = timeToString(object[key])
             }
             if (
@@ -110,7 +117,10 @@ const functions = {
             ) {
                 object[key] = timeToTimeStr(object[key])
             }
-            if (typeof object[key] === 'string' && object[key].substr(0, 11).match(/\d{4}-\d{2}-\d{2}T/)) {
+            if (
+                typeof object[key] === 'string' &&
+                object[key].substr(0, 11).match(/\d{4}-\d{2}-\d{2}T/)
+            ) {
                 object[key] = object[key].substr(0, 10)
             }
         }
@@ -126,40 +136,39 @@ const functions = {
         return true
     },
     findDuplicates: (array, key) => {
-        const seen = new Set();
-        const duplicates = [];
+        const seen = new Set()
+        const duplicates = []
 
         for (const item of array) {
             if (seen.has(item[key])) {
-            duplicates.push(item);
+                duplicates.push(item)
             } else {
-            seen.add(item[key]);
+                seen.add(item[key])
             }
         }
 
-        return duplicates;
+        return duplicates
     },
     unitQty: (LargeUnitQty, SmallUnitQty, product) => {
-
-        if(SmallUnitQty > 0 && (!product.SmallUnit || product.ConversionRate <= 0)) {
-            throw new Error(`Mã sản phẩm [${product.ProductCode}] không có đơn vị 2`);
+        if (SmallUnitQty > 0 && (!product.SmallUnit || product.ConversionRate <= 0)) {
+            throw new Error(`Mã sản phẩm [${product.ProductCode}] không có đơn vị 2`)
         }
 
-        if(SmallUnitQty > 0 && SmallUnitQty > product.ConversionRate) {
+        if (SmallUnitQty > 0 && SmallUnitQty > product.ConversionRate) {
             LargeUnitQty += Math.floor(SmallUnitQty / product.ConversionRate)
             SmallUnitQty = SmallUnitQty % product.ConversionRate
         }
 
-        return  { LargeUnitQty: LargeUnitQty, SmallUnitQty: SmallUnitQty }
+        return { LargeUnitQty: LargeUnitQty, SmallUnitQty: SmallUnitQty }
     },
     unitQtyTransfer: (LargeUnitQty, SmallUnitQty, product) => {
-        if(SmallUnitQty > 0 && (!product.SmallUnit || product.ConversionRate <= 0)) {
-            throw new Error(`Mã sản phẩm [${product.ProductCode}] không có đơn vị 2`);
+        if (SmallUnitQty > 0 && (!product.SmallUnit || product.ConversionRate <= 0)) {
+            throw new Error(`Mã sản phẩm [${product.ProductCode}] không có đơn vị 2`)
         }
 
         let TransferUnitQty = SmallUnitQty
-        if(product.ConversionRate > 0) {
-            TransferUnitQty = SmallUnitQty + (LargeUnitQty * product.ConversionRate)
+        if (product.ConversionRate > 0) {
+            TransferUnitQty = SmallUnitQty + LargeUnitQty * product.ConversionRate
         } else {
             TransferUnitQty = LargeUnitQty
         }
@@ -169,7 +178,7 @@ const functions = {
     unitQtyLS: (Qty, product) => {
         let LargeUnitQty = 0
         let SmallUnitQty = 0
-        if(product.ConversionRate > 0) {
+        if (product.ConversionRate > 0) {
             LargeUnitQty = Math.floor(Qty / product.ConversionRate)
             SmallUnitQty = Qty % product.ConversionRate
         } else {
@@ -179,13 +188,22 @@ const functions = {
         return { LargeUnitQty: LargeUnitQty, SmallUnitQty: SmallUnitQty }
     },
     excelDate: (value) => {
-        if(!(Number.isInteger(value) && value >= 0)) {
-            throw new Error(`Ngày [${value}] bị sai format.`);
+        if (!(Number.isInteger(value) && value >= 0)) {
+            throw new Error(`Ngày [${value}] bị sai format.`)
         }
-        const date = moment('1899-12-30').add(value, 'days');
+        const date = moment('1899-12-30').add(value, 'days')
 
-        return date.format('YYYY-MM-DD');
-    }
+        return date.format('YYYY-MM-DD')
+    },
+    parseBoolean: (value) => {
+        if (value === null || value === undefined || value === '') return undefined;
+
+        const val = value.toString().toLowerCase().trim();
+        if (val === 'true' || val === '1') return true;
+        if (val === 'false' || val === '0') return false;
+
+        return undefined;
+    },
 }
 
 const helpers = {

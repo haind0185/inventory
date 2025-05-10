@@ -142,8 +142,5 @@ watch(
 
 onMounted(async () => {
     payload.value = data
-    if(data.inventories && data.inventories.length > 0) {
-        disable.value = true
-    }
 })
 </script>

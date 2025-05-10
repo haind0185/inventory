@@ -14,6 +14,7 @@ const DeliveryStaff = sequelize.define('DeliveryStaff', {
     },
     DeliveryStaffActive: {
         type: DataTypes.BOOLEAN,
+        allowNull: false,
         defaultValue: true
     },
 });
