@@ -406,3 +406,15 @@ input::-webkit-inner-spin-button {
 input.form-control:focus {
     user-select: all;
 }
+
+.divider {
+    border: 0.5px solid gray;
+    margin: 0 5px;
+}
+
+.group-menu-title {
+    margin: 0 5px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #8d8d8d;
+}

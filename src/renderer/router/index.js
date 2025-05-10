@@ -99,6 +99,32 @@ const routes = [
                 ]
             },
             {
+                path: '/',
+                name: 'sale-off',
+                children: [
+                    {
+                        path: 'product',
+                        name: 'SaleOffProduct',
+                        component: () => import("@/views/saleOff/product/SaleOffProductIndex.vue"),
+                    },
+                    {
+                        path: 'sale-staff',
+                        name: 'SaleStaff',
+                        component: () => import("@/views/saleOff/saleStaff/SaleStaffIndex.vue"),
+                    },
+                    {
+                        path: 'delivery-staff',
+                        name: 'DeliveryStaff',
+                        component: () => import("@/views/saleOff/deliveryStaff/DeliveryStaffIndex.vue"),
+                    },
+                    {
+                        path: 'customer',
+                        name: 'Customer',
+                        component: () => import("@/views/saleOff/customer/CustomerIndex.vue"),
+                    },
+                ]
+            },
+            {
                 path: '/errors',
                 children: [
                     {
