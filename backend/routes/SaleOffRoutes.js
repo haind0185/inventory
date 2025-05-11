@@ -1,6 +1,7 @@
 import SaleOffProductController from '../controllers/SaleOffProductController';
 import SaleStaffController from '../controllers/SaleStaffController';
 import DeliveryStaffController from '../controllers/DeliveryStaffController';
+import CustomerController from '../controllers/CustomerController';
 import { upload, setPermissions } from './multer';
 const express = require('express');
 const multer = require('multer');
@@ -28,6 +29,13 @@ router.get('/delivery-staffs/show', DeliveryStaffController.show);
 router.put('/delivery-staffs', DeliveryStaffController.update);
 router.post('/delivery-staffs/delete', DeliveryStaffController.delete);
 // router.get('/delivery-staffs/list', DeliveryStaffController.list);
+
+router.get('/customers', CustomerController.index);
+router.post('/customers', CustomerController.store);
+router.get('/customers/show', CustomerController.show);
+router.put('/customers', CustomerController.update);
+router.post('/customers/delete', CustomerController.delete);
+// router.get('/customers/list', CustomerController.list);
 
 
 const SaleOffRouter = router;

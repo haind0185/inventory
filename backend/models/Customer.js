@@ -2,11 +2,11 @@ import sequelize from './index';
 const { DataTypes } = require('sequelize');
 
 const Customer = sequelize.define('Customer', {
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        allowNull: false,
-    },
+    // id: {
+    //     type: DataTypes.INTEGER,
+    //     primaryKey: true,
+    //     allowNull: false,
+    // },
     CustomerCode: {
         type: DataTypes.STRING,
         allowNull: false,

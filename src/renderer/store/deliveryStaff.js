@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { initPinia } from '@/store/setup'
 import api from '@/api'
 import { store } from '.'
-import { UNIT } from '@/constant';
 
 const initSearch = {
     DeliveryStaffName: null,
@@ -12,26 +11,12 @@ const initSearch = {
     page: 1
 }
 
-const productInit = {
-    ProductCode: null,
-    ProductName: null,
-    Price: 0,
-    LargeUnit: UNIT[0],
-    SmallUnit: UNIT[1],
-    ConversionRate: 1,
-}
-
 const createStore = defineStore('deliveryStaff', {
     state: () => {
         return {
             search: {
                 ...initSearch
             },
-            products: [
-            ],
-            init: {
-                ...productInit
-            }
         }
     },
     getters: {

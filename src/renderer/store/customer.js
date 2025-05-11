@@ -4,14 +4,17 @@ import api from '@/api'
 import { store } from '.'
 
 const initSearch = {
-    SaleStaffName: null,
-    SaleStaffActive: null,
+    CustomerCode: null,
+    CustomerName: null,
+    CustomerName: null,
+    CustomerAddress: null,
+
     sort: null,
     sort_by: null,
     page: 1
 }
 
-const createStore = defineStore('saleStaff', {
+const createStore = defineStore('customer', {
     state: () => {
         return {
             search: {
@@ -25,7 +28,7 @@ const createStore = defineStore('saleStaff', {
     actions: {
         async index(params) {
             store.setLoading(true)
-            return await api.get(`/sale-off/sale-staffs`, { params: params })
+            return await api.get(`/sale-off/customers`, { params: params })
                 .then((res) => {
                     store.setLoading(false)
                     return res.data
@@ -37,7 +40,7 @@ const createStore = defineStore('saleStaff', {
         },
         async store(payload) {
             store.setLoading(true)
-            return await api.post(`/sale-off/sale-staffs`, payload)
+            return await api.post(`/sale-off/customers`, payload)
                 .then((res) => {
                     store.setLoading(false)
                     return res.data
@@ -49,7 +52,7 @@ const createStore = defineStore('saleStaff', {
         },
         async show(params) {
             store.setLoading(true)
-            return await api.get(`/sale-off/sale-staffs/show`, { params: params })
+            return await api.get(`/sale-off/customers/show`, { params: params })
                 .then((res) => {
                     store.setLoading(false)
                     return res.data
@@ -61,7 +64,7 @@ const createStore = defineStore('saleStaff', {
         },
         async update(payload) {
             store.setLoading(true)
-            return await api.put(`/sale-off/sale-staffs`, payload)
+            return await api.put(`/sale-off/customers`, payload)
                 .then((res) => {
                     store.setLoading(false)
                     return res.data
@@ -73,7 +76,7 @@ const createStore = defineStore('saleStaff', {
         },
         async destroy(payload) {
             store.setLoading(true)
-            return await api.post(`/sale-off/sale-staffs/delete`, payload)
+            return await api.post(`/sale-off/customers/delete`, payload)
                 .then((res) => {
                     store.setLoading(false)
                     return res.data
@@ -86,7 +89,7 @@ const createStore = defineStore('saleStaff', {
         
         async list(params) {
             store.setLoading(true)
-            return await api.get(`/sale-off/sale-staffs/list`, { params: params })
+            return await api.get(`/sale-off/customers/list`, { params: params })
                 .then((res) => {
                     store.setLoading(false)
                     return res.data
@@ -109,4 +112,4 @@ const createStore = defineStore('saleStaff', {
     },
 })
 
-export const saleStaffStore = createStore(initPinia)
+export const customerStore = createStore(initPinia)
