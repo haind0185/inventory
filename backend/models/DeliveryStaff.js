@@ -1,12 +1,13 @@
 import sequelize from './index';
+import { ACTIVE_LIST } from '../../src/renderer/constant'
 const { DataTypes } = require('sequelize');
 
 const DeliveryStaff = sequelize.define('DeliveryStaff', {
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        allowNull: false,
-    },
+    // id: {
+    //     type: DataTypes.INTEGER,
+    //     primaryKey: true,
+    //     allowNull: false,
+    // },
     DeliveryStaffName: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -17,6 +18,14 @@ const DeliveryStaff = sequelize.define('DeliveryStaff', {
         allowNull: false,
         defaultValue: true
     },
+
+    // get attribute
+    ActiveLabel: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            return ACTIVE_LIST[this.DeliveryStaffActive] ?? '-';
+        }
+    }
 });
 
 export default DeliveryStaff;
