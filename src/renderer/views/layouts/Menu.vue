@@ -35,6 +35,54 @@
         <span class="group-menu-title">Buôn hàng</span>
 
         <ul class="menus">
+            <template v-for="menu in sale_off_order">
+                <template v-if="menu.children">
+                    <li class="flex flex-col gap-2 item-parent" :class="{'active': menu.open || menu.children.find(item => item.name == route.name)}">
+                        <span class="menu-item" @click="menu.open = !menu.open">
+                            {{ menu.label }}
+                        </span>
+                        <ul v-show="menu.children.find(item => item.name == route.name) || menu.open" style="padding-left: 15px; padding-right: 5px;" class="flex flex-col gap-1">
+                            <template v-for="item in menu.children">
+                                <li :active="route.name == item.name" class="item">
+                                    <router-link :to="{name: item.name}" class="menu-item"><span>{{ item.label }}</span></router-link>
+                                </li>
+                            </template>
+                        </ul>
+                    </li>
+                </template>
+                <template v-else>
+                    <li :active="route.name == menu.name" class="item">
+                        <router-link :to="{name: menu.name}" class="menu-item"><span>{{ menu.label }}</span></router-link>
+                    </li>
+                </template>
+            </template>
+        </ul>
+
+        <ul class="menus">
+            <template v-for="menu in sale_off_stock">
+                <template v-if="menu.children">
+                    <li class="flex flex-col gap-2 item-parent" :class="{'active': menu.open || menu.children.find(item => item.name == route.name)}">
+                        <span class="menu-item" @click="menu.open = !menu.open">
+                            {{ menu.label }}
+                        </span>
+                        <ul v-show="menu.children.find(item => item.name == route.name) || menu.open" style="padding-left: 15px; padding-right: 5px;" class="flex flex-col gap-1">
+                            <template v-for="item in menu.children">
+                                <li :active="route.name == item.name" class="item">
+                                    <router-link :to="{name: item.name}" class="menu-item"><span>{{ item.label }}</span></router-link>
+                                </li>
+                            </template>
+                        </ul>
+                    </li>
+                </template>
+                <template v-else>
+                    <li :active="route.name == menu.name" class="item">
+                        <router-link :to="{name: menu.name}" class="menu-item"><span>{{ menu.label }}</span></router-link>
+                    </li>
+                </template>
+            </template>
+        </ul>
+
+        <ul class="menus">
             <template v-for="menu in sale_off">
                 <template v-if="menu.children">
                     <li class="flex flex-col gap-2 item-parent" :class="{'active': menu.open || menu.children.find(item => item.name == route.name)}">
@@ -199,7 +247,7 @@ const update = ref([
 
 const sale_off = ref([
     {
-        name: 'SaleOffSaleOff',
+        name: 'SaleOff',
         label: 'Quản lý buôn hàng',
         children: [
             {
@@ -217,6 +265,34 @@ const sale_off = ref([
             {
                 name: 'Customer',
                 label: 'DS khách hàng',
+            },
+        ],
+        open: false
+    },
+])
+
+const sale_off_order = ref([
+    {
+        name: 'SaleOffOrder',
+        label: 'Quản lý đơn hàng',
+        children: [
+            {
+                name: 'OrderList',
+                label: 'DS đơn hàng',
+            },
+        ],
+        open: false
+    },
+])
+
+const sale_off_stock = ref([
+    {
+        name: 'SaleOffStock',
+        label: 'Quản lý nhập hàng',
+        children: [
+            {
+                name: 'StockList',
+                label: 'DS sản phẩm',
             },
         ],
         open: false

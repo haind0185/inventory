@@ -11,6 +11,7 @@ const SaleOffStock = sequelize.define('SaleOffStock', {
     ProductCode: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true,
         references: {
             model: SaleOffProduct,
             key: 'ProductCode',

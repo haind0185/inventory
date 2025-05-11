@@ -16,6 +16,7 @@ export const create_sale_off_stocks = {
             ProductCode: {
                 type: DataTypes.STRING,
                 allowNull: false,
+                unique: true,
                 references: {
                     model: 'SaleOffProducts',
                     key: 'ProductCode',

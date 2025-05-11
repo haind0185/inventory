@@ -122,6 +122,28 @@ const routes = [
                         name: 'Customer',
                         component: () => import("@/views/saleOff/customer/CustomerIndex.vue"),
                     },
+                    {
+                        path: 'order',
+                        name: "order",
+                        children: [
+                            {
+                                path: 'list',
+                                name: 'OrderList',
+                                component: () => import("@/views/saleOff/order/OrderIndex.vue")
+                            }
+                        ]
+                    },
+                    {
+                        path: 'stock',
+                        name: "stock",
+                        children: [
+                            {
+                                path: 'list',
+                                name: 'StockList',
+                                component: () => import("@/views/saleOff/stock/StockIndex.vue")
+                            }
+                        ]
+                    }
                 ]
             },
             {
