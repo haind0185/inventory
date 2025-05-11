@@ -11,7 +11,7 @@
                     </fieldset>
 
                     <!-- SaleStaffActive -->
-                    <fieldset class="w-[40%] form-input required">
+                    <fieldset class="w-[40%] form-input">
                         <legend>Tình trạng</legend>
                         <template v-if="ACTIVE_LIST">
                             <div class="flex gap-4">
