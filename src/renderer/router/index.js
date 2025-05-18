@@ -134,13 +134,13 @@ const routes = [
                         ]
                     },
                     {
-                        path: 'stock',
-                        name: "stock",
+                        path: 'stockIn',
+                        name: "stockIn",
                         children: [
                             {
                                 path: 'list',
-                                name: 'StockList',
-                                component: () => import("@/views/saleOff/stock/StockIndex.vue")
+                                name: 'StockInList',
+                                component: () => import("@/views/saleOff/stockIn/StockInIndex.vue")
                             }
                         ]
                     }

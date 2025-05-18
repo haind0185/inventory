@@ -287,12 +287,12 @@ const sale_off_order = ref([
 
 const sale_off_stock = ref([
     {
-        name: 'SaleOffStock',
+        name: 'SaleOffStockIn',
         label: 'Quản lý nhập hàng',
         children: [
             {
-                name: 'StockList',
-                label: 'DS sản phẩm',
+                name: 'StockInList',
+                label: 'Lịch sử nhập hàng',
             },
         ],
         open: false

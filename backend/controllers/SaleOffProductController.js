@@ -381,6 +381,56 @@ const SaleOffProductController = {
             return res.json(error(err.message, 501));
         }
     },
+
+    list: async (req, res) => {
+        try {
+            console.log(req.query)
+
+            /**
+             * set condition
+             */
+            const where = {}
+
+            if (req.query.ProductCode) {
+                where.ProductCode = { [Op.like]: `%${req.query.ProductCode}%` }
+            }
+
+            if (req.query.ProductName) {
+                where.ProductName = { [Op.like]: `%${req.query.ProductName}%` }
+            }
+
+            /**
+             * order
+             */
+            const order_list = ['ProductCode', 'ProductName']
+            let order = []
+            if (order_list.includes(req.query.sort)) {
+                let sort_by = req.query.sort_by == 'desc' ? 'desc' : 'asc'
+                order = [[req.query.sort, sort_by]]
+            }
+
+            /**
+             * call select action
+             */
+            const total = await SaleOffProduct.count({
+                where: where,
+            })
+
+            let products = []
+            if (total > 0) {
+                products = await SaleOffProduct.findAll({
+                    order: order,
+                    // attributes: { include: ['ProductNameLabel'] }
+                });
+            }
+
+            return res.json(success({
+                items: products,
+            }));
+        } catch (err) {
+            return res.json(error(err.message, 501));
+        }
+    },
 };
 
 export default SaleOffProductController;

@@ -27,8 +27,7 @@ const createStore = defineStore('saleOffProduct', {
             search: {
                 ...initSearch
             },
-            products: [
-            ],
+            products: [],
             init: {
                 ...productInit
             }
@@ -79,6 +78,7 @@ const createStore = defineStore('saleOffProduct', {
             return await api.put(`/sale-off/products`, payload)
                 .then((res) => {
                     store.setLoading(false)
+                    console.log(res)
                     return res.data
                 })
                 .catch((error) => {
@@ -128,6 +128,7 @@ const createStore = defineStore('saleOffProduct', {
             return await api.get(`/sale-off/products/list`, { params: params })
                 .then((res) => {
                     store.setLoading(false)
+                    this.products = res.data.data.items
                     return res.data
                 })
                 .catch((error) => {

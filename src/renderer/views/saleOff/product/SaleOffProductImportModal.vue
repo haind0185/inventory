@@ -108,6 +108,7 @@ const onClose = () => {
 
 const changeSmallUnit = (product) => {
     if(!product.SmallUnit) {
+        console.log(product)
         product.ConversionRate = null
     }
 }

@@ -1,6 +1,7 @@
 import SaleOffStockIn from '../models/SaleOffStockIn';
 import SaleOffStockInItem from '../models/SaleOffStockInItem';
 import SaleOffProduct from '../models/SaleOffProduct';
+import SaleOffStock from '../models/SaleOffStock';
 
 import { error, success } from './common/http';
 import { t } from '../../src/renderer/i18n'
@@ -102,9 +103,14 @@ const SaleOffStockInController = {
 
             const items = await SaleOffStockIn.findOne({
                 where: {
-                    'StockInCode': req.query.StockInCode
+                    StockInCode: req.query.StockInCode,
                 },
-                include: { association: 'saleOffStockInItems' }
+                include: [
+                    {
+                        association: 'saleOffStockInItems',
+                        include: [{ association: 'saleOffProduct' }],
+                    },
+                ],
             })
 
             if(!items) {
@@ -126,12 +132,12 @@ const SaleOffStockInController = {
              * validation
              */
             // SaleOffStockIn
-            const entrySchema = Joi.object({
+            const stockInSchema = Joi.object({
                 StockInCode: Joi.string().required(),
                 StockInDate: Joi.string().required(),
                 StockInNote: Joi.string().allow(null, '').min(0).max(200),
             }).unknown()
-            let validation = entrySchema.validate({StockInCode: StockInCode, StockInDate: StockInDate, StockInNote: StockInNote});
+            let validation = stockInSchema.validate({StockInCode: StockInCode, StockInDate: StockInDate, StockInNote: StockInNote});
             if (validation.error) {
                 throw new Error(validation.error.details[0].message);
             }
@@ -218,6 +224,242 @@ const SaleOffStockInController = {
             return res.json(success());
         } catch (err) {
             await transaction.rollback();
+            return res.json(error(err.message, 501));
+        }
+    },
+
+    import: async function (req, res) {
+        const transaction = await sequelize.transaction();
+        try {
+            if (!req.file) {
+                throw new Error("Không tìm thấy file");
+            }
+    
+            const filePath = req.file.path;
+            const workbook = xlsx.readFile(filePath);
+    
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            let data = xlsx.utils.sheet_to_json(worksheet);
+
+            data = data.map(item => {
+                return {
+                    ProductCode : item.ProductCode,
+                    LargeUnitQty: item.LargeUnitQty,
+                    SmallUnitQty: item.SmallUnitQty,
+                }
+            })
+
+            await transaction.commit();
+            return res.json(success(data));
+        } catch (err) {
+            await transaction.rollback();
+            return res.json(error(err.message, 501));
+        }
+    },
+
+    update: async function (req, res) {
+        const transaction = await sequelize.transaction();
+        try {
+            const { StockInCode, StockInDate, StockInNote, items } = req.body;
+
+            /**
+             * validation
+             */
+            // SaleOffStockIn
+            const stockInSchema = Joi.object({
+                StockInCode: Joi.string().required(),
+                StockInDate: Joi.string().required(),
+                StockInNote: Joi.string().allow(null, '').min(0).max(200),
+            }).unknown()
+            let validation = stockInSchema.validate({StockInCode: StockInCode, StockInDate: StockInDate, StockInNote: StockInNote});
+            if (validation.error) {
+                throw new Error(validation.error.details[0].message);
+            }
+
+            // SaleOffStockInItem
+            const schema = Joi.object({
+                ProductCode    : Joi.string().required(),
+                LargeUnitQty   : Joi.number().required().min(0),
+                SmallUnitQty   : Joi.number().required().min(0),
+                StockInItemNote: Joi.string().allow(null, '').min(0).max(200),
+            }).unknown();
+            if(items.length <= 0) {
+                throw new Error("Cần nhập ít nhất một sản phẩm.");
+            }
+            items.forEach((item, index) => {
+                let validation = schema.validate(item);
+                if (validation.error) {
+                    throw new Error(`[${index+1}] ${validation.error.details[0].message}`);
+                }
+            });
+
+            /**
+             * check exists code
+             */
+            const exists_stock_in = await SaleOffStockIn.findOne({
+                where: {
+                    StockInCode: StockInCode
+                }
+            })
+            if(!exists_stock_in) {
+                throw new Error("Không tìm thấy đơn nhập này.");
+            }
+
+            /**
+             * call update action
+             */
+
+            const oldItems = await SaleOffStockInItem.findAll({
+                    where: {
+                        StockInCode: StockInCode,
+                    },
+                }, {transaction: transaction})
+
+            const products = await SaleOffProduct.findAll({
+                where: {
+                    ProductCode: {
+                        [Op.in]: [...oldItems.map(item => {
+                            return item.ProductCode
+                        }), ...items.map(item => {
+                            return item.ProductCode
+                        })]
+                    }
+                }
+            }, {transaction: transaction})
+
+            const update = async (items) => {
+                let stocksUpdate = []
+
+                // Chỉnh sửa và xóa item
+                for(const index in oldItems) {
+                    let oldItem = oldItems[index]
+                    // Product check
+                    let product = products.find(prd => {
+                        return prd.ProductCode == oldItem.ProductCode
+                    })
+                    if(!product) {
+                        throw new Error(`Mã sản phẩm [${oldItem.ProductCode}] không tồn tại 1.`);
+                    }
+
+                    const item = items.find(i => i.id == oldItem.id)
+                    let qty = 0
+                    let oldQty = helper.unitQtyTransfer(oldItem.LargeUnitQty, oldItem.SmallUnitQty, product)
+                    if(item) {
+                        qty = helper.unitQtyTransfer(item.LargeUnitQty, item.SmallUnitQty, product)
+                        
+                        oldItem.LargeUnitQty = item.LargeUnitQty
+                        oldItem.SmallUnitQty = item.SmallUnitQty
+
+                        await oldItem.save({ transaction: transaction })
+                    } else {
+                        await oldItem.destroy({ transaction: transaction })
+                    }
+                    
+                    let stockUpdate = stocksUpdate.find(stock => stock.ProductCode == product.ProductCode)
+                    if(stockUpdate) {
+                        stocksUpdate = stocksUpdate.map(stock => {
+                            if(stock.ProductCode == product.ProductCode) {
+                                stock.Qty = stock.Qty + (qty - oldQty)
+                            }
+                            return stock
+                        })
+                    } else {
+                        stocksUpdate.push({ProductCode: product.ProductCode, Qty: qty - oldQty})
+                    }
+                }
+
+                if(stocksUpdate.length > 0) {
+                    await updateStock(stocksUpdate)
+                }  
+            }
+
+            const create = async (stockIn, items) => {
+                // Thêm item
+                let SaleOffStockInItemModels = []
+                for(const index in items) {
+                    const item = items[index]
+                    // Product check
+                    let product = products.find(prd => {
+                        return prd.ProductCode == item.ProductCode
+                    })
+                    if(!product) {
+                        throw new Error(`Mã sản phẩm [${item.ProductCode}] không tồn tại 2.`);
+                    }
+
+                    if(!item?.id || !oldItems.find(i => i.id == item.id)) {
+                        let SaleOffStockInItemModel = {
+                            StockInCode    : stockIn.StockInCode,
+                            StockInItemNote: item.StockInItemNote,
+                            ProductCode    : item.ProductCode,
+                            LargeUnitQty   : item.LargeUnitQty,
+                            SmallUnitQty   : item.SmallUnitQty,
+                        }
+
+                        SaleOffStockInItemModels.push(SaleOffStockInItemModel)
+                    }
+                }
+
+                if(SaleOffStockInItemModels.length > 0) {
+                    await SaleOffStockInItem.bulkCreate(SaleOffStockInItemModels, {transaction: newTransaction});
+                }
+            }
+            const updateStock = async (items) => {
+                const stocks = await SaleOffStock.findAll({
+                    where: {
+                        ProductCode: {
+                            [Op.in]: items.map(item => {
+                                return item.ProductCode
+                            })
+                        }
+                    }
+                }, {transaction: transaction})
+
+                for(const index in stocks) {
+                    let stock = stocks[index]
+
+                    // Product check
+                    let product = products.find(prd => {
+                        return prd.ProductCode == stock.ProductCode
+                    })
+                    if(!product) {
+                        throw new Error(`Mã sản phẩm [${stock.ProductCode}] không tồn tại 3.`);
+                    }
+
+                    const item = items.find(i => i.ProductCode ==  stock.ProductCode)
+                    if(item) {
+                        let OldQty = helper.unitQtyTransfer(stock.LargeUnitQty, stock.SmallUnitQty, product)
+                        let NewQty = OldQty + item.Qty;
+
+                        let Qty = helper.unitQtyLS(NewQty, product)
+
+                        stock.LargeUnitQty = Qty.LargeUnitQty
+                        stock.SmallUnitQty = Qty.SmallUnitQty
+                        await stock.save({transaction: transaction})
+                    } else {
+                        throw new Error(`Mã sản phẩm [${stock.ProductCode}] không tồn tại trong kho.`);
+                    }
+                }
+            }
+
+            // step 1:
+            exists_stock_in.StockInDate = StockInDate
+            exists_stock_in.StockInNote = StockInNote
+            await exists_stock_in.save({ transaction: transaction }).then(async () => {
+                return await update(items)
+            })
+            await transaction.commit();
+            
+            // step 2:
+            const newTransaction = await sequelize.transaction();
+            await create(exists_stock_in, items, oldItems)
+
+
+            await newTransaction.commit();
+            return res.json(success());
+        } catch (err) {
+            await transaction.rollback();
+            console.log(err)
             return res.json(error(err.message, 501));
         }
     },

@@ -15,7 +15,7 @@ router.put('/products', SaleOffProductController.update);
 router.post('/products/delete', SaleOffProductController.delete);
 router.post('/products/import', upload.single('file'), setPermissions, SaleOffProductController.import);
 router.post('/products/bulkCreate', SaleOffProductController.bulkCreate);
-// router.get('/products/list', ProductController.list);
+router.get('/products/list', SaleOffProductController.list);
 
 router.get('/sale-staffs', SaleStaffController.index);
 router.post('/sale-staffs', SaleStaffController.store);
@@ -40,6 +40,9 @@ router.post('/customers/delete', CustomerController.delete);
 
 router.get('/stock-ins', SaleOffStockInController.index);
 router.post('/stock-ins', SaleOffStockInController.store);
+router.post('/stock-ins/import', upload.single('file'), setPermissions, SaleOffStockInController.import);
+router.get('/stock-ins/show', SaleOffStockInController.show);
+router.post('/stock-ins/update', SaleOffStockInController.update);
 
 
 const SaleOffRouter = router;

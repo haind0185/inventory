@@ -2,14 +2,10 @@ import sequelize from './index';
 import SaleOffStockIn from './SaleOffStockIn';
 import SaleOffProduct from './SaleOffProduct';
 import SaleOffStock from './SaleOffStock';
+import { helper } from '../../src/renderer/helper'
 const { DataTypes } = require('sequelize');
 
 const SaleOffStockInItem = sequelize.define('SaleOffStockInItem', {
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        allowNull: false,
-    },
     StockInCode: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -40,6 +36,29 @@ const SaleOffStockInItem = sequelize.define('SaleOffStockInItem', {
         allowNull: false,
         defaultValue: 0,
     },
+
+    Price: {
+        type: DataTypes.VIRTUAL,
+        get() { 
+            if(!this.saleOffProduct) return 0
+            return this.saleOffProduct.Price
+        }
+    },
+    Qty: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            if(!this.saleOffProduct) return 0
+            return helper.unitQtyTransfer(this.LargeUnitQty, this.SmallUnitQty, this.saleOffProduct)
+        }
+    },
+    PriceQty: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            if(!this.saleOffProduct) return 0
+            let Qty = helper.unitQtyTransfer(this.LargeUnitQty, this.SmallUnitQty, this.saleOffProduct)
+            return Qty * this.Price
+        }
+    },
 }, {
     hooks: {
         afterBulkCreate: async (instances, options) => {
@@ -60,7 +79,7 @@ const SaleOffStockInItem = sequelize.define('SaleOffStockInItem', {
                 let item = items[i]
                 let stock = await SaleOffStock.findOne({
                     where: {
-                        ProductCode: entry.ProductCode,
+                        ProductCode: item.ProductCode,
                     }
                 }, {transaction: transaction});
 
