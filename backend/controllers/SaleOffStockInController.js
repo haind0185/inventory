@@ -435,6 +435,9 @@ const SaleOffStockInController = {
 
                         stock.LargeUnitQty = Qty.LargeUnitQty
                         stock.SmallUnitQty = Qty.SmallUnitQty
+                        if(stock.LargeUnitQty < 0 || stock.SmallUnitQty < 0) {
+                            throw new Error(`Mã sản phẩm [${stock.ProductCode}] trong kho không đủ số lượng để điều chỉnh. Kiểm tra lại kho.`);
+                        }
                         await stock.save({transaction: transaction})
                     } else {
                         throw new Error(`Mã sản phẩm [${stock.ProductCode}] không tồn tại trong kho.`);
