@@ -3,6 +3,7 @@ import SaleStaffController from '../controllers/SaleStaffController';
 import DeliveryStaffController from '../controllers/DeliveryStaffController';
 import CustomerController from '../controllers/CustomerController';
 import SaleOffStockInController from '../controllers/SaleOffStockInController';
+import SaleOffStockController from '../controllers/SaleOffStockController';
 import { upload, setPermissions } from './multer';
 const express = require('express');
 const multer = require('multer');
@@ -43,6 +44,9 @@ router.post('/stock-ins', SaleOffStockInController.store);
 router.post('/stock-ins/import', upload.single('file'), setPermissions, SaleOffStockInController.import);
 router.get('/stock-ins/show', SaleOffStockInController.show);
 router.post('/stock-ins/update', SaleOffStockInController.update);
+
+router.get('/stock/total', SaleOffStockController.total);
+router.get('/stock/totalPrice', SaleOffStockController.totalPrice);
 
 
 const SaleOffRouter = router;

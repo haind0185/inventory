@@ -25,6 +25,14 @@ const SaleOffStock = sequelize.define('SaleOffStock', {
         type: DataTypes.FLOAT,
         allowNull: false,
     },
+
+    ProductName: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            if(!this.saleOffProduct) return ''
+            return `[${this.saleOffProduct.ProductCode}] ${this.saleOffProduct.ProductName}`;
+        }
+    },
     
 });
 

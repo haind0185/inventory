@@ -59,6 +59,30 @@
         </ul>
 
         <ul class="menus">
+            <template v-for="menu in sale_off_stock_in">
+                <template v-if="menu.children">
+                    <li class="flex flex-col gap-2 item-parent" :class="{'active': menu.open || menu.children.find(item => item.name == route.name)}">
+                        <span class="menu-item" @click="menu.open = !menu.open">
+                            {{ menu.label }}
+                        </span>
+                        <ul v-show="menu.children.find(item => item.name == route.name) || menu.open" style="padding-left: 15px; padding-right: 5px;" class="flex flex-col gap-1">
+                            <template v-for="item in menu.children">
+                                <li :active="route.name == item.name" class="item">
+                                    <router-link :to="{name: item.name}" class="menu-item"><span>{{ item.label }}</span></router-link>
+                                </li>
+                            </template>
+                        </ul>
+                    </li>
+                </template>
+                <template v-else>
+                    <li :active="route.name == menu.name" class="item">
+                        <router-link :to="{name: menu.name}" class="menu-item"><span>{{ menu.label }}</span></router-link>
+                    </li>
+                </template>
+            </template>
+        </ul>
+
+        <ul class="menus">
             <template v-for="menu in sale_off_stock">
                 <template v-if="menu.children">
                     <li class="flex flex-col gap-2 item-parent" :class="{'active': menu.open || menu.children.find(item => item.name == route.name)}">
@@ -285,7 +309,7 @@ const sale_off_order = ref([
     },
 ])
 
-const sale_off_stock = ref([
+const sale_off_stock_in = ref([
     {
         name: 'SaleOffStockIn',
         label: 'Quản lý nhập hàng',
@@ -293,6 +317,20 @@ const sale_off_stock = ref([
             {
                 name: 'StockInList',
                 label: 'Lịch sử nhập hàng',
+            },
+        ],
+        open: false
+    },
+])
+
+const sale_off_stock = ref([
+    {
+        name: 'SaleOffStockIn',
+        label: 'Quản lý kho hàng',
+        children: [
+            {
+                name: 'StockList',
+                label: 'Danh sách sản phẩm',
             },
         ],
         open: false

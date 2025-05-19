@@ -143,7 +143,19 @@ const routes = [
                                 component: () => import("@/views/saleOff/stockIn/StockInIndex.vue")
                             }
                         ]
-                    }
+                    },
+                    {
+                        path: 'stock',
+                        name: "stock",
+                        children: [
+                            {
+                                path: 'list',
+                                name: 'StockList',
+                                component: () => import("@/views/saleOff/stock/StockIndex.vue")
+                            }
+                        ]
+                    },
+                    
                 ]
             },
             {
