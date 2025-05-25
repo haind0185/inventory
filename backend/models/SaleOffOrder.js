@@ -3,11 +3,6 @@ import DeliveryStaff from './DeliveryStaff';
 const { DataTypes } = require('sequelize');
 
 const SaleOffOrder = sequelize.define('SaleOffOrder', {
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        allowNull: false,
-    },
     OrderCode: {
         type: DataTypes.STRING,
         allowNull: false,

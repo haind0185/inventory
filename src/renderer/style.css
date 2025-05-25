@@ -418,3 +418,61 @@ input.form-control:focus {
     font-weight: 700;
     color: #8d8d8d;
 }
+
+.header-icon {
+    position: relative;
+}
+
+.header-icon-action .icon {
+    color: #877e7e;
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translate(0, -50%);
+}
+
+.header-icon-action.text {
+    display: flex;
+    justify-content: center;
+}
+
+.header-icon-action.text .icon {
+    position: relative;
+    right: unset;
+    top: unset;
+    transform: unset;
+    color: #FFF;
+}
+
+
+
+.route-item {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.route-item svg {
+    font-size: 30px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    color: #877e7e;
+}
+
+.icon {
+    font-size: 30px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    color: #877e7e;
+}
+
+.icon:focus {
+    outline: none !important;
+}
+
+.icon:hover {
+    color: #ccc !important;
+}

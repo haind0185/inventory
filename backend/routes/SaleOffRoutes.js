@@ -4,6 +4,7 @@ import DeliveryStaffController from '../controllers/DeliveryStaffController';
 import CustomerController from '../controllers/CustomerController';
 import SaleOffStockInController from '../controllers/SaleOffStockInController';
 import SaleOffStockController from '../controllers/SaleOffStockController';
+import SaleOffOrderController from '../controllers/SaleOffOrderController';
 import { upload, setPermissions } from './multer';
 const express = require('express');
 const multer = require('multer');
@@ -47,6 +48,8 @@ router.post('/stock-ins/update', SaleOffStockInController.update);
 
 router.get('/stock/total', SaleOffStockController.total);
 router.get('/stock/totalPrice', SaleOffStockController.totalPrice);
+
+router.post('/order', SaleOffOrderController.store);
 
 
 const SaleOffRouter = router;

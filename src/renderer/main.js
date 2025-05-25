@@ -4,6 +4,8 @@
 import { createApp, onMounted } from 'vue'
 import VueCookies from 'vue-cookies'
 import 'vue-select/dist/vue-select.css'
+import FloatingVue from 'floating-vue'
+import 'floating-vue/dist/style.css'
 
 import i18n from "@/i18n"
 import helpers from '@/helper'
@@ -33,6 +35,7 @@ app.use(VueCookies, { expire: '7d' })
     .use(i18n)
     .use(helpers)
     .use(initPinia)
+    .use(FloatingVue)
 
 // add component
 app.component('Modal', Modal)

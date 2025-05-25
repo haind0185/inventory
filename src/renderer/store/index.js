@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { initPinia } from '@/store/setup'
 import { t } from '@/i18n'
+import api from '@/api'
 
 const createStore = defineStore('app', {
     state: () => {
@@ -35,7 +36,8 @@ const createStore = defineStore('app', {
             progress: {
                 isShow: false,
                 value: 0,
-            }
+            },
+            master: {},
         }
     },
     getters: {
@@ -45,7 +47,20 @@ const createStore = defineStore('app', {
     },
     actions: {
         // api
-        
+        async getMaster() {
+            if(Object.keys(this.master).length !== 0) return
+            store.setLoading(true)
+            return await api.get(`/master`,)
+                .then((res) => {
+                    store.setLoading(false)
+                    this.master = res.data.data
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
 
         // mutation
         setLoading(value) {

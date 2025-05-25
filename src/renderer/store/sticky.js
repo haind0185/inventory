@@ -16,14 +16,14 @@ const createStore = defineStore("sticky", {
     actions: {
         async syncData() {
             try {
-                const notes = localStorage.getItem("stickyNotes") == 'undefined' ? [] : JSON.parse(localStorage.getItem("stickyNotes"))
+                // const notes = localStorage.getItem("stickyNotes") == 'undefined' ? [] : JSON.parse(localStorage.getItem("stickyNotes"))
 
-                const response = await api.post(`/sticky-note/sync`, { notes: notes });
+                // const response = await api.post(`/sticky-note/sync`, { notes: notes });
 
-                if (response.status === 200) {
-                    this.notes = response.data.data;
-                    localStorage.setItem("stickyNotes", JSON.stringify(this.notes));
-                }
+                // if (response.status === 200) {
+                //     this.notes = response.data.data;
+                //     localStorage.setItem("stickyNotes", JSON.stringify(this.notes));
+                // }
             } catch (error) {
                 console.error("Lỗi đồng bộ dữ liệu:", error);
             }
