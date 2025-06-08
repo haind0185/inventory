@@ -22,6 +22,7 @@ import { create_sale_off_order_items } from './20250510123461_create_sale_off_or
 import { create_sale_off_order_stock_ins } from './20250510123462_create_sale_off_stock_ins_table'
 import { create_sale_off_stock_in_items } from './20250510123463_create_sale_off_stock_in_items_table'
 import { create_sale_off_stocks } from './20250510123464_create_sale_off_stocks_table'
+import { create_sale_customers } from './20250608123456_create_sale_staffs_customer_table'
 
 const { Umzug, SequelizeStorage } = require('umzug');
 
@@ -48,7 +49,8 @@ const migrations = [
     create_sale_off_order_items,
     create_sale_off_order_stock_ins,
     create_sale_off_stock_in_items,
-    create_sale_off_stocks
+    create_sale_off_stocks,
+    create_sale_customers,
 ]
 
 export const migrator = new Umzug({

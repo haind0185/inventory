@@ -1,4 +1,5 @@
 import sequelize from './index';
+import Customer from './Customer';
 import { ACTIVE_LIST } from '../../src/renderer/constant'
 const { DataTypes } = require('sequelize');
 
@@ -22,5 +23,14 @@ const SaleStaff = sequelize.define('SaleStaff', {
         }
     }
 });
+
+SaleStaff.belongsToMany(Customer, {
+    through: 'SaleStaffCustomers',
+    sourceKey: 'id',
+    foreignKey: 'SaleStaffId',
+    targetKey: 'CustomerCode',
+    otherKey: 'CustomerCode',
+    as: 'customers'
+})
 
 export default SaleStaff;

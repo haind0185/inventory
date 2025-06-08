@@ -95,6 +95,7 @@ import { onMounted, onBeforeMount, computed, watch, ref } from 'vue'
 import { saleStaffStore } from '@/store/saleStaff'
 import SaleStaffAddModel from '@/views/saleOff/saleStaff/SaleStaffAddModel.vue'
 import SaleStaffDetailModal from '@/views/saleOff/saleStaff/SaleStaffDetailModal.vue'
+import { store } from '@/store'
 import { ACTIVE_LIST } from '@/constant'
 
 const showAdd = ref(false)
@@ -169,6 +170,10 @@ const pagination = (page) => {
     search.value.page = page
     index()
 }
+
+onBeforeMount(async () => {
+    await store.getMaster()
+})
 
 onMounted(async () => {
     await index()

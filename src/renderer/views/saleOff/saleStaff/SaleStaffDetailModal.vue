@@ -19,6 +19,21 @@
                         </div>
                     </template>
                 </fieldset>
+
+                <!-- SaleStaffCustomer -->
+                 <fieldset class="w-[100%] form-input">
+                    <legend>Danh sách khách hàng</legend>
+                    <div class="flex flex-col gap-1">
+                        <div v-for="(customer, index) in payload.customers" class="flex items-center gap-2">
+                            <IconRemove v-tooltip="{ content: 'Xóa bỏ khách hàng này', placement: 'top' }" @click="removeCustomer(customer.CustomerCode)" ></IconRemove>
+                            {{ `${index+1}. ${customer.CustomerNameLabel}` }}
+                        </div>
+                        <div>
+                            <select2 class="form-control" :options="customers()" v-model="customer" label="CustomerNameLabel" :reduce="item => item.CustomerCode" :option:selected="onSelectCustomer()" placeholder="Thêm một khách hàng">
+                            </select2>
+                        </div>
+                    </div>
+                </fieldset>
             </div>
 
             <div class="flex justify-around w-full mt-[10rem]">
@@ -36,19 +51,39 @@ import { onMounted, ref, watch } from 'vue'
 import { t } from '@/i18n'
 import { saleStaffStore } from '@/store/saleStaff';
 import { ACTIVE_LIST } from '@/constant';
+import { store } from '@/store'
+import IconRemove from '@/views/component/icon/IconRemove.vue'
 
 const { show, data } = defineProps(['show', 'data'])
 const emit = defineEmits(['close', 'save'])
 const title = "Chi tiết NV bán hàng"
 const disable = ref(false)
+const master = ref(store.master)
 
 const payload = ref({
     id: null,
     SaleStaffName: null,
     SaleStaffActive: null,
+    customers: []
 })
+const customer = ref(null)
 const confirm = ref(null)
 const reload = ref(false)
+const customers = () => {
+    return master.value.customers.filter((item) => {
+        return !payload.value.customers.find((i) => i.CustomerCode == item.CustomerCode)
+    })
+}
+const onSelectCustomer = () => {
+    if(customer.value) {
+        const item = master.value.customers.find((item) => item.CustomerCode == customer.value)
+        payload.value.customers.push(item)
+        customer.value = null
+    }
+}
+const removeCustomer = (CustomerCode) => {
+    payload.value.customers = payload.value.customers.filter((item) => item.CustomerCode != CustomerCode)
+}
 
 const onClose = () => {
     emit('close', reload.value)
@@ -56,6 +91,9 @@ const onClose = () => {
 
 const onSave = async () => {
     console.log(payload.value)
+    payload.value.customers = payload.value.customers.map((item) => {
+        return item.CustomerCode
+    })
     const res = await saleStaffStore.update(payload.value).then((res) => {
         if (res && res.code == 200) {
             reload.value = true

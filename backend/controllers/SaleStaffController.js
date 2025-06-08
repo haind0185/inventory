@@ -1,5 +1,7 @@
 import SaleStaff from '../models/SaleStaff';
 import SaleOffOrderItem from '../models/SaleOffOrderItem';
+import Customer from '../models/Customer';
+import SaleStaffCustomer from '../models/SaleStaffCustomer';
 import { error, success } from './common/http';
 import { ACTIVE_LIST } from '../../src/renderer/constant'
 import { t } from '../../src/renderer/i18n'
@@ -135,7 +137,8 @@ const SaleStaffController = {
             const staff = await SaleStaff.findOne({
                 where: {
                     'id': req.query.id
-                }
+                },
+                include: [{ 'association': 'customers' }],
             })
 
             if(!staff) {
@@ -152,7 +155,7 @@ const SaleStaffController = {
         const transaction = await sequelize.transaction();
         try {
             console.log(req.body)
-            const { id, SaleStaffName, SaleStaffActive } = req.body;
+            const { id, SaleStaffName, SaleStaffActive, customers } = req.body;
 
             /**
              * validation
@@ -180,6 +183,17 @@ const SaleStaffController = {
                 throw new Error("Nhân viên này không tồn tại.")
             }
 
+            customers.forEach(async (item, index) => {
+                const existsCustomer = await Customer.findOne({
+                    where: {
+                        CustomerCode: item
+                    }
+                })
+                if (!existsCustomer) {
+                    throw new Error(`Mã KH này không tồn tại: ${item}`)
+                }
+            });
+
 
             /**
              * call create action
@@ -188,6 +202,21 @@ const SaleStaffController = {
             existsStaff.SaleStaffActive = SaleStaffActive
             
             await existsStaff.save({ transaction: transaction })
+
+            await SaleStaffCustomer.destroy({
+                where: { SaleStaffId: id }
+            }, { transaction: transaction }).then(async (res) => {
+                if(customers.length > 0) {
+                    const SaleStaffCustomerModels = customers.map((item) => {
+                        return {
+                            SaleStaffId: id,
+                            CustomerCode: item
+                        }
+                    })
+                    await SaleStaffCustomer.bulkCreate(SaleStaffCustomerModels, { transaction: transaction })
+                }
+            })
+
 
             await transaction.commit();
             return res.json(success(existsStaff));
