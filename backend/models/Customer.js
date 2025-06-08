@@ -20,6 +20,14 @@ const Customer = sequelize.define('Customer', {
         type: DataTypes.STRING,
         allowNull: true,
     },
+
+    // get attribute
+    CustomerNameLabel: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            return `[${this.CustomerCode}] ${this.CustomerName}`;
+        }
+    }
 });
 
 export default Customer;

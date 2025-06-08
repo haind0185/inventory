@@ -425,10 +425,10 @@ input.form-control:focus {
 
 .header-icon-action .icon {
     color: #877e7e;
-    position: absolute;
+    /* position: absolute;
     right: 4px;
-    top: 50%;
-    transform: translate(0, -50%);
+    top: 50%; */
+    /* transform: translate(0, -50%); */
 }
 
 .header-icon-action.text {

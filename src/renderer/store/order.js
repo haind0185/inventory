@@ -52,6 +52,7 @@ const deliveryStaffInit = {
 const saleRouteInit = {
     DeliveryStaffs: [ helper.deepClone(deliveryStaffInit) ],
     SaleStaffs: [ helper.deepClone(saleStaffInit) ],
+    Background: helper.getBG()
 }
 
 const createStore = defineStore('order', {
@@ -106,7 +107,9 @@ const createStore = defineStore('order', {
             this.search = {...this.search, ...initSearch}
         },
         routeAdd() {
-            this.saleRoutes.push(helper.deepClone(saleRouteInit))
+            let saleRoute = helper.deepClone(saleRouteInit)
+            saleRoute.Background = helper.getBG()
+            this.saleRoutes.push(saleRoute)
         },
         routeRemove(index) {
             this.saleRoutes = this.saleRoutes.filter((item, i) => i != index)
