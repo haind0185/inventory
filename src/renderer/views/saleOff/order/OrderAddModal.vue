@@ -85,6 +85,7 @@
                                                     v-model="customer.CustomerCode"
                                                     label="CustomerNameLabel"
                                                     :reduce="item => item.CustomerCode"
+                                                    :selectable="item => !item.disabled"
                                                     :option:selected="() => {}">
                                                         <template #search="{attributes, events}">
                                                             <input class="vs__search" :required="customer.CustomerCode == null || customer.CustomerCode == ''" v-bind="attributes" v-on="events" />
@@ -200,13 +201,13 @@ const getSmallUnit = (ProductCode) => {
 }
 
 const getCustomers = (saleStaff) => {
-    let customers = master.value.customers.map((item) => {
+    let customers = helper.deepClone(master.value.customers)
+    customers = customers.map((item) => {
         if(saleStaff.Customers.find((i) => i.CustomerCode == item.CustomerCode)) {
             item.disabled = true
         }
         return item
     })
-    console.log(customers)
     return customers
 }
 
