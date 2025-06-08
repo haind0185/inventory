@@ -62,7 +62,7 @@
                                         <td class="row-left w-[8rem]" v-if="customerCount == 0 && productCount == 0" :rowspan="countNestedItems(saleStaff, ['Customers', 'Products'])">
                                             <div class="flex items-center gap-1 w-[full]">
                                                 <div class="flex items-center flex-1">
-                                                    <select2 class="w-full form-control" required :options="master.saleStaffs" v-model="saleStaff.id" label="SaleStaffName" :reduce="item => item.id" :option:selected="() => {}">
+                                                    <select2 class="w-full form-control" required :options="master.saleStaffs" v-model="saleStaff.id" label="SaleStaffName" :reduce="item => item.id" @update:modelValue="onSelectSaleStaff(saleStaff)">
                                                         <template #search="{attributes, events}">
                                                             <input class="vs__search" :required="saleStaff.id == null || saleStaff.id == ''" v-bind="attributes" v-on="events" />
                                                         </template>
@@ -79,14 +79,20 @@
                                         <td class="row-left w-[14rem]" v-if="productCount == 0" :rowspan="countNestedItems(customer, ['Products'])">
                                             <div class="flex items-center gap-1 w-[full]">
                                                 <div class="flex items-center flex-1">
-                                                    <select2 class="w-full form-control" required :options="master.customers" v-model="customer.CustomerCode" label="CustomerNameLabel" :reduce="item => item.CustomerCode" :option:selected="() => {}">
+                                                    <select2 class="w-full form-control"
+                                                    required
+                                                    :options="getCustomers(saleStaff)"
+                                                    v-model="customer.CustomerCode"
+                                                    label="CustomerNameLabel"
+                                                    :reduce="item => item.CustomerCode"
+                                                    :option:selected="() => {}">
                                                         <template #search="{attributes, events}">
                                                             <input class="vs__search" :required="customer.CustomerCode == null || customer.CustomerCode == ''" v-bind="attributes" v-on="events" />
                                                         </template>
                                                     </select2>
                                                     <IconRemove class="w-[10%]" v-tooltip="{ content: 'Xóa bỏ khách hàng này', placement: 'top' }" @click="orderStore.customerRemove(saleStaff, customerCount)" v-show="saleStaff.Customers.length > 1"></IconRemove>
                                                 </div>
-                                                <span class="header-icon-action" @click="orderStore.customerAdd({...saleStaff})" v-if="customerCount == saleStaff.Customers.length - 1">
+                                                <span class="header-icon-action" @click="orderStore.customerAdd({...saleStaff})" v-if="customerCount == saleStaff.Customers.length - 1 && saleStaff.Customers.length < master.customers.length">
                                                     <IconAdd v-tooltip="{ content: 'Thêm một khách hàng cho NVBH này', placement: 'top' }"></IconAdd>
                                                 </span>
                                             </div>
@@ -96,7 +102,14 @@
                                         <td class="header-icon w-[20rem]" :class="{'row-left': productCount > 0}">
                                             <div class="flex items-center gap-1 w-[full]">
                                                 <div class="flex items-center flex-1">
-                                                    <select2 class="w-full form-control" required :options="master.stocks" v-model="product.ProductCode" label="ProductName" :reduce="item => item.ProductCode" :option:selected="onChangeProduct(product)">
+                                                    <select2 class="w-full form-control" 
+                                                    required
+                                                    :options="master.stocks"
+                                                    v-model="product.ProductCode"
+                                                    label="ProductName"
+                                                    :reduce="item => item.ProductCode"
+                                                    :option:selected="onChangeProduct(product)"
+                                                    >
                                                         <template #search="{attributes, events}">
                                                             <input class="vs__search" :required="product.ProductCode == null || product.ProductCode == ''" v-bind="attributes" v-on="events" />
                                                         </template>
@@ -186,6 +199,17 @@ const getSmallUnit = (ProductCode) => {
     return findProduct(ProductCode)?.SmallUnit
 }
 
+const getCustomers = (saleStaff) => {
+    let customers = master.value.customers.map((item) => {
+        if(saleStaff.Customers.find((i) => i.CustomerCode == item.CustomerCode)) {
+            item.disabled = true
+        }
+        return item
+    })
+    console.log(customers)
+    return customers
+}
+
 const onChangeProduct = (product) => {
     let prod = findProduct(product.ProductCode)
 
@@ -205,6 +229,18 @@ const onChangeProduct = (product) => {
 
         product.PriceQty = 0
         product.PriceQtyLabel = helper.format_number(product.PriceQty)
+    }
+}
+
+const onSelectSaleStaff = (saleStaff) => {
+    const staff = master.value.saleStaffs.find((item) => {
+        return item.id == saleStaff.id
+    })
+    if(staff && staff.customers.length > 0) {
+        orderStore.customerClear(saleStaff)
+        staff.customers.forEach((item, index) => {
+            orderStore.customerAdd(saleStaff, item.CustomerCode)
+        })
     }
 }
 

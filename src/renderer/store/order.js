@@ -126,11 +126,18 @@ const createStore = defineStore('order', {
         saleStaffRemove(saleRoute, index) {
             saleRoute.SaleStaffs = saleRoute.SaleStaffs.filter((item, i) => i != index)
         },
-        customerAdd(saleStaff) {
-            saleStaff.Customers.push(helper.deepClone(customerInit))
+        customerAdd(saleStaff, CustomerCode=null) {
+            let customer = helper.deepClone(customerInit)
+            if(CustomerCode) {
+                customer.CustomerCode = CustomerCode
+            }
+            saleStaff.Customers.push(customer)
         },
         customerRemove(saleStaff, index) {
             saleStaff.Customers = saleStaff.Customers.filter((item, i) => i != index)
+        },
+        customerClear(saleStaff) {
+            saleStaff.Customers = []
         },
         productAdd(customer) {
             customer.Products.push(helper.deepClone(productInit))

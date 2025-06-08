@@ -23,6 +23,7 @@ const MasterController = {
 
             const saleStaffs = await SaleStaff.findAll({
                 order: [['SaleStaffName', 'asc']],
+                include: [{ 'association': 'customers' }],
             });
 
             const stocks = await SaleOffStock.findAll({
