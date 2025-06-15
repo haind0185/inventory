@@ -26,30 +26,6 @@ export const create_sale_off_orders = {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
-            DeliveryStaffId1: {
-                type: DataTypes.STRING,
-                allowNull: false,
-                references: {
-                    model: 'DeliveryStaffs',
-                    key: 'id',
-                },
-            },
-            DeliveryStaffId2: {
-                type: DataTypes.STRING,
-                allowNull: true,
-                references: {
-                    model: 'DeliveryStaffs',
-                    key: 'id',
-                },
-            },
-            DeliveryStaffId3: {
-                type: DataTypes.STRING,
-                allowNull: true,
-                references: {
-                    model: 'DeliveryStaffs',
-                    key: 'id',
-                },
-            },
 
             /**
              * From: Timestamp

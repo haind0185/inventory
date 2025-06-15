@@ -3,7 +3,9 @@ import Customer from '../models/Customer';
 import DeliveryStaff from '../models/DeliveryStaff';
 import SaleStaff from '../models/SaleStaff';
 import SaleOffStock from '../models/SaleOffStock';
+import SaleOffOrder from '../models/SaleOffOrder';
 import { error, success } from './common/http';
+import moment from 'moment';
 const { Op } = require("sequelize");
 
 const MasterController = {
@@ -31,12 +33,19 @@ const MasterController = {
                 include: [{ association: 'saleOffProduct' }],
             });
 
+            const order_count = await SaleOffOrder.count({
+                where: {
+                    'OrderDate': moment().format('YYYY-MM-DD')
+                }
+            });
+
             return res.json(success({
                 products      : products,
                 customers     : customers,
                 deliveryStaffs: deliveryStaffs,
                 saleStaffs    : saleStaffs,
                 stocks        : stocks,
+                order_count   : order_count,
             }));
         } catch (err) {
             return res.json(error(err.message, 501));

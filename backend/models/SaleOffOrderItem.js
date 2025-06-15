@@ -3,20 +3,16 @@ import SaleOffOrder from './SaleOffOrder';
 import SaleStaff from './SaleStaff';
 import Customer from './Customer';
 import SaleOffProduct from './SaleOffProduct';
+import SaleOffRoute from './SaleOffRoute';
 const { DataTypes } = require('sequelize');
 
 const SaleOffOrderItem = sequelize.define('SaleOffOrderItem', {
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        allowNull: false,
-    },
-    OrderCode: {
+    RouteId: {
         type: DataTypes.STRING,
         allowNull: false,
         references: {
-            model: SaleOffOrder,
-            key: 'OrderCode',
+            model: SaleOffRoute,
+            key: 'id',
         },
     },
     OrderItemNote: {
@@ -59,8 +55,8 @@ const SaleOffOrderItem = sequelize.define('SaleOffOrderItem', {
     },
 });
 
-SaleOffOrder.hasMany(SaleOffOrderItem, { foreignKey: 'OrderCode', sourceKey: 'OrderCode', as: 'saleOffOrderItems' });
-SaleOffOrderItem.belongsTo(SaleOffOrder, { foreignKey: 'OrderCode', targetKey: 'OrderCode', as: 'saleOffOrder' });
+SaleOffRoute.hasMany(SaleOffOrderItem, { foreignKey: 'RouteId', sourceKey: 'id', as: 'saleOffOrderItems' });
+SaleOffOrderItem.belongsTo(SaleOffRoute, { foreignKey: 'RouteId', targetKey: 'id', as: 'saleOffRoute' });
 
 SaleStaff.hasMany(SaleOffOrderItem, { foreignKey: 'SaleStaffId', sourceKey: 'id', as: 'saleOffOrderItems' });
 SaleOffOrderItem.belongsTo(SaleStaff, { foreignKey: 'SaleStaffId', targetKey: 'id', as: 'saleStaff' });

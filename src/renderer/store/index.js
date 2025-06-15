@@ -48,7 +48,7 @@ const createStore = defineStore('app', {
     actions: {
         // api
         async getMaster() {
-            if(Object.keys(this.master).length !== 0) return
+            // if(Object.keys(this.master).length !== 0) return
             store.setLoading(true)
             return await api.get(`/master`,)
                 .then((res) => {

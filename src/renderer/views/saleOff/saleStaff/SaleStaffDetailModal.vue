@@ -24,7 +24,7 @@
                  <fieldset class="w-[100%] form-input">
                     <legend>Danh sách khách hàng</legend>
                     <div class="flex flex-col gap-1">
-                        <div v-for="(customer, index) in payload.customers" class="flex items-center gap-2">
+                        <div v-for="(customer, index) in payload.customers" class="flex items-center gap-2 font-semibold">
                             <IconRemove v-tooltip="{ content: 'Xóa bỏ khách hàng này', placement: 'top' }" @click="removeCustomer(customer.CustomerCode)" ></IconRemove>
                             {{ `${index+1}. ${customer.CustomerNameLabel}` }}
                         </div>

@@ -13,21 +13,12 @@ const initSearch = {
     sort_by: null,
     page: 1
 }
-const orderInit = {
-    SaleStaffId  : null,
-    CustomerCode : null,
-    ProductCode  : null,
-    LargeUnitQty : 0,
-    SmallUnitQty : 0,
-    OrderItemNote: null,
-}
+
 const payloadInit = {
-    OrderCode       : null,
-    OrderDate       : null,
-    OrderNote       : null,
-    DeliveryStaffId1: null,
-    DeliveryStaffId2: null,
-    DeliveryStaffId3: null,
+    OrderCode    : null,
+    OrderDate    : null,
+    OrderNote    : null,
+    SaleOffRoutes: []
 }
 
 const productInit = {
@@ -43,7 +34,7 @@ const customerInit = {
     Products: [ helper.deepClone(productInit) ],
 }
 const saleStaffInit = {
-    SaleStaffId: null,
+    id: null,
     Customers: [ helper.deepClone(customerInit) ]
 }
 const deliveryStaffInit = {
@@ -105,6 +96,9 @@ const createStore = defineStore('order', {
         },
         resetSearch() {
             this.search = {...this.search, ...initSearch}
+        },
+        reset() {
+            this.saleRoutes =[]
         },
         routeAdd() {
             let saleRoute = helper.deepClone(saleRouteInit)

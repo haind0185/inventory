@@ -1,5 +1,7 @@
 import moment from 'moment'
 
+let lastHue = null;
+
 const functions = {
     format_number: (value, decimals, currency) => {
         value = parseFloat(value)
@@ -205,11 +207,18 @@ const functions = {
         return undefined;
     },
     getBG: () => {
-        const hue = Math.floor(Math.random() * 360)
-        const saturation = 50 + Math.random() * 20
-        const lightness = 85 + Math.random() * 10
+        let hue
+        do {
+            hue = Math.floor(Math.random() * 360)
+        } while (lastHue !== null && Math.abs(hue - lastHue) < 40)
+        lastHue = hue
+        const saturation = 60 + Math.random() * 30 // 60-90%
+        const lightness = 60 + Math.random() * 20 // 60-80%
         return `hsl(${hue}, ${saturation}%, ${lightness}%)`
     },
+    getOrderCode: (no) => {
+        return `X${moment().format('YYYYMMDD')}${no.toString().padStart(2, 0)}`
+    }
 }
 
 const helpers = {

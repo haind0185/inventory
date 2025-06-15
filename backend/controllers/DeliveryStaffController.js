@@ -5,6 +5,7 @@ import { ACTIVE_LIST } from '../../src/renderer/constant'
 import { t } from '../../src/renderer/i18n'
 import { helper } from '../../src/renderer/helper'
 import sequelize from '../models/index';
+import SaleOffRoute from '../models/SaleOffRoute';
 const xlsx = require('xlsx');
 const path = require('path');
 const { Op } = require("sequelize");
@@ -218,7 +219,7 @@ const DeliveryStaffController = {
                 throw new Error("Không tìm thấy nhân viên.");
             }
 
-            const orders = await SaleOffOrder.findAll({
+            const orders = await SaleOffRoute.findAll({
                 where: {
                     [Op.or]: [
                         { DeliveryStaffId1: id },

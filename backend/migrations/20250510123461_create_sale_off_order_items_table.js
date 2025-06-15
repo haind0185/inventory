@@ -13,12 +13,12 @@ export const create_sale_off_order_items = {
                 primaryKey: true,
                 type: DataTypes.INTEGER,
             },
-            OrderCode: {
+            RouteId: {
                 type: DataTypes.STRING,
                 allowNull: false,
                 references: {
-                    model: 'SaleOffOrders',
-                    key: 'OrderCode',
+                    model: 'SaleOffRoutes',
+                    key: 'id',
                 },
             },
             OrderItemNote: {

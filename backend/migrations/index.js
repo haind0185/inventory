@@ -19,6 +19,7 @@ import { create_delivery_staffs } from './20250510123458_create_delivery_staffs_
 import { create_customers } from './20250510123459_create_customers_table'
 import { create_sale_off_orders } from './20250510123460_create_sale_off_orders_table'
 import { create_sale_off_order_items } from './20250510123461_create_sale_off_order_items_table'
+import { create_sale_off_routes } from './20250510123461_create_sale_off_routes_table'
 import { create_sale_off_order_stock_ins } from './20250510123462_create_sale_off_stock_ins_table'
 import { create_sale_off_stock_in_items } from './20250510123463_create_sale_off_stock_in_items_table'
 import { create_sale_off_stocks } from './20250510123464_create_sale_off_stocks_table'
@@ -47,6 +48,7 @@ const migrations = [
     create_customers,
     create_sale_off_orders,
     create_sale_off_order_items,
+    create_sale_off_routes,
     create_sale_off_order_stock_ins,
     create_sale_off_stock_in_items,
     create_sale_off_stocks,

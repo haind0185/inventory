@@ -1,4 +1,5 @@
 import SaleOffOrder from '../models/SaleOffOrder';
+import SaleOffRoute from '../models/SaleOffRoute';
 import SaleOffOrderItem from '../models/SaleOffOrderItem';
 import SaleOffProduct from '../models/SaleOffProduct';
 import SaleOffStock from '../models/SaleOffStock';
@@ -18,7 +19,7 @@ const SaleOffOrderController = {
     store: async (req, res) => {
         const transaction = await sequelize.transaction();
         try {
-            const { OrderCode, OrderDate, OrderNote, DeliveryStaffId1, DeliveryStaffId2, DeliveryStaffId3, SaleOffOrderItems } = req.body;
+            const { OrderCode, OrderDate, OrderNote, SaleOffRoutes } = req.body;
 
             /**
              * validation
@@ -28,24 +29,26 @@ const SaleOffOrderController = {
                 OrderCode: Joi.string().required(),
                 OrderDate: Joi.string().required(),
                 OrderNote: Joi.string().allow(null, '').min(0).max(200),
-                DeliveryStaffId1: Joi.number().required().min(0),
-                DeliveryStaffId2: Joi.number().allow(null).min(1),
-                DeliveryStaffId3: Joi.number().allow(null).min(1),
             }).unknown()
             let validation = orderSchema.validate({
                 OrderCode       : OrderCode,
                 OrderDate       : OrderDate,
                 OrderNote       : OrderNote,
-                DeliveryStaffId1: DeliveryStaffId1,
-                DeliveryStaffId2: DeliveryStaffId2,
-                DeliveryStaffId3: DeliveryStaffId3,
             })
             if (validation.error) {
                 throw new Error(validation.error.details[0].message);
             }
 
-            // 2. SaleOffOrderItem
-            const schema = Joi.object({
+            // 2. SaleOffRoutes
+            const routeSchema = Joi.object({
+                RouteNote: Joi.string().allow(null, '').min(0).max(200),
+                DeliveryStaffId1: Joi.number().required().min(0),
+                DeliveryStaffId2: Joi.number().allow(null).min(1),
+                DeliveryStaffId3: Joi.number().allow(null).min(1),
+            }).unknown()
+
+            // 3. SaleOffOrderItem
+            const orderItemSchema = Joi.object({
                 OrderItemNote: Joi.string().allow(null, '').min(0).max(200),
                 SaleStaffId  : Joi.number().required().min(0),
                 CustomerCode : Joi.string().required(),
@@ -54,15 +57,20 @@ const SaleOffOrderController = {
                 LargeUnitQty: Joi.number().required().min(0),
                 SmallUnitQty: Joi.number().required().min(0),
             }).unknown();
-            if(SaleOffOrderItems.length <= 0) {
-                throw new Error('Cần có ít nhất một item cho đơn hàng.');
-            }
-            SaleOffOrderItems.forEach((exit, index) => {
-                let validation = schema.validate(exit);
+
+            for (const route of SaleOffRoutes) {
+                const validation = routeSchema.validate(route)
                 if (validation.error) {
                     throw new Error(`[${index+1}] ${validation.error.details[0].message}`);
                 }
-            });
+
+                for (const orderItem of route.SaleOffOrderItems) {
+                    const validation = orderItemSchema.validate(orderItem)
+                    if (validation.error) {
+                        throw new Error(`[${index+1}] ${validation.error.details[0].message}`);
+                    }
+                }
+            }
 
             /**
              * check exists code
@@ -76,48 +84,25 @@ const SaleOffOrderController = {
                 throw new Error("Mã đơn hàng đã tồn tại.");
             }
             
-            const DeliveryStaff1 = await DeliveryStaff.findOne({
-                where: {
-                    id: DeliveryStaffId1
-                }
-            })
-            if(!DeliveryStaff1) {
-                throw new Error(`Không tìm thấy nhân viên giao nhận: ${DeliveryStaffId1}`);
-            }
-
-            const DeliveryStaff2 = null
-            if(DeliveryStaffId2) {
-                DeliveryStaff2 = await DeliveryStaff.findOne({
-                    where: {
-                        id: DeliveryStaffId2
-                    }
-                })
-                if(!DeliveryStaff2) {
-                    throw new Error(`Không tìm thấy nhân viên giao nhận: ${DeliveryStaffId2}`);
-                }
-            }
-
-            const DeliveryStaff3 = null
-            if(DeliveryStaffId3) {
-                DeliveryStaff3 = await DeliveryStaff.findOne({
-                    where: {
-                        id: DeliveryStaffId3
-                    }
-                })
-                if(!DeliveryStaff3) {
-                    throw new Error(`Không tìm thấy nhân viên giao nhận: ${DeliveryStaffId3}`);
-                }
-            }
-
             /**
              * GET master data from DB
              */
+            let ProductCodeList = []
+            let SaleStaffIdList = []
+            let CustomerCodeList = []
+
+            for (const route of SaleOffRoutes) {
+                for (const orderItem of route.SaleOffOrderItems) {
+                    ProductCodeList.push(orderItem.ProductCode)
+                    SaleStaffIdList.push(orderItem.SaleStaffId)
+                    CustomerCodeList.push(orderItem.CustomerCode)
+                }
+            }
+
             const SaleOffProduct_Master = await SaleOffProduct.findAll({
                 where: {
                     ProductCode: {
-                        [Op.in]: SaleOffOrderItems.map(item => {
-                            return item.ProductCode
-                        })
+                        [Op.in]: ProductCodeList
                     }
                 }
             }, {transaction: transaction})
@@ -125,9 +110,7 @@ const SaleOffOrderController = {
             const SaleStaff_Master = await SaleStaff.findAll({
                 where: {
                     id: {
-                        [Op.in]: SaleOffOrderItems.map(item => {
-                            return item.SaleStaffId
-                        })
+                        [Op.in]: SaleStaffIdList
                     }
                 }
             }, {transaction: transaction})
@@ -135,9 +118,7 @@ const SaleOffOrderController = {
             const Customer_Master = await Customer.findAll({
                 where: {
                     CustomerCode: {
-                        [Op.in]: SaleOffOrderItems.map(item => {
-                            return item.CustomerCode
-                        })
+                        [Op.in]: CustomerCodeList
                     }
                 }
             }, {transaction: transaction})
@@ -150,113 +131,96 @@ const SaleOffOrderController = {
                 ],
                 where: {
                     ProductCode: {
-                        [Op.in]: SaleOffOrderItems.map(item => {
-                            return item.ProductCode
-                        })
+                        [Op.in]: ProductCodeList
                     }
                 },
                 group: ['SaleOffStock.ProductCode'],
             }, {transaction: transaction});
 
-
-            /**
-             * call create action
-             */
-            await SaleOffOrder.create({
-                OrderCode       : OrderCode,
-                OrderDate       : OrderDate,
-                OrderNote       : OrderNote,
-                DeliveryStaffId1: DeliveryStaffId1,
-                DeliveryStaffId2: DeliveryStaffId2,
-                DeliveryStaffId3: DeliveryStaffId3,
-            }, {transaction: transaction}).then(async (SaleOffOrder) => {
-                return await bulkCreateItem(SaleOffOrder, SaleOffOrderItems)
-            })
-
             /**
              *  Handle create order item and stock
-             * @param {SaleOffOrder} SaleOffOrder
-             * @param {SaleOffOrderItem[]} SaleOffOrderItems
+             * @param {SaleOffRoute[]} saleOffRoutes
              */
-            const bulkCreateItem = async (SaleOffOrder, SaleOffOrderItems) => {
+            const bulkCreateItem = async (saleOffRoutes) => {
                 let SaleOffOrderItem_Models = []
 
                 /**
                  * Step 1: Format data
                  */
-                for(const i in SaleOffOrderItems) {
-                    let SaleOffOrderItem = SaleOffOrderItems[i]
-
-                    // SaleOffProduct check
-                    let SaleOffProduct = SaleOffProduct_Master.find(item => {
-                        return item.ProductCode == SaleOffOrderItem.ProductCode
-                    })
-                    if(!SaleOffProduct) {
-                        throw new Error(`Mã sản phẩm [${SaleOffOrderItem.ProductCode}] không tồn tại.`);
-                    }
-
-                    // SaleStaff check
-                    let SaleStaff = SaleStaff_Master.find(item => {
-                        return item.id == SaleOffOrderItem.SaleStaffId
-                    })
-                    if(!SaleStaff) {
-                        throw new Error(`Mã nhân viên bán hàng [${SaleOffOrderItem.SaleStaffId}] không tồn tại.`);
-                    }
-
-                    // Customer check
-                    let Customer = Customer_Master.find(item => {
-                        return item.CustomerCode == SaleOffOrderItem.CustomerCode
-                    })
-                    if(!Customer) {
-                        throw new Error(`Mã khách hàng [${SaleOffOrderItem.CustomerCode}] không tồn tại.`);
-                    }
-
-                    // SaleOffStock check
-                    let SaleOffStock = SaleOffStock_Master.find(item => {
-                        return item.ProductCode == SaleOffOrderItem.ProductCode
-                    })
-                    if(!SaleOffStock) {
-                        throw new Error(`Mã sản phẩm [${SaleOffOrderItem.ProductCode}] không tồn tại trong kho.`);
-                    }
-
-                    // Tính toán để trừ đi số lượng trong stock, lúc nay sẽ update lại SaleOffStock_Master luôn
-                    SaleOffStock_Master = SaleOffStock_Master.map(SaleOffStock => {
-                        // Cộng dồn nếu một đơn có nhiều sản phẩm giống nhau
-                        SaleOffStock.qtyNeeded = SaleOffStock.qtyNeeded ?? 0
-
-                        let CurrentQty = helper.unitQtyTransfer(SaleOffStock.LargeUnitQty, SaleOffStock.SmallUnitQty, SaleOffProduct)
-                        let OrderQty = helper.unitQtyTransfer(SaleOffOrderItem.LargeUnitQty, SaleOffOrderItem.SmallUnitQty, SaleOffProduct)
-
-                        if(SaleOffStock.ProductCode == SaleOffOrderItem.ProductCode) {
-                            CurrentQty -= OrderQty
-                            if(CurrentQty < 0) {
-                                throw new Error(`Mã sản phẩm [${SaleOffOrderItem.ProductCode}] không đủ số lượng.`);
-                            }
-                            
-                            // Gáng lại giá trị mới cho record stock
-                            let StockQty = helper.unitQtyLS(CurrentQty, SaleOffProduct)
-                            SaleOffStock.LargeUnitQty = StockQty.LargeUnitQty
-                            SaleOffStock.SmallUnitQty = StockQty.SmallUnitQty
-
-                            // Cộng dồn nếu một đơn có nhiều sản phẩm giống nhau
-                            SaleOffStock.qtyNeeded += OrderQty
+                for (const routeIndex in saleOffRoutes) {
+                    for(const orderItem of SaleOffRoutes[routeIndex].SaleOffOrderItems) {
+    
+                        // SaleOffProduct check
+                        let SaleOffProduct = SaleOffProduct_Master.find(item => {
+                            return item.ProductCode == orderItem.ProductCode
+                        })
+                        if(!SaleOffProduct) {
+                            throw new Error(`Mã sản phẩm [${orderItem.ProductCode}] không tồn tại.`);
                         }
-
-                        return SaleOffStock
-                    })
-
-                    let SaleOffOrderItem_Model = {
-                        OrderCode   : SaleOffOrder.OrderCode,
-
-                        SaleStaffId : SaleOffOrderItem.SaleStaffId,
-                        CustomerCode: SaleOffOrderItem.CustomerCode,
-                        ProductCode : SaleOffOrderItem.ProductCode,
-
-                        LargeUnitQty: SaleOffOrderItem.LargeUnitQty,
-                        SmallUnitQty: SaleOffOrderItem.SmallUnitQty,
+    
+                        // SaleStaff check
+                        let saleStaff = SaleStaff_Master.find(item => {
+                            return item.id == orderItem.SaleStaffId
+                        })
+                        if(!saleStaff) {
+                            throw new Error(`Mã nhân viên bán hàng [${orderItem.SaleStaffId}] không tồn tại.`);
+                        }
+    
+                        // Customer check
+                        let customer = Customer_Master.find(item => {
+                            return item.CustomerCode == orderItem.CustomerCode
+                        })
+                        if(!customer) {
+                            throw new Error(`Mã khách hàng [${orderItem.CustomerCode}] không tồn tại.`);
+                        }
+    
+                        // SaleOffStock check
+                        let saleOffStock = SaleOffStock_Master.find(item => {
+                            return item.ProductCode == orderItem.ProductCode
+                        })
+                        if(!saleOffStock) {
+                            throw new Error(`Mã sản phẩm [${orderItem.ProductCode}] không tồn tại trong kho.`);
+                        }
+    
+                        // Tính toán để trừ đi số lượng trong stock, lúc nay sẽ update lại SaleOffStock_Master luôn
+                        SaleOffStock_Master = SaleOffStock_Master.map(SaleOffStock => {
+                            // Cộng dồn nếu một đơn có nhiều sản phẩm giống nhau
+                            SaleOffStock.qtyNeeded = SaleOffStock.qtyNeeded ?? 0
+    
+                            let CurrentQty = helper.unitQtyTransfer(SaleOffStock.LargeUnitQty, SaleOffStock.SmallUnitQty, SaleOffProduct)
+                            let OrderQty = helper.unitQtyTransfer(orderItem.LargeUnitQty, orderItem.SmallUnitQty, SaleOffProduct)
+    
+                            if(SaleOffStock.ProductCode == orderItem.ProductCode) {
+                                CurrentQty -= OrderQty
+                                if(CurrentQty < 0) {
+                                    throw new Error(`Mã sản phẩm [${orderItem.ProductCode}] không đủ số lượng.`);
+                                }
+                                
+                                // Gáng lại giá trị mới cho record stock
+                                let StockQty = helper.unitQtyLS(CurrentQty, SaleOffProduct)
+                                SaleOffStock.LargeUnitQty = StockQty.LargeUnitQty
+                                SaleOffStock.SmallUnitQty = StockQty.SmallUnitQty
+    
+                                // Cộng dồn nếu một đơn có nhiều sản phẩm giống nhau
+                                SaleOffStock.qtyNeeded += OrderQty
+                            }
+    
+                            return SaleOffStock
+                        })
+    
+                        let SaleOffOrderItem_Model = {
+                            RouteId     : saleOffRoutes[routeIndex].id,
+    
+                            SaleStaffId : orderItem.SaleStaffId,
+                            CustomerCode: orderItem.CustomerCode,
+                            ProductCode : orderItem.ProductCode,
+    
+                            LargeUnitQty: orderItem.LargeUnitQty,
+                            SmallUnitQty: orderItem.SmallUnitQty,
+                        }
+    
+                        SaleOffOrderItem_Models.push(SaleOffOrderItem_Model)
                     }
-
-                    SaleOffOrderItem_Models.push(SaleOffOrderItem_Model)
                 }
 
                 /**
@@ -279,9 +243,42 @@ const SaleOffOrderController = {
                 })
             }
 
+            /**
+             *  Handle create route
+             * @param {SaleOffOrder} saleOffOrder
+             */
+            const bulkCreateRoute = async (saleOffOrder) => {
+                let SaleOffRoute_Models = []
+                for (const route of SaleOffRoutes) {
+                    SaleOffRoute_Models.push({
+                        OrderCode       : saleOffOrder.OrderCode,
+                        RouteNote       : route.RouteNote,
+                        DeliveryStaffId1: route.DeliveryStaffId1,
+                        DeliveryStaffId2: route.DeliveryStaffId2,
+                        DeliveryStaffId3: route.DeliveryStaffId3,
+                    })
+                }
+                
+                await SaleOffRoute.bulkCreate(SaleOffRoute_Models, {transaction: transaction}).then(async (saleOffRoutes) => {
+                    return await bulkCreateItem(saleOffRoutes)
+                })
+            }
+            
+            /**
+             * call create action
+             */
+            await SaleOffOrder.create({
+                OrderCode       : OrderCode,
+                OrderDate       : OrderDate,
+                OrderNote       : OrderNote,
+            }, {transaction: transaction}).then(async (saleOffOrder) => {
+                return await bulkCreateRoute(saleOffOrder)
+            })
+
             await transaction.commit();
             return res.json(success());
         } catch (err) {
+            console.log(err)
             await transaction.rollback();
             return res.json(error(err.message, 501));
         }
