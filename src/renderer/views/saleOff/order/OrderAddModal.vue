@@ -17,6 +17,7 @@
             </div>
             
             <div class="flex justify-end gap-3">
+                {{ getTotalPriceQty() }}
                 <button type="button" class="btn silver w-[6rem]" @click="reset()" tabindex="-1" :disabled="saleRoutes.length < 1">{{ t('button.reset') }}</button>
             </div>
             
@@ -207,10 +208,10 @@ import IconRemove from '@/views/component/icon/IconRemove.vue'
 
 const props = defineProps(['show'])
 const emit = defineEmits(['close', 'save'])
-const onClose = () => {
-    emit('close', true)
-}
 const reload = ref(false)
+const onClose = () => {
+    emit('close', reload.value)
+}
 const confirm = ref(null)
 const master = ref(store.master)
 const saleRoutes = computed(() => orderStore.saleRoutes)
@@ -336,7 +337,12 @@ const onSelectSaleStaff = (saleStaff) => {
     }
 }
 
+const getTotalPriceQty = () => {
+    return helper.format_number(saleRoutes.value.reduce((sum, item) => sum + item.SaleStaffs.reduce((sum, item) => sum + item.Customers.reduce((sum, item) => sum + item.Products.reduce((sum, item) => sum + item.PriceQty, 0), 0), 0), 0))
+}
+
 onBeforeMount(async () => {
+    await store.getMaster()
     if(!payload.value.OrderCode) {
         payload.value.OrderCode = helper.getOrderCode((master.value?.order_count ?? 0) + 1)
     }
@@ -437,28 +443,36 @@ const onSave = async () => {
             cancelButton: t("button.back"),
             type: 3
         })
+        return
     }
 
     const params = getParams()
 
-    const res = await orderStore.store(params).then((res) => {
-        if(res && res.code == 200) {
-            reload.value = true
-            return true
-        }
-        return false
+    const ok = await confirm.value.show({
+        title: t("title.confirm"),
+        message: 'Xác nhận xuất đơn có tổng giá trị: '+getTotalPriceQty(),
+        cancelButton: t("button.back"),
     })
-    if(res) {
-        await confirm.value.show({
-            title: t("title.notify"),
-            message: t("msg.save_ok"),
-            cancelButton: t("button.back"),
-            type: 1
+    if(ok) {
+        const res = await orderStore.store(params).then((res) => {
+            if(res && res.code == 200) {
+                reload.value = true
+                return true
+            }
+            return false
         })
-        orderStore.reset()
-        emit('save', reload.value)
+        if(res) {
+            await confirm.value.show({
+                title: t("title.notify"),
+                message: t("msg.save_ok"),
+                cancelButton: t("button.back"),
+                type: 1
+            })
+            await store.getMaster()
+            orderStore.reset(true)
+            emit('save', reload.value)
+        }
     }
-    
 }
 
 </script>

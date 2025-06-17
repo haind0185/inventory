@@ -4,16 +4,16 @@
             <div class="flex flex-col flex-1">
                 <div class="flex w-full gap-3">
                     <fieldset class="form-input w-[30%]">
-                        <legend>{{ $t("attr.exit.ExitCode") }}</legend>
-                        <input type="text" class="w-full form-control" v-model="search.ExitCode">
+                        <legend>{{ 'Mã xuất đơn' }}</legend>
+                        <input type="text" class="w-full form-control" v-model="search.OrderCode">
                     </fieldset>
     
                     <fieldset class="form-input w-[40%]">
-                        <legend>{{ $t("attr.exit.ExitDate") }}</legend>
+                        <legend>{{ 'Ngày xuất đơn' }}</legend>
                         <div class="flex gap-3">
-                            <date class="w-full from-control" v-model="search.ExitDateFrom" :max-date="search.ExitDateTo"></date>
+                            <date class="w-full from-control" v-model="search.OrderDateFrom" :max-date="search.OrderDateTo"></date>
                             ~
-                            <date class="w-full from-control" v-model="search.ExitDateTo" :min-date="search.ExitDateFrom"></date>
+                            <date class="w-full from-control" v-model="search.OrderDateTo" :min-date="search.OrderDateFrom"></date>
                         </div>
                     </fieldset>
                 </div>
@@ -26,12 +26,12 @@
 
         <div class="flex mt-5">
             <div class="w-[40%] flex">
-                <Pagination v-if="exits.total" v-model="search.page" class="mb-0" :page-count="exits.page_count ?? 0" :click-handler="pagination"></Pagination>
+                <Pagination v-if="orders.total" v-model="search.page" class="mb-0" :page-count="orders.page_count ?? 0" :click-handler="pagination"></Pagination>
                 
             </div>
             <div class="flex justify-center w-[20%] items-center">
-                <span v-if="exits.total">
-                    {{ format_number(exits.firstItem) }}-{{ format_number(exits.lastItem) }}/{{  format_number(exits.total) }}
+                <span v-if="orders.total">
+                    {{ format_number(orders.firstItem) }}-{{ format_number(orders.lastItem) }}/{{  format_number(orders.total) }}
                 </span>
             </div>
             <div class="flex justify-end w-[40%] gap-3">
@@ -43,54 +43,74 @@
             <table class="view-scroll t-border">
                 <thead>
                     <tr>
-                        <th class="" colspan="2">{{ $t("attr.exit.ProductNameLabel") }}</th>
-                        <th class="w-[4rem]">{{ $t("attr.exit.LargeUnitQty") }}</th>
-                        <th class="w-[4rem]">{{ $t("attr.exit.SmallUnitQty") }}</th>
-                        <th class="w-[5rem]">{{ $t("attr.exit.Price") }}</th>
-                        <th class="w-[6rem]">{{ $t("attr.exit.Qty") }}</th>
-                        <th class="w-[7rem]">{{ $t("attr.exit.PriceQty") }}</th>
-                        <th class="w-[12rem]">{{ $t("attr.exit.Note") }}</th>
+                        <th class="text-center w-[1.5rem]">T'</th>
+                        <th class="text-center w-[7rem]">NVGN</th>
+                        <th class="text-center w-[7rem]">NVBH</th>
+                        <th class="text-center w-[7rem]">Khách hàng</th>
+                        <th class="text-center">Sản phẩm</th>
+                        <th class="text-center">S.L.1</th>
+                        <th class="text-center">S.L.2</th>
+                        <th class="text-center">T.S.L</th>
+                        <th class="text-center">Đơn giá</th>
+                        <th class="text-center">Thành tiền</th>
+                        <th class="text-center">Ghi chú</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <template v-for="item in exits.items">
-                        <tr style="background: #dfe6f5; cursor: pointer;" @click="item.show = !item.show">
-                            <td class="w-[2.5rem] text-center show-list">{{ item.exits.length }}</td>
-                            <td colspan="5" class="text-left">
-                                [{{ item.show ? '-' : '+' }}] [Mã xuất: {{ item.ExitCode }}] [Ngày xuất: {{ item.ExitDate }}]
-                            </td>
-                            <td class="text-right">
-                                {{ format_number(item.PriceQty) }}
-                            </td>
-                            <td></td>
+                    <template v-for="(order, orderCount) in orders.items">
+                        <tr style="background: #dfe6f5; cursor: pointer;" @click="order.show = !order.show">
+                            <td class="text-center">[{{ order.show ? '-' : '+' }}]</td>
+                            <td colspan="8">[{{ order.OrderCode }}] [{{ displayDate(order.OrderDate) }}]</td>
+                            <td class="text-right !font-bold">{{ format_number(order.PriceQty) }}</td>
+                            <td>{{ order.OrderNote }}</td>
                         </tr>
-                        <tr v-for="(exit, index) in item.exits" v-show="item.show">
-                            <td class="text-center">{{ index+1 }}</td>
-                            <td class="text-left">{{ exit.product.ProductNameLabel }}</td>
-                            <td class="text-right">{{ format_number(exit.LargeUnitQty) }}</td>
-                            <td class="text-right">{{ format_number(exit.SmallUnitQty) }}</td>
-                            <td class="text-right">{{ format_number(exit.Price) }}</td>
-                            <td class="text-right">{{ format_number(exit.Qty) }}</td>
-                            <td class="text-right">{{ format_number(exit.PriceQty) }}</td>
-                            <td class="text-left">{{ exit.Note }}</td>
-                        </tr>
-                        <tr v-show="item.show">
-                            <td colspan="2" class="!font-bold text-right">Tổng cộng: </td>
-                            <td class="!font-bold text-right">
-                                {{ format_number(item.exits.reduce((sum, item) => sum + item.LargeUnitQty, 0)) }}
-                            </td>
-                            <td class="!font-bold text-right">
-                                {{ format_number(item.exits.reduce((sum, item) => sum + item.SmallUnitQty, 0)) }}
-                            </td>
-                            <td></td>
-                            <td class="!font-bold text-right">
-                                {{ format_number(item.exits.reduce((sum, item) => sum + item.Qty, 0)) }}
-                            </td>
-                            <td class="!font-bold text-right">
-                                {{ format_number(item.exits.reduce((sum, item) => sum + item.PriceQty, 0)) }}
-                            </td>
-                            <td></td>
-                        </tr>
+
+                        <template v-for="(saleRoute, saleRoutesCount) in order.saleRoutes">
+                            <template v-for="(saleStaff, saleStaffCount) in saleRoute.SaleStaffs">
+                                <template v-for="(customer, customerCount) in saleStaff.Customers">
+                                    <template v-for="(product, productCount) in customer.Products">
+                                        <tr v-show="order.show">
+                                            <td class="text-center" v-if="saleStaffCount == 0 && customerCount == 0 && productCount == 0" :rowspan="countNestedItems(saleRoute, ['SaleStaffs', 'Customers', 'Products'])">{{ saleRoutesCount+1 }}</td>
+                                            
+                                            <!-- DeliveryStaff -->
+                                            <td class="text-center " v-if="saleStaffCount == 0 && customerCount == 0 && productCount == 0" :rowspan="countNestedItems(saleRoute, ['SaleStaffs', 'Customers', 'Products'])">
+                                                <template v-for="(deliveryStaff, deliveryStaffCount) in saleRoute.DeliveryStaffs">
+                                                    {{ (deliveryStaffCount != 0 ? ', ' : '')+`${deliveryStaff.DeliveryStaffName}` }}
+                                                </template>
+                                                <br>
+                                                <span class="font-bold">{{ format_number(saleRoute.PriceQty) }}</span>
+                                            </td>
+                                            
+                                            <!-- SaleStaff -->
+                                            <td class="text-center row-left" v-if="customerCount == 0 && productCount == 0" :rowspan="countNestedItems(saleStaff, ['Customers', 'Products'])">
+                                                {{ saleStaff.SaleStaffName }}
+                                                <br>
+                                                <span class="font-bold">{{ format_number(saleStaff.Customers.reduce((sum, item) => sum + item.Products.reduce((sum, item) => sum + item.PriceQty, 0), 0)) }}</span>
+                                            </td>
+        
+                                            <!-- Customer -->
+                                            <td class="text-center row-left" v-if="productCount == 0" :rowspan="countNestedItems(customer, ['Products'])">
+                                                {{ customer.CustomerNameLabel }}
+                                                <br>
+                                                <span class="font-bold">{{ format_number(customer.Products.reduce((sum, item) => sum + item.PriceQty, 0)) }}</span>
+                                            </td>
+
+                                            <!-- Product -->
+                                            <td class="header-icon" :class="{'row-left': productCount > 0}">
+                                                {{ product.ProductNameLabel }}
+                                            </td>
+
+                                            <td class="text-right">{{ format_number(product.LargeUnitQty) }}</td>
+                                            <td class="text-right">{{ format_number(product.SmallUnitQty) }}</td>
+                                            <td class="text-right">{{ format_number(product.Qty) }}</td>
+                                            <td class="text-right">{{ format_number(product.Price) }}</td>
+                                            <td class="text-right">{{ format_number(product.PriceQty) }}</td>
+                                            <td class="">{{ product.OrderItemNote }}</td>
+                                        </tr>
+                                    </template>
+                                </template>
+                            </template>
+                        </template>
                     </template>
                 </tbody>
             </table>
@@ -106,38 +126,52 @@
 
 <script setup>
 import { onMounted, onBeforeMount, computed, watch, ref } from 'vue'
-import { exitStore } from '@/store/exit';
+import { orderStore } from '@/store/order';
 import { store } from '@/store';
 import { inventoryStore } from '@/store/inventory';
 import OrderAddModal from './OrderAddModal.vue';
 
 const showAdd = ref(false)
-const search = computed(() => exitStore.search)
-const exits = ref({})
+const search = computed(() => orderStore.search)
+const orders = ref({})
+const master = ref()
 
+const countNestedItems = (obj, path) => {
+    if (!obj || !Array.isArray(path) || path.length === 0) return 0
+
+    let nodes = [obj]
+
+    for (const key of path) {
+        nodes = nodes.flatMap(item => {
+            const next = item[key]
+            return Array.isArray(next) ? next : []
+        });
+    }
+
+    return nodes.length
+}
 const onShowAdd = async () => {
     showAdd.value = true
-    // await inventoriesList()
 }
 const onCloseAdd = (event) => {
     showAdd.value = false
     if(event) {
-        // index()
+        index()
     }
 }
 const onSaveAdd = (event) => {
     showAdd.value = false
     if(event) {
-        // index()
+        index()
     }
 }
 
 const clear = async () => {
-    exitStore.resetSearch()
+    orderStore.resetSearch()
     await index()
 }
 const index = async () => {
-    await exitStore.index(search.value).then((res) => {
+    await orderStore.index(search.value).then((res) => {
         if(res && res.code == 200) {
             setData(res.data)
         }
@@ -145,15 +179,77 @@ const index = async () => {
 }
 
 const setData = (data) => {
-    exits.value = data
-    exits.value.items.map(item => {
-        item.show = false
-        return item
+    orders.value = data
+    orders.value.items.map(order => {
+        let SaleOffRoutes = []
+        
+        order.saleOffRoutes.forEach(route => {
+            let SaleRoute = SaleOffRoutes.find(c => c.id === route.id);
+            if(!SaleRoute) {
+                SaleRoute = {
+                    DeliveryStaffs: [],
+                    SaleStaffs: [],
+                    id: parseInt(route.id),
+                    PriceQty: route.PriceQty
+                }
+                SaleOffRoutes.push(SaleRoute)
+            }
+            let saleRouteIndex = SaleOffRoutes.findIndex(c => c.id === SaleRoute.id)
+
+            if(route.DeliveryStaffId1) {
+                SaleOffRoutes[saleRouteIndex].DeliveryStaffs.push(route.deliveryStaff1)
+            }
+            if(route.DeliveryStaffId2) {
+                SaleOffRoutes[saleRouteIndex].DeliveryStaffs.push(route.deliveryStaff2)
+            }
+            if(route.DeliveryStaffId3) {
+                SaleOffRoutes[saleRouteIndex].DeliveryStaffs.push(route.deliveryStaff3)
+            }
+            
+            route.saleOffOrderItems.forEach(orderItem => {
+                let SaleStaff = SaleOffRoutes[saleRouteIndex].SaleStaffs.find(c => c.id === orderItem.SaleStaffId)
+                if(!SaleStaff) {
+                    SaleStaff = orderItem.saleStaff
+                    SaleStaff.Customers = []
+                    
+                    SaleOffRoutes[saleRouteIndex].SaleStaffs.push(SaleStaff)
+                }
+                const staffIndex = SaleOffRoutes[saleRouteIndex].SaleStaffs.findIndex(c => c.id === SaleStaff.id)
+
+                let Customer = SaleStaff.Customers.find(c => c.CustomerCode === orderItem.CustomerCode)
+                if(!Customer) {
+                    Customer = orderItem.customer
+                    Customer.Products = []
+                    
+                    SaleOffRoutes[saleRouteIndex].SaleStaffs[staffIndex].Customers.push(Customer)
+                }
+                const customerIndex = SaleOffRoutes[saleRouteIndex].SaleStaffs[staffIndex].Customers.findIndex(c => c.CustomerCode === Customer.CustomerCode)
+
+                let Product = Customer.Products.find(c => c.ProductCode === orderItem.CustomerCode)
+                if(!Product) {
+                    Product = orderItem.saleOffProduct
+
+                    Product.LargeUnitQty  = orderItem.LargeUnitQty
+                    Product.SmallUnitQty  = orderItem.SmallUnitQty
+                    Product.OrderItemNote = orderItem.OrderItemNote
+                    Product.Qty           = orderItem.Qty
+                    Product.PriceQty      = orderItem.PriceQty
+
+                    SaleOffRoutes[saleRouteIndex].SaleStaffs[staffIndex].Customers[customerIndex].Products.push(Product)
+                }
+            })
+        })
+
+        order.saleRoutes = SaleOffRoutes
+        order.show = false
+
+        return order
     })
+    console.log(orders.value)
 }
 
 const sort = async () => {
-    if (exits.value.total > 0) {
+    if (orders.value.total > 0) {
         search.value.page = 1
         await index()
     }
@@ -164,19 +260,11 @@ const pagination = (page) => {
     index()
 }
 
-const inventoriesList = async () => {
-    await inventoryStore.list().then((res) => {
-        if(res && res.code == 200) {
-            exitStore.setInventories(res.data.items)
-            return true
-        }
-    })
-}
-
 onBeforeMount(async () => {
     await store.getMaster()
+    master.value = store.findMaster
+    await index()
 })
 onMounted(async () => {
-    await index()
 })
 </script>

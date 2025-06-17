@@ -44,6 +44,9 @@ const createStore = defineStore('app', {
         getUser: (state) => {
             return !state.user.data || Object.keys(state.user.data).length === 0 ? null : JSON.parse(state.user.data)
         },
+        findMaster: (state) => {
+            return state.master
+        }
     },
     actions: {
         // api

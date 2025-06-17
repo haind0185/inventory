@@ -15,6 +15,18 @@ const SaleOffOrder = sequelize.define('SaleOffOrder', {
         type: DataTypes.STRING,
         allowNull: true,
     },
+
+    PriceQty: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            if(this.saleOffRoutes.length < 0) return 0
+            let total = 0
+            this.saleOffRoutes.forEach(item => {
+                total += item.PriceQty
+            });
+            return total
+        }
+    },
 });
 
 export default SaleOffOrder;

@@ -1,5 +1,6 @@
 import sequelize from './index';
 import DeliveryStaff from './DeliveryStaff';
+import SaleOffOrder from './SaleOffOrder';
 const { DataTypes } = require('sequelize');
 
 const SaleOffRoute = sequelize.define('SaleOffRoute', {
@@ -36,7 +37,22 @@ const SaleOffRoute = sequelize.define('SaleOffRoute', {
             key: 'id',
         },
     },
+
+    PriceQty: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            if(this.saleOffOrderItems.length < 0) return 0
+            let total = 0
+            this.saleOffOrderItems.forEach(item => {
+                total += item.PriceQty
+            });
+            return total
+        }
+    },
 });
+
+SaleOffOrder.hasMany(SaleOffRoute, { foreignKey: 'OrderCode', sourceKey: 'OrderCode', as: 'saleOffRoutes' });
+SaleOffRoute.belongsTo(SaleOffOrder, { foreignKey: 'OrderCode', targetKey: 'OrderCode', as: 'saleOffOrder' });
 
 DeliveryStaff.hasMany(SaleOffRoute, { foreignKey: 'DeliveryStaffId1', sourceKey: 'id', as: 'saleOfOrders1' });
 DeliveryStaff.hasMany(SaleOffRoute, { foreignKey: 'DeliveryStaffId2', sourceKey: 'id', as: 'saleOfOrders2' });

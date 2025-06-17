@@ -16,6 +16,92 @@ const { Op } = require("sequelize");
 const Joi = require('joi');
 
 const SaleOffOrderController = {
+    index: async (req, res) => {
+        try {
+            console.log(req.query)
+
+            /**
+             * set condition
+             */
+            const where = {}
+
+            if(req.query.OrderCode) {
+                where.OrderCode = { [Op.like]: `%${req.query.OrderCode}%` }
+            }
+
+            if(req.query.OrderDateFrom) {
+                where.OrderDate = { ...where.OrderDate, [Op.gte]: `${req.query.OrderDateFrom}` }
+            }
+
+            if(req.query.OrderDateTo) {
+                where.OrderDate = { ...where.OrderDate, [Op.lte]: `${req.query.OrderDateTo}` }
+            }
+
+            /**
+             * order
+             */
+            const order_list = ['OrderCode', 'OrderDate']
+            let order = []
+            if(order_list.includes(req.query.sort)) {
+                let sort_by = req.query.sort_by == 'desc' ? 'desc' : 'asc'
+                order = [req.query.sort, sort_by]
+            }
+
+            /**
+             * page and limit a page
+             */
+            const limit = 50
+            let offset = req.query.page ? ((req.query.page - 1) * limit) : 0
+            
+            /**
+             * call select action
+             */
+            const total = await SaleOffOrder.count({
+                where: where,
+            })
+
+            let orders = []
+            if(total > 0) {
+                orders = await SaleOffOrder.findAll({
+                    where: where,
+                    order: order.length > 0 ? [order, ['OrderDate', 'DESC'], ['id', 'DESC']] : [['OrderDate', 'DESC'], ['id', 'DESC']],
+                    limit: limit,
+                    offset: offset,
+                    include: [
+                        { 
+                            association: 'saleOffRoutes',
+                            include: [
+                                { 
+                                    association: 'saleOffOrderItems',
+                                    include: [
+                                        { association: 'saleOffProduct' },
+                                        { association: 'customer'},
+                                        { association: 'saleStaff' }
+                                    ]
+                                },
+                                { association: 'deliveryStaff1' },
+                                { association: 'deliveryStaff2' },
+                                { association: 'deliveryStaff3' },
+                            ]
+                        }
+                    ]
+                });
+            }
+
+            let page = parseInt(req.query.page ?? 0)
+
+            return res.json(success({
+                items: orders,
+                total: total,
+                page: page,
+                page_count: Math.ceil(total / limit),
+                firstItem: orders.length ? (((page - 1) * limit) + 1) : 0,
+                lastItem: orders.length ? ((page * limit) <= total ? (page * limit) : total) : 0,
+            }));
+        } catch (err) {
+            return res.json(error(err.message, 501));
+        }
+    },
     store: async (req, res) => {
         const transaction = await sequelize.transaction();
         try {

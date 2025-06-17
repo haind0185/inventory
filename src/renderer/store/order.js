@@ -5,10 +5,10 @@ import { store } from '.'
 import { helper } from '@/helper'
 
 const initSearch = {
-    ExitCode: null,
-    ExitDate: null,
-    ExitDateFrom: null,
-    ExitDateTo: null,
+    OrderCode: null,
+    OrderDate: null,
+    OrderDateFrom: null,
+    OrderDateTo: null,
     sort: null,
     sort_by: null,
     page: 1
@@ -97,8 +97,13 @@ const createStore = defineStore('order', {
         resetSearch() {
             this.search = {...this.search, ...initSearch}
         },
-        reset() {
-            this.saleRoutes =[]
+        reset(all = false) {
+            this.saleRoutes = [
+                helper.deepClone(saleRouteInit),
+            ]
+            if(all) {
+                this.payload = {...payloadInit}
+            }
         },
         routeAdd() {
             let saleRoute = helper.deepClone(saleRouteInit)

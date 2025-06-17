@@ -4,6 +4,7 @@ import SaleStaff from './SaleStaff';
 import Customer from './Customer';
 import SaleOffProduct from './SaleOffProduct';
 import SaleOffRoute from './SaleOffRoute';
+import { helper } from '../../src/renderer/helper'
 const { DataTypes } = require('sequelize');
 
 const SaleOffOrderItem = sequelize.define('SaleOffOrderItem', {
@@ -52,6 +53,22 @@ const SaleOffOrderItem = sequelize.define('SaleOffOrderItem', {
         type: DataTypes.FLOAT,
         allowNull: false,
         defaultValue: 0,
+    },
+
+    Qty: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            if(!this.saleOffProduct) return 0
+            return helper.unitQtyTransfer(this.LargeUnitQty, this.SmallUnitQty, this.saleOffProduct)
+        }
+    },
+    PriceQty: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            if(!this.saleOffProduct) return 0
+            let Qty = helper.unitQtyTransfer(this.LargeUnitQty, this.SmallUnitQty, this.saleOffProduct)
+            return Qty * this.saleOffProduct.Price
+        }
     },
 });
 
