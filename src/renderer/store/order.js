@@ -43,6 +43,7 @@ const deliveryStaffInit = {
 const saleRouteInit = {
     DeliveryStaffs: [ helper.deepClone(deliveryStaffInit) ],
     SaleStaffs: [ helper.deepClone(saleStaffInit) ],
+    RouteNote: null,
     Background: helper.getBG()
 }
 

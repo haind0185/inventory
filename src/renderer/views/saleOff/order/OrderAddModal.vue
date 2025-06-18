@@ -75,6 +75,7 @@
                                                                 <IconRemove v-tooltip="{ content: 'Xóa bỏ NVGN này', placement: 'top' }" @click="orderStore.deliveryStaffRemove(saleRoute, deliveryStaffCount)" v-show="saleRoute.DeliveryStaffs.length > 1"></IconRemove>
                                                             </div>
                                                         </template>
+                                                        <input type="text" class="w-[8rem] form-control" v-model="saleRoute.RouteNote" maxlength="200" placeholder="Ghi chú" tabindex="-1">
                                                     </div>
         
                                                     <span class="header-icon-action" @click="orderStore.deliveryStaffAdd(saleRoute)" v-if="saleRoute.DeliveryStaffs.length < 3">
@@ -326,6 +327,11 @@ const onChangeProduct = (product) => {
 }
 
 const onSelectSaleStaff = (saleStaff) => {
+    for(const customer of saleStaff.Customers) {
+        if(customer.CustomerCode) {
+            return;
+        }
+    }
     const staff = master.value.saleStaffs.find((item) => {
         return item.id == saleStaff.id
     })
@@ -385,7 +391,7 @@ const getParams = () => {
     let SaleOffRoutes = []
     for (let saleRoute of saleRoutes.value) {
         let SaleOffRoute = {
-            RouteNote: null,
+            RouteNote: saleRoute.RouteNote,
             DeliveryStaffId1: null,
             DeliveryStaffId2: null,
             DeliveryStaffId3: null,

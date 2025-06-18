@@ -79,6 +79,8 @@
                                                 </template>
                                                 <br>
                                                 <span class="font-bold">{{ format_number(saleRoute.PriceQty) }}</span>
+                                                <br>
+                                                <span class="">{{ saleRoute.RouteNote ? `(${saleRoute.RouteNote})` : '' }}</span>
                                             </td>
                                             
                                             <!-- SaleStaff -->
@@ -196,6 +198,8 @@ const setData = (data) => {
             }
             let saleRouteIndex = SaleOffRoutes.findIndex(c => c.id === SaleRoute.id)
 
+            SaleOffRoutes[saleRouteIndex].RouteNote = route.RouteNote
+            
             if(route.DeliveryStaffId1) {
                 SaleOffRoutes[saleRouteIndex].DeliveryStaffs.push(route.deliveryStaff1)
             }
