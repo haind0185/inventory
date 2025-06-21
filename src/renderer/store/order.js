@@ -101,6 +101,18 @@ const createStore = defineStore('order', {
                     return false
                 })
         },
+        async destroy(payload) {
+            store.setLoading(true)
+            return await api.post(`/sale-off/order/delete`, payload)
+                .then((res) => {
+                    store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
 
         // mutation
         setSearch() {

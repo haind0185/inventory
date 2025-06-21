@@ -187,6 +187,7 @@
             <div class="py-1">
                 <div class="flex justify-around w-full">
                     <button type="button" class="btn silver w-[6rem]" @click="onClose()" tabindex="-1">{{ $t("button.cancel") }}</button>
+                    <button type="button" class="btn red w-[6rem]" @click="onDelete()" tabindex="-1">{{ $t("button.delete") }}</button>
                     <button type="submit" class="btn w-[6rem]" :disabled="saleRoutes.length < 1" tabindex="-1">{{ $t("button.save") }}</button>
                 </div>
             </div>
@@ -490,6 +491,26 @@ const onSave = async () => {
             })
             await store.getMaster()
             orderStore.reset(true)
+            emit('save', reload.value)
+        }
+    }
+}
+const onDelete = async () => {
+    const ok = await confirm.value.show({
+        title: t("title.confirm"),
+        message: 'Xác nhận xóa đơn: '+order.OrderCode,
+        cancelButton: t("button.back"),
+    })
+    if(ok) {
+        await confirm.value.close()
+        const res = await orderStore.destroy({OrderCode: order.OrderCode}).then((res) => {
+            if (res && res.code == 200) {
+                reload.value = true
+                return true
+            }
+            return false
+        })
+        if(res) {
             emit('save', reload.value)
         }
     }
