@@ -122,6 +122,7 @@ import { saleOffProductStore } from '@/store/saleOffProduct';
 import StockInAddModal from './StockInAddModal.vue';
 import StockInDetailModal from './StockInDetailModal.vue';
 import { t } from '@/i18n'
+import { store } from '@/store'
 
 const showAdd = ref(false)
 const showDetail = ref({
@@ -224,6 +225,7 @@ const pagination = (page) => {
 }
 
 onMounted(async () => {
+    await store.getMaster()
     await index()
 })
 </script>

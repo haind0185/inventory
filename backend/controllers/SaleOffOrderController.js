@@ -128,7 +128,8 @@ const SaleOffOrderController = {
 
             // 2. SaleOffRoutes
             const routeSchema = Joi.object({
-                RouteNote: Joi.string().allow(null, '').min(0).max(200),
+                RouteNote       : Joi.string().allow(null, '').min(0).max(200),
+                RouteQty        : Joi.number().required().min(0),
                 DeliveryStaffId1: Joi.number().required().min(0),
                 DeliveryStaffId2: Joi.number().allow(null).min(1),
                 DeliveryStaffId3: Joi.number().allow(null).min(1),
@@ -340,6 +341,7 @@ const SaleOffOrderController = {
                     SaleOffRoute_Models.push({
                         OrderCode       : saleOffOrder.OrderCode,
                         RouteNote       : route.RouteNote,
+                        RouteQty        : route.RouteQty,
                         DeliveryStaffId1: route.DeliveryStaffId1,
                         DeliveryStaffId2: route.DeliveryStaffId2,
                         DeliveryStaffId3: route.DeliveryStaffId3,
@@ -396,7 +398,8 @@ const SaleOffOrderController = {
 
             // 2. SaleOffRoutes
             const routeSchema = Joi.object({
-                RouteNote: Joi.string().allow(null, '').min(0).max(200),
+                RouteNote       : Joi.string().allow(null, '').min(0).max(200),
+                RouteQty        : Joi.number().required().min(0),
                 DeliveryStaffId1: Joi.number().required().min(0),
                 DeliveryStaffId2: Joi.number().allow(null).min(1),
                 DeliveryStaffId3: Joi.number().allow(null).min(1),
@@ -621,6 +624,7 @@ const SaleOffOrderController = {
                     SaleOffRoute_Models.push({
                         OrderCode       : saleOffOrder.OrderCode,
                         RouteNote       : route.RouteNote,
+                        RouteQty        : route.RouteQty,
                         DeliveryStaffId1: route.DeliveryStaffId1,
                         DeliveryStaffId2: route.DeliveryStaffId2,
                         DeliveryStaffId3: route.DeliveryStaffId3,

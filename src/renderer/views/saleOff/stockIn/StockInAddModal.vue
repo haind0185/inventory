@@ -113,9 +113,11 @@
 
 <script setup>
 import { onMounted, onBeforeMount, ref, watch } from 'vue'
+import moment from 'moment'
 import { t } from '@/i18n'
 import { saleOffProductStore } from '@/store/saleOffProduct';
 import { stockInStore } from '@/store/stockIn';
+import { store } from '@/store'
 import { helper } from '@/helper'
 import { computed } from 'vue';
 
@@ -128,6 +130,7 @@ const payload = computed(() => stockInStore.payload)
 const stockInItems = computed(() => stockInStore.items)
 const products = computed(() => saleOffProductStore.products)
 const confirm = ref(null)
+const master = ref(store.master)
 const reload = ref(false)
 const file = ref(null)
 const price_total = ref(null)
@@ -216,7 +219,14 @@ const reset = () => {
 }
 
 onBeforeMount(async () => {
-    // await saleOffProductStore.list()
+    await store.getMaster()
+    if(!payload.value.StockInCode) {
+        console.log(master.value)
+        payload.value.StockInCode = helper.getStockInCode((master.value?.stock_count ?? 0) + 1)
+    }
+    if(!payload.value.StockInDate) {
+        payload.value.StockInDate = moment()
+    }
 })
 onMounted(async () => {
 })

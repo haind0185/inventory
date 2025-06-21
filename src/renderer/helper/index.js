@@ -218,7 +218,10 @@ const functions = {
     },
     getOrderCode: (no) => {
         return `X${moment().format('YYYYMMDD')}${no.toString().padStart(2, 0)}`
-    }
+    },
+    getStockInCode: (no) => {
+        return `N${moment().format('YYYYMMDD')}${no.toString().padStart(2, 0)}`
+    },
 }
 
 const helpers = {

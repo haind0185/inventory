@@ -75,7 +75,7 @@
                                                                 <IconRemove v-tooltip="{ content: 'Xóa bỏ NVGN này', placement: 'top' }" @click="orderStore.deliveryStaffRemove(saleRoute, deliveryStaffCount)" v-show="saleRoute.DeliveryStaffs.length > 1"></IconRemove>
                                                             </div>
                                                         </template>
-                                                        <input type="text" class="w-[8rem] flex-1 text-right form-control" v-model="saleRoute.RouteQty" min="0" v-select-on-focus>
+                                                        <span class="px-3">{{ format_number(saleRoute.RouteQty) }}</span>
                                                         <input type="text" class="w-[8rem] form-control" v-model="saleRoute.RouteNote" maxlength="200" placeholder="Ghi chú" tabindex="-1">
                                                     </div>
         
@@ -304,7 +304,6 @@ const getProducts = (customer) => {
     return products
 }
 
-
 const onChangeProduct = (product) => {
     let prod = findProduct(product.ProductCode)
 
@@ -349,7 +348,8 @@ const getTotalPriceQty = () => {
 }
 const setRouteQty = (saleRoute) => {
     let qty = saleRoute.SaleStaffs.reduce((sum, item) => sum + item.Customers.reduce((sum, item) => sum + item.Products.reduce((sum, item) => sum + item.PriceQty, 0), 0), 0) * 0.003
-    saleRoute.RouteQty = Math.floor(qty / 1000) * 1000;
+    // saleRoute.RouteQty = helper.format_number(Math.floor(qty / 1000) * 1000)
+    saleRoute.RouteQty = Math.floor(qty / 1000) * 1000
 }
 
 onBeforeMount(async () => {
@@ -466,6 +466,7 @@ const onSave = async () => {
         cancelButton: t("button.back"),
     })
     if(ok) {
+        await confirm.value.close()
         const res = await orderStore.store(params).then((res) => {
             if(res && res.code == 200) {
                 reload.value = true

@@ -75,6 +75,7 @@
                                                                 <IconRemove v-tooltip="{ content: 'Xóa bỏ NVGN này', placement: 'top' }" @click="orderStore.deliveryStaffRemove(saleRoute, deliveryStaffCount)" v-show="saleRoute.DeliveryStaffs.length > 1"></IconRemove>
                                                             </div>
                                                         </template>
+                                                        <input type="number" class="w-[8rem] flex-1 text-right form-control" v-model="saleRoute.RouteQty" min="0" v-select-on-focus>
                                                         <input type="text" class="w-[8rem] form-control" v-model="saleRoute.RouteNote" maxlength="200" placeholder="Ghi chú" tabindex="-1">
                                                     </div>
         
@@ -172,7 +173,7 @@
                                             <td class="text-right">{{ product.PriceLabel }}</td>
                                             <td class="text-right">{{ product.PriceQtyLabel }}</td>
                                             <td>
-                                                <input type="text" class="w-[8rem] form-control" v-model="product.Note" maxlength="200">
+                                                <input type="text" class="w-[8rem] form-control" v-model="product.Note" placeholder="Ghi chú" maxlength="200">
                                             </td>
                                         </tr>
                                     </template>
@@ -407,6 +408,7 @@ const getParams = () => {
     for (let saleRoute of saleRoutes.value) {
         let SaleOffRoute = {
             RouteNote: saleRoute.RouteNote,
+            RouteQty: saleRoute.RouteQty,
             DeliveryStaffId1: null,
             DeliveryStaffId2: null,
             DeliveryStaffId3: null,
@@ -428,6 +430,7 @@ const getParams = () => {
             for (let customer of saleStaff.Customers) {
                 for (let product of customer.Products) {
                     let SaleOffOrderItem = {
+                        OrderItemNote: null,
                         OrderItemNote: null,
                         SaleStaffId: null,
                         CustomerCode: null,
@@ -475,6 +478,7 @@ const onSave = async () => {
         cancelButton: t("button.back"),
     })
     if(ok) {
+        await confirm.value.close()
         const res = await orderStore.update(params).then((res) => {
             if(res && res.code == 200) {
                 reload.value = true

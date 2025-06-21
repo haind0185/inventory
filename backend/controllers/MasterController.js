@@ -3,6 +3,7 @@ import Customer from '../models/Customer';
 import DeliveryStaff from '../models/DeliveryStaff';
 import SaleStaff from '../models/SaleStaff';
 import SaleOffStock from '../models/SaleOffStock';
+import SaleOffStockIn from '../models/SaleOffStockIn';
 import SaleOffOrder from '../models/SaleOffOrder';
 import { error, success } from './common/http';
 import moment from 'moment';
@@ -39,6 +40,12 @@ const MasterController = {
                 }
             });
 
+            const stock_count = await SaleOffStockIn.count({
+                where: {
+                    'StockInDate': moment().format('YYYY-MM-DD')
+                }
+            });
+
             return res.json(success({
                 products      : products,
                 customers     : customers,
@@ -46,6 +53,7 @@ const MasterController = {
                 saleStaffs    : saleStaffs,
                 stocks        : stocks,
                 order_count   : order_count,
+                stock_count   : stock_count,
             }));
         } catch (err) {
             return res.json(error(err.message, 501));

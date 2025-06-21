@@ -85,6 +85,7 @@
                                                 <br>
                                                 <span class="font-bold">{{ format_number(saleRoute.PriceQty) }}</span>
                                                 <br>
+                                                <span class="text-pink-700">{{ format_number(saleRoute.RouteQty) }}</span>
                                                 <span class="">{{ saleRoute.RouteNote ? `(${saleRoute.RouteNote})` : '' }}</span>
                                             </td>
                                             
@@ -230,6 +231,7 @@ const setData = (data) => {
             let saleRouteIndex = SaleOffRoutes.findIndex(c => c.id === SaleRoute.id)
 
             SaleOffRoutes[saleRouteIndex].RouteNote = route.RouteNote
+            SaleOffRoutes[saleRouteIndex].RouteQty = route.RouteQty
             
             if(route.DeliveryStaffId1) {
                 SaleOffRoutes[saleRouteIndex].DeliveryStaffs.push(route.deliveryStaff1)
