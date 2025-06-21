@@ -89,6 +89,18 @@ const createStore = defineStore('order', {
                     return false
                 })
         },
+        async update(payload) {
+            store.setLoading(true)
+            return await api.put(`/sale-off/order`, payload)
+                .then((res) => {
+                    store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
 
         // mutation
         setSearch() {
@@ -149,6 +161,12 @@ const createStore = defineStore('order', {
             return this.stocks.find(item => {
                 return item.ProductCode == ProductCode
             })?.product
+        },
+        setPayload(data) {
+            this.payload = helper.deepClone(data)
+        },
+        setSaleRoutes(data) {
+            this.saleRoutes = helper.deepClone(data)
         }
     },
 })

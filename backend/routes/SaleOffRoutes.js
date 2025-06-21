@@ -51,6 +51,8 @@ router.get('/stock/totalPrice', SaleOffStockController.totalPrice);
 
 router.get('/order', SaleOffOrderController.index);
 router.post('/order', SaleOffOrderController.store);
+router.put('/order', SaleOffOrderController.update);
+router.post('/order/delete', SaleOffOrderController.delete);
 
 
 const SaleOffRouter = router;

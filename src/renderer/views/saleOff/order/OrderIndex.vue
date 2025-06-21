@@ -60,7 +60,12 @@
                     <template v-for="(order, orderCount) in orders.items">
                         <tr style="background: #dfe6f5; cursor: pointer;" @click="order.show = !order.show">
                             <td class="text-center">[{{ order.show ? '-' : '+' }}]</td>
-                            <td colspan="8">[{{ order.OrderCode }}] [{{ displayDate(order.OrderDate) }}]</td>
+                            <td colspan="7">[{{ order.OrderCode }}] [{{ displayDate(order.OrderDate) }}]</td>
+                            <td colspan="1" style="cursor: default;">
+                                <div class="flex justify-end w-full">
+                                    <a href="javascript:void(0)" class="link" @click="onShowDetail(order)" tabindex="-1">Chi tiết</a>
+                                </div>
+                            </td>
                             <td class="text-right !font-bold">{{ format_number(order.PriceQty) }}</td>
                             <td>{{ order.OrderNote }}</td>
                         </tr>
@@ -123,6 +128,13 @@
             :show="showAdd"
             @close="onCloseAdd($event)"
             @save="onSaveAdd($event)" />
+
+        <OrderDetailModal
+            v-if="showDetail"
+            :show="showDetail"
+            :order="detail"
+            @close="onCloseDetail($event)"
+            @save="onSaveDetail($event)" />
     </div>
 </template>
 
@@ -132,11 +144,14 @@ import { orderStore } from '@/store/order';
 import { store } from '@/store';
 import { inventoryStore } from '@/store/inventory';
 import OrderAddModal from './OrderAddModal.vue';
+import OrderDetailModal from './OrderDetailModal.vue';
 
 const showAdd = ref(false)
+const showDetail = ref(false)
 const search = computed(() => orderStore.search)
-const orders = ref({})
 const master = ref()
+const orders = ref({})
+const detail = ref({})
 
 const countNestedItems = (obj, path) => {
     if (!obj || !Array.isArray(path) || path.length === 0) return 0
@@ -163,6 +178,22 @@ const onCloseAdd = (event) => {
 }
 const onSaveAdd = (event) => {
     showAdd.value = false
+    if(event) {
+        index()
+    }
+}
+const onShowDetail = (order) => {
+    showDetail.value = true
+    detail.value = order
+}
+const onCloseDetail = (event) => {
+    showDetail.value = false
+    if(event) {
+        index()
+    }
+}
+const onSaveDetail = (event) => {
+    showDetail.value = false
     if(event) {
         index()
     }
@@ -249,7 +280,6 @@ const setData = (data) => {
 
         return order
     })
-    console.log(orders.value)
 }
 
 const sort = async () => {
