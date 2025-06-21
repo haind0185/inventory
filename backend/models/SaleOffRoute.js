@@ -13,6 +13,11 @@ const SaleOffRoute = sequelize.define('SaleOffRoute', {
         type: DataTypes.STRING,
         allowNull: true,
     },
+    RouteQty: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        defaultValue: 0,
+    },
     DeliveryStaffId1: {
         type: DataTypes.STRING,
         allowNull: false,

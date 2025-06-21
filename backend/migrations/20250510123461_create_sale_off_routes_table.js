@@ -25,6 +25,11 @@ export const create_sale_off_routes = {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
+            RouteQty: {
+                type: DataTypes.FLOAT,
+                allowNull: false,
+                default: 0,
+            },
             DeliveryStaffId1: {
                 type: DataTypes.STRING,
                 allowNull: false,

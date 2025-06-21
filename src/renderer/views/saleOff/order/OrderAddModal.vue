@@ -75,6 +75,7 @@
                                                                 <IconRemove v-tooltip="{ content: 'Xóa bỏ NVGN này', placement: 'top' }" @click="orderStore.deliveryStaffRemove(saleRoute, deliveryStaffCount)" v-show="saleRoute.DeliveryStaffs.length > 1"></IconRemove>
                                                             </div>
                                                         </template>
+                                                        <input type="text" class="w-[8rem] flex-1 text-right form-control" v-model="saleRoute.RouteQty" min="0" v-select-on-focus>
                                                         <input type="text" class="w-[8rem] form-control" v-model="saleRoute.RouteNote" maxlength="200" placeholder="Ghi chú" tabindex="-1">
                                                     </div>
         
@@ -159,13 +160,13 @@
     
                                             <td width="6rem">
                                                 <div class="flex items-center gap-1">
-                                                    <input type="number" class="w-[4rem] text-right form-control" v-model="product.LargeUnitQty" min="0" v-select-on-focus>
+                                                    <input type="number" class="w-[4rem] text-right form-control" v-model="product.LargeUnitQty" min="0" v-select-on-focus :update:modelValue="setRouteQty(saleRoute)">
                                                     <span class="w-[3rem] text-sm pl-1">{{ getLargeUnit(product.ProductCode) }}</span>
                                                 </div>
                                             </td>
                                             <td width="6rem">
                                                 <div class="flex items-center gap-1">
-                                                    <input type="number" class="w-[4rem] flex-1 text-right form-control" v-model="product.SmallUnitQty" min="0" v-select-on-focus>
+                                                    <input type="number" class="w-[4rem] flex-1 text-right form-control" v-model="product.SmallUnitQty" min="0" v-select-on-focus :update:modelValue="setRouteQty(saleRoute)">
                                                     <span class="w-[3rem] text-sm pl-1">{{ getSmallUnit(product.ProductCode) }}</span>
                                                 </div>
                                             </td>
@@ -346,6 +347,10 @@ const onSelectSaleStaff = (saleStaff) => {
 const getTotalPriceQty = () => {
     return helper.format_number(saleRoutes.value.reduce((sum, item) => sum + item.SaleStaffs.reduce((sum, item) => sum + item.Customers.reduce((sum, item) => sum + item.Products.reduce((sum, item) => sum + item.PriceQty, 0), 0), 0), 0))
 }
+const setRouteQty = (saleRoute) => {
+    let qty = saleRoute.SaleStaffs.reduce((sum, item) => sum + item.Customers.reduce((sum, item) => sum + item.Products.reduce((sum, item) => sum + item.PriceQty, 0), 0), 0) * 0.003
+    saleRoute.RouteQty = Math.floor(qty / 1000) * 1000;
+}
 
 onBeforeMount(async () => {
     await store.getMaster()
@@ -392,6 +397,7 @@ const getParams = () => {
     for (let saleRoute of saleRoutes.value) {
         let SaleOffRoute = {
             RouteNote: saleRoute.RouteNote,
+            RouteQty: saleRoute.RouteQty,
             DeliveryStaffId1: null,
             DeliveryStaffId2: null,
             DeliveryStaffId3: null,

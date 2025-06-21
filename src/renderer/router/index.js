@@ -155,6 +155,27 @@ const routes = [
                             }
                         ]
                     },
+                    {
+                        path: 'report',
+                        name: "report",
+                        children: [
+                            {
+                                path: 'customer',
+                                name: 'CustomerReport',
+                                component: () => import("@/views/saleOff/report/CustomerReport.vue")
+                            },
+                            {
+                                path: 'sale-staff',
+                                name: 'SaleStaffReport',
+                                component: () => import("@/views/saleOff/report/SaleStaffReport.vue")
+                            },
+                            {
+                                path: 'delivery-staff',
+                                name: 'DeliveryStaffReport',
+                                component: () => import("@/views/saleOff/report/DeliveryStaffReport.vue")
+                            }
+                        ]
+                    },
                     
                 ]
             },

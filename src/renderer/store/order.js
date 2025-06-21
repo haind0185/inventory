@@ -44,6 +44,7 @@ const saleRouteInit = {
     DeliveryStaffs: [ helper.deepClone(deliveryStaffInit) ],
     SaleStaffs: [ helper.deepClone(saleStaffInit) ],
     RouteNote: null,
+    RouteQty: 0,
     Background: helper.getBG()
 }
 
