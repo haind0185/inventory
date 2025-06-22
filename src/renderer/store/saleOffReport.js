@@ -21,6 +21,15 @@ const initSearchSaleStaff = {
     page: 1
 }
 
+const initSearchDeliveryStaff = {
+    Ids: null,
+    OrderDateFrom: null,
+    OrderDateTo: null,
+    sort: null,
+    sort_by: null,
+    page: 1
+}
+
 const createStore = defineStore('saleOffReport', {
     state: () => {
         return {
@@ -29,6 +38,9 @@ const createStore = defineStore('saleOffReport', {
             },
             searchSaleStaff: {
                 ...initSearchSaleStaff
+            },
+            searchDeliveryStaff: {
+                ...initSearchDeliveryStaff
             },
         }
     },
@@ -60,6 +72,18 @@ const createStore = defineStore('saleOffReport', {
                     return false
                 })
         },
+        async deliveryStaff(params) {
+            store.setLoading(true)
+            return await api.get(`/sale-off/report/delivery-staff`, { params: params })
+                .then((res) => {
+                    store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
 
         // mutation
         setSearchCustomer() {
@@ -77,6 +101,14 @@ const createStore = defineStore('saleOffReport', {
         },
         resetSearchSaleStaff() {
             this.searchSaleStaff = {...this.searchSaleStaff, ...initSearchSaleStaff}
+        },
+        setSearchDeliveryStaff() {
+            this.searchDeliveryStaff.sort = null
+            this.searchDeliveryStaff.sort_by = 'asc'
+            this.searchDeliveryStaff.page = 1
+        },
+        resetSearchDeliveryStaff() {
+            this.searchDeliveryStaff = {...this.searchDeliveryStaff, ...initSearchDeliveryStaff}
         },
     },
 })

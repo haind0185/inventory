@@ -123,7 +123,7 @@ import { store } from '@/store'
 import { t } from '@/i18n'
 import { helper } from '@/helper'
 
-const saleStaffSearch = computed(() => SOReport.searchCustomer)
+const saleStaffSearch = computed(() => SOReport.searchSaleStaff)
 const customers = ref({})
 const confirm = ref(null)
 const master = computed({
@@ -152,7 +152,7 @@ const countNestedItems = (obj, path) => {
 
 
 const clear = async () => {
-    SOReport.resetSearchCustomer()
+    SOReport.resetSearchSaleStaff()
     await index()
 }
 const index = async () => {

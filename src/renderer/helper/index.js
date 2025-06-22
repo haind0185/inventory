@@ -403,6 +403,127 @@ const functions = {
         return result
     },
 
+    transformDeliveryStaff: (items) => {
+        // Map staffId -> staff data (gồm Months ...)
+        const staffMap = new Map()
+
+        items = items.filter(item =>
+            (item.saleOffRoutes1 && item.saleOffRoutes1.id) ||
+            (item.saleOffRoutes2 && item.saleOffRoutes2.id) ||
+            (item.saleOffRoutes3 && item.saleOffRoutes3.id)
+        );
+
+        items.forEach((item) => {
+            const staffId = item.id
+            if (!staffMap.has(staffId)) {
+                staffMap.set(staffId, {
+                    id: staffId,
+                    DeliveryStaffName: item.DeliveryStaffName,
+                    MonthsMap: new Map(), // để gom orders theo tháng
+                })
+            }
+
+            const staffData = staffMap.get(staffId)
+
+            // Gom tất cả routes 1,2,3, filter id tồn tại
+            const allRoutes = [
+                item.saleOffRoutes1,
+                item.saleOffRoutes2,
+                item.saleOffRoutes3,
+            ].filter((r) => r && r.id)
+
+            allRoutes.forEach((route) => {
+                if (!route.saleOffOrder || !route.saleOffOrder.OrderDate) return
+
+                const monthKey = moment(route.saleOffOrder.OrderDate).format('YYYY-MM')
+                if (!staffData.MonthsMap.has(monthKey)) {
+                    staffData.MonthsMap.set(monthKey, {
+                        Name: monthKey,
+                        OrdersMap: new Map(), // gom orders theo OrderCode
+                    })
+                }
+
+                const monthData = staffData.MonthsMap.get(monthKey)
+                const orderCode = route.saleOffOrder.OrderCode
+
+                if (!monthData.OrdersMap.has(orderCode)) {
+                    monthData.OrdersMap.set(orderCode, {
+                        OrderCode: orderCode,
+                        OrderDate: route.saleOffOrder.OrderDate,
+                        Workload: route.workLoad,
+                        Products: [],
+                    })
+                }
+
+                const orderData = monthData.OrdersMap.get(orderCode)
+
+                // Thêm product vào order
+                if (route.saleOffOrderItems && route.saleOffOrderItems.ProductCode) {
+                    orderData.Products.push({
+                        ProductCode: route.saleOffOrderItems.ProductCode,
+                        OrderItemNote: route.saleOffOrderItems.OrderItemNote,
+                        ProductNameLabel: `[${route.saleOffOrderItems.saleOffProduct.ProductCode}] ${route.saleOffOrderItems.saleOffProduct.ProductName}`,
+                        Price: route.saleOffOrderItems.saleOffProduct.Price,
+                        LargeUnitQty: route.saleOffOrderItems.LargeUnitQty,
+                        SmallUnitQty: route.saleOffOrderItems.SmallUnitQty,
+                        Qty: helper.unitQtyTransfer(
+                            route.saleOffOrderItems.LargeUnitQty,
+                            route.saleOffOrderItems.SmallUnitQty,
+                            route.saleOffOrderItems.saleOffProduct
+                        ),
+                        PriceQty:
+                            route.saleOffOrderItems.saleOffProduct.Price *
+                            helper.unitQtyTransfer(
+                                route.saleOffOrderItems.LargeUnitQty,
+                                route.saleOffOrderItems.SmallUnitQty,
+                                route.saleOffOrderItems.saleOffProduct
+                            ),
+                    })
+                }
+            })
+        })
+
+        // Chuyển đổi cấu trúc map -> array
+        let result = []
+        for (const staff of staffMap.values()) {
+            const Months = []
+            for (const monthData of staff.MonthsMap.values()) {
+                const Orders = Array.from(monthData.OrdersMap.values())
+                Months.push({ Name: monthData.Name, Orders })
+            }
+            // Sắp xếp tháng tăng dần nếu muốn
+            Months.sort((a, b) => b.Name.localeCompare(a.Name))
+
+            result.push({
+                id: staff.id,
+                DeliveryStaffName: staff.DeliveryStaffName,
+                Months,
+            })
+        }
+
+        result = result.map((re) => {
+            let staffQty = re.Months.reduce((sum, item) => sum + item.Orders.reduce((sum, item) => sum + ((item.Products.reduce((sum, item) => sum + item.PriceQty, 0)) / item.Workload), 0), 0)
+            re.StaffQty = staffQty
+            re.SupportStaffQty = Math.floor(staffQty * 0.003 / 1000) * 1000
+
+            re.Months = re.Months.map((month) => {
+                let monthQty = month.Orders.reduce((sum, item) => sum + ((item.Products.reduce((sum, item) => sum + item.PriceQty, 0)) / item.Workload), 0)
+                month.MonthQty = monthQty
+
+                month.Orders = month.Orders.map((order) => {
+                    let orderQty = order.Products.reduce((sum, item) => sum + item.PriceQty, 0)
+                    order.orderQty = orderQty
+                    return order
+                })
+
+                return month
+            })
+            return re
+        })
+
+        return result
+    },
+
     sortCustomersByOrderDate: (data) => {
         return data.map((customer) => {
             // Sort Orders in each Month by OrderDate desc

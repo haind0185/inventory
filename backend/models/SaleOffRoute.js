@@ -59,9 +59,9 @@ const SaleOffRoute = sequelize.define('SaleOffRoute', {
 SaleOffOrder.hasMany(SaleOffRoute, { foreignKey: 'OrderCode', sourceKey: 'OrderCode', as: 'saleOffRoutes' });
 SaleOffRoute.belongsTo(SaleOffOrder, { foreignKey: 'OrderCode', targetKey: 'OrderCode', as: 'saleOffOrder' });
 
-DeliveryStaff.hasMany(SaleOffRoute, { foreignKey: 'DeliveryStaffId1', sourceKey: 'id', as: 'saleOfOrders1' });
-DeliveryStaff.hasMany(SaleOffRoute, { foreignKey: 'DeliveryStaffId2', sourceKey: 'id', as: 'saleOfOrders2' });
-DeliveryStaff.hasMany(SaleOffRoute, { foreignKey: 'DeliveryStaffId3', sourceKey: 'id', as: 'saleOfOrders3' });
+DeliveryStaff.hasMany(SaleOffRoute, { foreignKey: 'DeliveryStaffId1', sourceKey: 'id', as: 'saleOffRoutes1' });
+DeliveryStaff.hasMany(SaleOffRoute, { foreignKey: 'DeliveryStaffId2', sourceKey: 'id', as: 'saleOffRoutes2' });
+DeliveryStaff.hasMany(SaleOffRoute, { foreignKey: 'DeliveryStaffId3', sourceKey: 'id', as: 'saleOffRoutes3' });
 
 SaleOffRoute.belongsTo(DeliveryStaff, { foreignKey: 'DeliveryStaffId1', targetKey: 'id', as: 'deliveryStaff1' });
 SaleOffRoute.belongsTo(DeliveryStaff, { foreignKey: 'DeliveryStaffId2', targetKey: 'id', as: 'deliveryStaff2' });
