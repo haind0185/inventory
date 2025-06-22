@@ -198,13 +198,13 @@ const functions = {
         return date.format('YYYY-MM-DD')
     },
     parseBoolean: (value) => {
-        if (value === null || value === undefined || value === '') return undefined;
+        if (value === null || value === undefined || value === '') return undefined
 
-        const val = value.toString().toLowerCase().trim();
-        if (val === 'true' || val === '1') return true;
-        if (val === 'false' || val === '0') return false;
+        const val = value.toString().toLowerCase().trim()
+        if (val === 'true' || val === '1') return true
+        if (val === 'false' || val === '0') return false
 
-        return undefined;
+        return undefined
     },
     getBG: () => {
         let hue
@@ -221,6 +221,131 @@ const functions = {
     },
     getStockInCode: (no) => {
         return `N${moment().format('YYYYMMDD')}${no.toString().padStart(2, 0)}`
+    },
+    unFlattenSequelizeObject: (flatObj) => {
+        const result = {}
+
+        for (const [flatKey, value] of Object.entries(flatObj)) {
+            const keys = flatKey.split('.')
+            let current = result
+
+            for (let i = 0; i < keys.length; i++) {
+                const key = keys[i]
+
+                if (i === keys.length - 1) {
+                    current[key] = value
+                } else {
+                    if (!current[key]) {
+                        current[key] = {}
+                    }
+                    current = current[key]
+                }
+            }
+        }
+
+        return result
+    },
+    transformData: (items) => {
+        const result = []
+
+        for (const item of items) {
+            const customerCode = item.CustomerCode
+            const customerName = item.CustomerName
+            const orderItem = item.saleOffOrderItems
+
+            // Bỏ qua item nếu không có đơn hàng thực tế
+            if (
+                !orderItem ||
+                !orderItem.saleOffRoute ||
+                !orderItem.saleOffRoute.saleOffOrder?.OrderCode
+            )
+                continue
+
+            const order = orderItem.saleOffRoute.saleOffOrder
+            const month = moment(order.OrderDate).format('YYYY-MM')
+
+            const product = {
+                ProductCode: orderItem.ProductCode,
+                OrderItemNote: orderItem.OrderItemNote,
+                ProductNameLabel: `[${orderItem.saleOffProduct.ProductCode}] ${orderItem.saleOffProduct.ProductName}`,
+                Price: orderItem.saleOffProduct.Price,
+                LargeUnitQty: orderItem.LargeUnitQty,
+                SmallUnitQty: orderItem.SmallUnitQty,
+                Qty: helper.unitQtyTransfer(
+                    orderItem.LargeUnitQty,
+                    orderItem.SmallUnitQty,
+                    orderItem.saleOffProduct
+                ),
+                PriceQty:
+                    orderItem.saleOffProduct.Price *
+                    helper.unitQtyTransfer(
+                        orderItem.LargeUnitQty,
+                        orderItem.SmallUnitQty,
+                        orderItem.saleOffProduct
+                    ),
+            }
+
+            // === Group theo Customer ===
+            let customer = result.find((c) => c.CustomerCode === customerCode)
+            if (!customer) {
+                customer = {
+                    CustomerCode: customerCode,
+                    CustomerName: customerName,
+                    Months: [],
+                }
+                result.push(customer)
+            }
+
+            // === Group theo Month ===
+            let monthGroup = customer.Months.find((m) => m.Name === month)
+            if (!monthGroup) {
+                monthGroup = {
+                    Name: month,
+                    Orders: [],
+                }
+                customer.Months.push(monthGroup)
+            }
+
+            // === Group theo OrderCode ===
+            let orderGroup = monthGroup.Orders.find((o) => o.OrderCode === order.OrderCode)
+            if (!orderGroup) {
+                orderGroup = {
+                    OrderCode: order.OrderCode,
+                    OrderDate: order.OrderDate,
+                    Products: [],
+                }
+                monthGroup.Orders.push(orderGroup)
+            }
+
+            // === Push Product ===
+            orderGroup.Products.push(product)
+        }
+
+        return result
+    },
+
+    sortCustomersByOrderDate: (data) => {
+        return data.map((customer) => {
+            // Sort Orders in each Month by OrderDate desc
+            const sortedMonths = customer.Months.map((month) => {
+                const sortedOrders = [...month.Orders].sort((a, b) => {
+                    return new Date(b.OrderDate) - new Date(a.OrderDate)
+                })
+
+                return {
+                    ...month,
+                    Orders: sortedOrders,
+                }
+            }).sort((a, b) => {
+                // Sort Months by YYYY-MM descending
+                return b.Name.localeCompare(a.Name)
+            })
+
+            return {
+                ...customer,
+                Months: sortedMonths,
+            }
+        })
     },
 }
 

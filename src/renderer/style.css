@@ -319,9 +319,28 @@ table.t-border tbody tr.selected {
     left: 0;
 }
 
+.vs--multiple {
+    min-height: 25px;
+    height: auto;
+}
+
+.vs--multiple.v-select .vs__dropdown-toggle {
+    height: auto;
+}
+
+.vs--multiple .vs__selected {
+    position: unset;
+    top: unset;
+    left: unset;
+    margin: 2px 5px 5px 0;
+    padding: 1px 4px;
+    float: left;
+}
+
 .vs__selected-options {
     padding: 0;
     overflow: hidden;
+    display: inline-block;
 }
 
 .v-select .vs__dropdown-toggle {

@@ -299,9 +299,10 @@ const SaleOffOrderController = {
                         let SaleOffOrderItem_Model = {
                             RouteId     : saleOffRoutes[routeIndex].id,
     
-                            SaleStaffId : orderItem.SaleStaffId,
-                            CustomerCode: orderItem.CustomerCode,
-                            ProductCode : orderItem.ProductCode,
+                            SaleStaffId  : orderItem.SaleStaffId,
+                            CustomerCode : orderItem.CustomerCode,
+                            ProductCode  : orderItem.ProductCode,
+                            OrderItemNote: orderItem.OrderItemNote,
     
                             LargeUnitQty: orderItem.LargeUnitQty,
                             SmallUnitQty: orderItem.SmallUnitQty,
@@ -585,6 +586,7 @@ const SaleOffOrderController = {
                             SaleStaffId : orderItem.SaleStaffId,
                             CustomerCode: orderItem.CustomerCode,
                             ProductCode : orderItem.ProductCode,
+                            OrderItemNote : orderItem.OrderItemNote,
     
                             LargeUnitQty: orderItem.LargeUnitQty,
                             SmallUnitQty: orderItem.SmallUnitQty,

@@ -269,6 +269,7 @@ const setData = (data) => {
                     Product.LargeUnitQty  = orderItem.LargeUnitQty
                     Product.SmallUnitQty  = orderItem.SmallUnitQty
                     Product.OrderItemNote = orderItem.OrderItemNote
+                    Product.Note          = orderItem.OrderItemNote
                     Product.Qty           = orderItem.Qty
                     Product.PriceQty      = orderItem.PriceQty
 

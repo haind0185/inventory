@@ -7,7 +7,9 @@
         :reduce="reduce"
         ref="vueSelect"
         >
-        <slot></slot>
+        <template #search="slotProps">
+            <slot name="search" v-bind="slotProps" />
+        </template>
     </v-select>
 </template>
 
@@ -28,7 +30,8 @@ export default {
     data: function () {
         return {
             value: null,
-            id: Date.now() + '-' + Math.round(Math.random() * 1E9)
+            id: Date.now() + '-' + Math.round(Math.random() * 1E9),
+            exceptFocus: ['multiple-customer']
         }
     },
     computed: {},
@@ -59,6 +62,7 @@ export default {
         focusNextInput: function () {
             let focusableElements = Array.from(document.querySelectorAll("input"))
             let currentIndex = focusableElements.findIndex(el => el.id === this.id)
+            if(this.exceptFocus.includes(focusableElements[currentIndex].getAttribute('data-extra'))) return
             
             if (currentIndex !== -1 && currentIndex < focusableElements.length - 1) {
                 focusableElements[currentIndex + 1].focus()
