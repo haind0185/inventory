@@ -4,7 +4,7 @@
             <div class="flex flex-col flex-1">
                 <div class="flex w-full gap-3">
                     <fieldset class="form-input w-[50%]">
-                        <legend>Mã khách hàng</legend>
+                        <legend>Khách hàng</legend>
                         <select2 class="w-full form-control"
                             :multiple="true"
                             :clearable="true"    

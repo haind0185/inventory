@@ -245,7 +245,7 @@ const functions = {
 
         return result
     },
-    transformData: (items) => {
+    transformDataCustomer: (items) => {
         const result = []
 
         for (const item of items) {
@@ -304,6 +304,85 @@ const functions = {
                     Orders: [],
                 }
                 customer.Months.push(monthGroup)
+            }
+
+            // === Group theo OrderCode ===
+            let orderGroup = monthGroup.Orders.find((o) => o.OrderCode === order.OrderCode)
+            if (!orderGroup) {
+                orderGroup = {
+                    OrderCode: order.OrderCode,
+                    OrderDate: order.OrderDate,
+                    Products: [],
+                }
+                monthGroup.Orders.push(orderGroup)
+            }
+
+            // === Push Product ===
+            orderGroup.Products.push(product)
+        }
+
+        return result
+    },
+
+    transformDataSaleStaff: (items) => {
+        const result = []
+
+        for (const item of items) {
+            const saleStaffId = item.id
+            const saleStaffName = item.SaleStaffName
+            const orderItem = item.saleOffOrderItems
+
+            // Bỏ qua item nếu không có đơn hàng thực tế
+            if (
+                !orderItem ||
+                !orderItem.saleOffRoute ||
+                !orderItem.saleOffRoute.saleOffOrder?.OrderCode
+            )
+                continue
+
+            const order = orderItem.saleOffRoute.saleOffOrder
+            const month = moment(order.OrderDate).format('YYYY-MM')
+
+            const product = {
+                ProductCode: orderItem.ProductCode,
+                OrderItemNote: orderItem.OrderItemNote,
+                ProductNameLabel: `[${orderItem.saleOffProduct.ProductCode}] ${orderItem.saleOffProduct.ProductName}`,
+                Price: orderItem.saleOffProduct.Price,
+                LargeUnitQty: orderItem.LargeUnitQty,
+                SmallUnitQty: orderItem.SmallUnitQty,
+                Qty: helper.unitQtyTransfer(
+                    orderItem.LargeUnitQty,
+                    orderItem.SmallUnitQty,
+                    orderItem.saleOffProduct
+                ),
+                PriceQty:
+                    orderItem.saleOffProduct.Price *
+                    helper.unitQtyTransfer(
+                        orderItem.LargeUnitQty,
+                        orderItem.SmallUnitQty,
+                        orderItem.saleOffProduct
+                    ),
+            }
+
+            // === Group theo SaleStaff ===
+            let saleStaff = result.find((c) => c.id === saleStaffId)
+            if (!saleStaff) {
+                saleStaff = {
+                    id: saleStaffId,
+                    SaleStaffName: saleStaffName,
+                    Months: [],
+                }
+                result.push(saleStaff)
+            }
+
+            // === Group theo Month ===
+            let monthGroup = saleStaff.Months.find((m) => m.Name === month)
+            if (!monthGroup) {
+                monthGroup = {
+                    Name: month,
+                    Orders: [],
+                }
+                saleStaff.Months.push(monthGroup)
             }
 
             // === Group theo OrderCode ===

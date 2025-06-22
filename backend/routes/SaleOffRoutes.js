@@ -56,6 +56,7 @@ router.put('/order', SaleOffOrderController.update);
 router.post('/order/delete', SaleOffOrderController.delete);
 
 router.get('/report/customer', SaleOffReportController.customer);
+router.get('/report/sale-staff', SaleOffReportController.saleStaff);
 
 
 const SaleOffRouter = router;
