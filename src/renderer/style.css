@@ -340,7 +340,7 @@ table.t-border tbody tr.selected {
 .vs__selected-options {
     padding: 0;
     overflow: hidden;
-    display: inline-block;
+    /* display: inline-block; */
 }
 
 .v-select .vs__dropdown-toggle {
