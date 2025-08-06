@@ -1,5 +1,6 @@
 const { app, dialog } = require('electron');
 const fs = require('fs');
+const fsPromises = require('fs').promises;
 const path = require('path');
 const XLSX = require('xlsx');
 const XLSXStyle = require('xlsx-style');
@@ -25,17 +26,13 @@ const download = async (workbook, filename) => {
 
     console.log('Server path:', filePath);
     // Lưu file vào hệ thống server
-    const resSave = fs.writeFile(filePath, buffer, async (err) => {
-        if (err) {
-            console.log(err);
-            throw new Error(`Lỗi đường dẫn: ${filePath}`);
-        } else {
-            // Copy file từ server vào local
-            return await copy(filePath, filename);
-        }
-    });
-
-    return resSave
+    try {
+        await fsPromises.writeFile(filePath, buffer); // ✅ await được vì là Promise
+        return await copy(filePath, filename);        // ✅ await copy sau khi lưu xong
+    } catch (err) {
+        console.error(err);
+        throw new Error(`Lỗi đường dẫn: ${filePath}`);
+    }
 };
 
 const copy = async (serverPath, filename) => {
@@ -78,17 +75,13 @@ const downloadStyle = async (workbook, filename) => {
 
     console.log('Server path:', filePath);
     // Lưu file vào hệ thống server
-    const resSave = fs.writeFile(filePath, buffer, async (err) => {
-        if (err) {
-            console.log(err);
-            throw new Error(`Lỗi đường dẫn: ${filePath}`);
-        } else {
-            // Copy file từ server vào local
-            return await copy(filePath, filename);
-        }
-    });
-
-    return resSave
+    try {
+        await fsPromises.writeFile(filePath, buffer); // ✅ await được vì là Promise
+        return await copy(filePath, filename);        // ✅ await copy sau khi lưu xong
+    } catch (err) {
+        console.error(err);
+        throw new Error(`Lỗi đường dẫn: ${filePath}`);
+    }
 };
 
 export const Service = {

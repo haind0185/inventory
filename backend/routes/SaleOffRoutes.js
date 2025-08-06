@@ -58,6 +58,7 @@ router.post('/order/delete', SaleOffOrderController.delete);
 router.get('/report/customer', SaleOffReportController.customer);
 router.get('/report/sale-staff', SaleOffReportController.saleStaff);
 router.get('/report/delivery-staff', SaleOffReportController.deliveryStaff);
+router.get('/report/export-delivery-staff', SaleOffReportController.exportDeliveryStaff);
 
 
 const SaleOffRouter = router;

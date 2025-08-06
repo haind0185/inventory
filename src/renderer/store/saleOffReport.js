@@ -85,6 +85,19 @@ const createStore = defineStore('saleOffReport', {
                 })
         },
 
+        async exportDeliveryStaff(params) {
+            store.setLoading(true)
+            return await api.get(`/sale-off/report/export-delivery-staff`, { params: params })
+                .then((res) => {
+                    store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
+
         // mutation
         setSearchCustomer() {
             this.searchCustomer.sort = null
