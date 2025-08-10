@@ -49,6 +49,7 @@ router.post('/stock-ins/update', SaleOffStockInController.update);
 
 router.get('/stock/total', SaleOffStockController.total);
 router.get('/stock/totalPrice', SaleOffStockController.totalPrice);
+router.get('/stock/export-total', SaleOffStockController.exportTotal);
 
 router.get('/order', SaleOffOrderController.index);
 router.post('/order', SaleOffOrderController.store);

@@ -48,6 +48,18 @@ const createStore = defineStore('stock', {
                     return false
                 })
         },
+        async exportTotal(params = {}) {
+            store.setLoading(true)
+            return await api.get(`/sale-off/stock/export-total`, { params: params })
+                .then((res) => {
+                    store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
 
         // mutation
         setTotalSearch() {

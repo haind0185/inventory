@@ -31,7 +31,8 @@
                 </span>
             </div>
             <div class="flex justify-end w-[40%] gap-3">
-                Số lượng mặt hàng: {{ format_number(report.total) }} | Giá trị kho: {{  format_number(report.totalPrice) }}
+                SL sản phẩm: {{ format_number(report.total) }} | Giá trị kho: {{  format_number(report.totalPrice) }}
+                <button type="button" class="btn w-[6rem]" @click="exportFile()">{{ $t("button.export") }}</button>
             </div>
         </div>
 
@@ -126,6 +127,14 @@ const totalPrice = async () => {
     await stockStore.totalPrice().then((res) => {
         if(res && res.code == 200) {
             report.value = res.data
+        }
+    })
+}
+
+const exportFile = async () => {
+    await stockStore.exportTotal(search.value).then((res) => {
+        if(res && res.code == 200) {
+            console.log(res)
         }
     })
 }
