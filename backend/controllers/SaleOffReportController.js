@@ -282,12 +282,11 @@ const SaleOffReportController = {
                 })
                 const orderCodes = orders.map((o) => o.OrderCode)
     
-                if(orderCodes.length > 0) {
-                    whereRoute.OrderCode = {
-                        [Op.in]: orderCodes
-                    }
+                whereRoute.OrderCode = {
+                    [Op.in]: orderCodes
                 }
-            } 
+            }
+
             const routes = await SaleOffRoute.findAll({
                 where: whereRoute,
                 attributes: ['DeliveryStaffId1', 'DeliveryStaffId2', 'DeliveryStaffId3'],
