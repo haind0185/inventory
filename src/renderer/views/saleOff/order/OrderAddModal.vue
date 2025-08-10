@@ -58,7 +58,7 @@
                                             </td>
                                             
                                             <!-- DeliveryStaff -->
-                                            <td class="w-[8rem]" v-if="saleStaffCount == 0 && customerCount == 0 && productCount == 0" :rowspan="countNestedItems(saleRoute, ['SaleStaffs', 'Customers', 'Products'])">
+                                            <td class="w-[7rem]" v-if="saleStaffCount == 0 && customerCount == 0 && productCount == 0" :rowspan="countNestedItems(saleRoute, ['SaleStaffs', 'Customers', 'Products'])">
                                                 <div class="flex items-center gap-1 ">
                                                     <div class="flex flex-col flex-1 gap-1">
                                                         <template v-for="(deliveryStaff, deliveryStaffCount) in saleRoute.DeliveryStaffs">
@@ -76,7 +76,7 @@
                                                             </div>
                                                         </template>
                                                         <span class="px-3">{{ format_number(saleRoute.RouteQty) }}</span>
-                                                        <input type="text" class="w-[8rem] form-control" v-model="saleRoute.RouteNote" maxlength="200" placeholder="Ghi chú" tabindex="-1">
+                                                        <input type="text" class="w-[7rem] form-control" v-model="saleRoute.RouteNote" maxlength="200" placeholder="Ghi chú" tabindex="-1">
                                                     </div>
         
                                                     <span class="header-icon-action" @click="orderStore.deliveryStaffAdd(saleRoute)" v-if="saleRoute.DeliveryStaffs.length < 3">
@@ -110,7 +110,7 @@
                                             </td>
     
                                             <!-- Customer -->
-                                            <td class="row-left w-[14rem]" v-if="productCount == 0" :rowspan="countNestedItems(customer, ['Products'])">
+                                            <td class="row-left w-[11rem]" v-if="productCount == 0" :rowspan="countNestedItems(customer, ['Products'])">
                                                 <div class="flex items-center gap-1 w-[full]">
                                                     <div class="flex items-center flex-1">
                                                         <select2 class="w-full form-control"
@@ -134,7 +134,7 @@
                                             </td>
     
                                             <!-- Product -->
-                                            <td class="header-icon w-[20rem]" :class="{'row-left': productCount > 0}">
+                                            <td class="header-icon w-[24rem]" :class="{'row-left': productCount > 0}">
                                                 <div class="flex items-center gap-1 w-[full]">
                                                     <div class="flex items-center flex-1">
                                                         <select2 class="w-full form-control" 
@@ -160,13 +160,13 @@
     
                                             <td width="6rem">
                                                 <div class="flex items-center gap-1">
-                                                    <input type="number" class="w-[4rem] text-right form-control" v-model="product.LargeUnitQty" min="0" v-select-on-focus :update:modelValue="setRouteQty(saleRoute)">
+                                                    <input type="number" class="w-[3rem] text-right form-control" v-model="product.LargeUnitQty" min="0" v-select-on-focus :update:modelValue="setRouteQty(saleRoute)">
                                                     <span class="w-[3rem] text-sm pl-1">{{ getLargeUnit(product.ProductCode) }}</span>
                                                 </div>
                                             </td>
                                             <td width="6rem">
                                                 <div class="flex items-center gap-1">
-                                                    <input type="number" class="w-[4rem] flex-1 text-right form-control" v-model="product.SmallUnitQty" min="0" v-select-on-focus :update:modelValue="setRouteQty(saleRoute)">
+                                                    <input type="number" class="w-[3rem] flex-1 text-right form-control" v-model="product.SmallUnitQty" min="0" v-select-on-focus :update:modelValue="setRouteQty(saleRoute)">
                                                     <span class="w-[3rem] text-sm pl-1">{{ getSmallUnit(product.ProductCode) }}</span>
                                                 </div>
                                             </td>
