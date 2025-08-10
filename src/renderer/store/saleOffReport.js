@@ -97,6 +97,30 @@ const createStore = defineStore('saleOffReport', {
                     return false
                 })
         },
+        async exportCustomer(params) {
+            store.setLoading(true)
+            return await api.get(`/sale-off/report/export-customer`, { params: params })
+                .then((res) => {
+                    store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
+        async exportSaleStaff(params) {
+            store.setLoading(true)
+            return await api.get(`/sale-off/report/export-sale-staff`, { params: params })
+                .then((res) => {
+                    store.setLoading(false)
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
 
         // mutation
         setSearchCustomer() {

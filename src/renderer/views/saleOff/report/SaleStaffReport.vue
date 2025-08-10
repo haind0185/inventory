@@ -51,6 +51,7 @@
                 </span>
             </div>
             <div class="flex justify-end w-[40%] gap-3">
+                <button type="button" class="btn w-[6rem]" @click="exportFile()">{{ $t("button.export") }}</button>
             </div>
         </div>
 
@@ -171,6 +172,14 @@ const setData = (data) => {
 const pagination = (page) => {
     saleStaffSearch.value.page = page
     index()
+}
+
+const exportFile = async () => {
+    await SOReport.exportSaleStaff(saleStaffSearch.value).then((res) => {
+        if(res && res.code == 200) {
+            console.log(res)
+        }
+    })
 }
 
 onBeforeMount(async () => {

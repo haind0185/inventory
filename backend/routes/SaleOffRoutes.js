@@ -59,6 +59,8 @@ router.get('/report/customer', SaleOffReportController.customer);
 router.get('/report/sale-staff', SaleOffReportController.saleStaff);
 router.get('/report/delivery-staff', SaleOffReportController.deliveryStaff);
 router.get('/report/export-delivery-staff', SaleOffReportController.exportDeliveryStaff);
+router.get('/report/export-customer', SaleOffReportController.exportCustomer);
+router.get('/report/export-sale-staff', SaleOffReportController.exportSaleStaff);
 
 
 const SaleOffRouter = router;

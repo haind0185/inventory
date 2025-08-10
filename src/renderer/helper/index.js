@@ -246,7 +246,7 @@ const functions = {
         return result
     },
     transformDataCustomer: (items) => {
-        const result = []
+        let result = []
 
         for (const item of items) {
             const customerCode = item.CustomerCode
@@ -321,11 +321,24 @@ const functions = {
             orderGroup.Products.push(product)
         }
 
+        result = result.map((item) => {
+            item.CustomerQty = item.Months.reduce((sum, item) => sum + item.Orders.reduce((sum, item) => sum + item.Products.reduce((sum, item) => sum + item.PriceQty, 0), 0), 0)
+            item.Months = item.Months.map((item) => {
+                item.MonthQty = item.Orders.reduce((sum, item) => sum + item.Products.reduce((sum, item) => sum + item.PriceQty, 0), 0)
+                item.Orders = item.Orders.map((item) => {
+                    item.OrderQty = item.Products.reduce((sum, item) => sum + item.PriceQty, 0)
+                    return item
+                })
+                return item
+            })
+            return item
+        })
+
         return result
     },
 
     transformDataSaleStaff: (items) => {
-        const result = []
+        let result = []
 
         for (const item of items) {
             const saleStaffId = item.id
@@ -399,6 +412,19 @@ const functions = {
             // === Push Product ===
             orderGroup.Products.push(product)
         }
+
+        result = result.map((item) => {
+            item.SaleStaffQty = item.Months.reduce((sum, item) => sum + item.Orders.reduce((sum, item) => sum + item.Products.reduce((sum, item) => sum + item.PriceQty, 0), 0), 0)
+            item.Months = item.Months.map((item) => {
+                item.MonthQty = item.Orders.reduce((sum, item) => sum + item.Products.reduce((sum, item) => sum + item.PriceQty, 0), 0)
+                item.Orders = item.Orders.map((item) => {
+                    item.OrderQty = item.Products.reduce((sum, item) => sum + item.PriceQty, 0)
+                    return item
+                })
+                return item
+            })
+            return item
+        })
 
         return result
     },
