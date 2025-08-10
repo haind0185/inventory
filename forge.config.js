@@ -15,7 +15,7 @@ module.exports = {
                 certificateFile: './cert.pfx',
                 certificatePassword: process.env.CERT_PASSWORD,
                 // Kích hoạt tính năng auto-update
-                setupExe: 'inventory-1.0.4-Setup.exe',
+                setupExe: 'inventory-1.0.5-Setup.exe',
             }
         },
         {
