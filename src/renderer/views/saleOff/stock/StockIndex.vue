@@ -63,7 +63,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="item in stocks.items">
+                    <tr v-for="item in stocks.items" :class="{'bg-1warning': item.Qty < 0}">
                         <td class="text-center">{{ item.ProductCode }}</td>
                         <td class="text-left">{{ item.ProductName }}</td>
                         <td class="text-center">{{ `${format_number(item.LargeUnitQty)} ${item.saleOffProduct?.LargeUnit}` }}</td>
@@ -78,6 +78,11 @@
     </div>
 
 </template>
+<style scoped>
+    .bg-1warning {
+        background-color: #edc4c4;
+    }
+</style>
 
 <script setup>
 import { onMounted, onBeforeMount, computed, watch, ref } from 'vue'

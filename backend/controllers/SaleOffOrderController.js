@@ -280,11 +280,11 @@ const SaleOffOrderController = {
     
                             if(SaleOffStock.ProductCode == orderItem.ProductCode) {
                                 CurrentQty -= OrderQty
-                                if(CurrentQty < 0) {
-                                    throw new Error(`Mã sản phẩm [${orderItem.ProductCode}] không đủ số lượng.`);
-                                }
+                                // if(CurrentQty < 0) {
+                                //     throw new Error(`Mã sản phẩm [${orderItem.ProductCode}] không đủ số lượng.`);
+                                // }
                                 
-                                // Gáng lại giá trị mới cho record stock
+                                // Gán lại giá trị mới cho record stock
                                 let StockQty = helper.unitQtyLS(CurrentQty, SaleOffProduct)
                                 SaleOffStock.LargeUnitQty = StockQty.LargeUnitQty
                                 SaleOffStock.SmallUnitQty = StockQty.SmallUnitQty
@@ -567,9 +567,9 @@ const SaleOffOrderController = {
     
                             if(SaleOffStock.ProductCode == orderItem.ProductCode) {
                                 CurrentQty -= OrderQty
-                                if(CurrentQty < 0) {
-                                    throw new Error(`Mã sản phẩm [${orderItem.ProductCode}] không đủ số lượng.`);
-                                }
+                                // if(CurrentQty < 0) {
+                                //     throw new Error(`Mã sản phẩm [${orderItem.ProductCode}] không đủ số lượng.`);
+                                // }
                                 
                                 // Gán lại giá trị mới cho record stock
                                 let StockQty = helper.unitQtyLS(CurrentQty, SaleOffProduct)
@@ -683,9 +683,9 @@ const SaleOffOrderController = {
 
                         if(SaleOffStock.ProductCode == orderItem.ProductCode) {
                             CurrentQty += OrderQty
-                            if(CurrentQty < 0) {
-                                throw new Error(`Mã sản phẩm [${orderItem.ProductCode}] không đủ số lượng.`);
-                            }
+                            // if(CurrentQty < 0) {
+                            //     throw new Error(`Mã sản phẩm [${orderItem.ProductCode}] không đủ số lượng.`);
+                            // }
                             
                             // Gáng lại giá trị mới cho record stock
                             let StockQty = helper.unitQtyLS(CurrentQty, product)
@@ -873,9 +873,9 @@ const SaleOffOrderController = {
 
                         if(SaleOffStock.ProductCode == orderItem.ProductCode) {
                             CurrentQty += OrderQty
-                            if(CurrentQty < 0) {
-                                throw new Error(`Mã sản phẩm [${orderItem.ProductCode}] không đủ số lượng.`);
-                            }
+                            // if(CurrentQty < 0) {
+                            //     throw new Error(`Mã sản phẩm [${orderItem.ProductCode}] không đủ số lượng.`);
+                            // }
                             
                             // Gáng lại giá trị mới cho record stock
                             let StockQty = helper.unitQtyLS(CurrentQty, product)
