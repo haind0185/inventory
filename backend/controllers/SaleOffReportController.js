@@ -233,8 +233,17 @@ const SaleOffReportController = {
              */
             let where = {}
             let whereOrder = {}
+            let whereRoute = {}
 
             if (req.query.Ids) {
+                whereRoute = {
+                    ...whereRoute,
+                    [Op.or]: {
+                        DeliveryStaffId1: { [Op.in]: req.query.Ids },
+                        DeliveryStaffId2: { [Op.in]: req.query.Ids },
+                        DeliveryStaffId3: { [Op.in]: req.query.Ids },
+                    },
+                }
                 where.id = {
                     [Op.in]: req.query.Ids
                 }
@@ -266,65 +275,100 @@ const SaleOffReportController = {
             /**
              * call select action
              */
-            const total = await DeliveryStaff.count({
-                where: {
-                    ...where,
-                    [Op.or]: [
-                        { '$saleOffRoutes1.id$': { [Op.not]: null } },
-                        { '$saleOffRoutes2.id$': { [Op.not]: null } },
-                        { '$saleOffRoutes3.id$': { [Op.not]: null } },
-                    ],
-                },
-                include: [
-                    {
-                        association: 'saleOffRoutes1',
-                        required: false,
-                        include: [
-                            { association: 'saleOffOrder', where: whereOrder, required: false },
-                            {
-                                association: 'saleOffOrderItems',
-                                required: false,
-                                include: [
-                                    { association: 'saleOffProduct' },
-                                    { association: 'customer' },
-                                ],
-                            },
-                        ],
-                    },
-                    {
-                        association: 'saleOffRoutes2',
-                        required: false,
-                        include: [
-                            { association: 'saleOffOrder', where: whereOrder, required: false },
-                            {
-                                association: 'saleOffOrderItems',
-                                required: false,
-                                include: [
-                                    { association: 'saleOffProduct' },
-                                    { association: 'customer' },
-                                ],
-                            },
-                        ],
-                    },
-                    {
-                        association: 'saleOffRoutes3',
-                        required: false,
-                        include: [
-                            { association: 'saleOffOrder', where: whereOrder, required: false },
-                            {
-                                association: 'saleOffOrderItems',
-                                required: false,
-                                include: [
-                                    { association: 'saleOffProduct' },
-                                    { association: 'customer' },
-                                ],
-                            },
-                        ],
-                    },
-                ],
-                distinct: true,
-                col: 'id',
+            if (Object.keys(whereOrder).length !== 0) {
+                const orders = await SaleOffOrder.findAll({
+                    where: whereOrder,
+                    attributes: ['OrderCode'],
+                })
+                const orderCodes = orders.map((o) => o.OrderCode)
+    
+                if(orderCodes.length > 0) {
+                    whereRoute.OrderCode = {
+                        [Op.in]: orderCodes
+                    }
+                }
+            } 
+            const routes = await SaleOffRoute.findAll({
+                where: whereRoute,
+                attributes: ['DeliveryStaffId1', 'DeliveryStaffId2', 'DeliveryStaffId3'],
             })
+
+            const staffSet = new Set()
+            if(req.query.Ids && req.query.Ids.length > 0) {
+                routes.forEach((r) => {
+                    if (req.query.Ids.includes(r.DeliveryStaffId1)) staffSet.add(r.DeliveryStaffId1)
+                    if (req.query.Ids.includes(r.DeliveryStaffId2)) staffSet.add(r.DeliveryStaffId2)
+                    if (req.query.Ids.includes(r.DeliveryStaffId3)) staffSet.add(r.DeliveryStaffId3)
+                })
+            } else {
+                routes.forEach((r) => {
+                    if (r.DeliveryStaffId1) staffSet.add(r.DeliveryStaffId1)
+                    if (r.DeliveryStaffId2) staffSet.add(r.DeliveryStaffId2)
+                    if (r.DeliveryStaffId3) staffSet.add(r.DeliveryStaffId3)
+                })
+            }
+
+            const total = staffSet.size
+
+            // const total = await DeliveryStaff.count({
+            //     where: {
+            //         ...where,
+            //         [Op.or]: [
+            //             { '$saleOffRoutes1.id$': { [Op.not]: null } },
+            //             { '$saleOffRoutes2.id$': { [Op.not]: null } },
+            //             { '$saleOffRoutes3.id$': { [Op.not]: null } },
+            //         ],
+            //     },
+            //     include: [
+            //         {
+            //             association: 'saleOffRoutes1',
+            //             required: false,
+            //             include: [
+            //                 { association: 'saleOffOrder', where: whereOrder, required: false },
+            //                 {
+            //                     association: 'saleOffOrderItems',
+            //                     required: false,
+            //                     include: [
+            //                         { association: 'saleOffProduct' },
+            //                         { association: 'customer' },
+            //                     ],
+            //                 },
+            //             ],
+            //         },
+            //         {
+            //             association: 'saleOffRoutes2',
+            //             required: false,
+            //             include: [
+            //                 { association: 'saleOffOrder', where: whereOrder, required: false },
+            //                 {
+            //                     association: 'saleOffOrderItems',
+            //                     required: false,
+            //                     include: [
+            //                         { association: 'saleOffProduct' },
+            //                         { association: 'customer' },
+            //                     ],
+            //                 },
+            //             ],
+            //         },
+            //         {
+            //             association: 'saleOffRoutes3',
+            //             required: false,
+            //             include: [
+            //                 { association: 'saleOffOrder', where: whereOrder, required: false },
+            //                 {
+            //                     association: 'saleOffOrderItems',
+            //                     required: false,
+            //                     include: [
+            //                         { association: 'saleOffProduct' },
+            //                         { association: 'customer' },
+            //                     ],
+            //                 },
+            //             ],
+            //         },
+            //     ],
+            //     distinct: true,
+            //     col: 'id',
+            // })
 
             let items = []
             if (total > 0) {
