@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 :root {
-    --theme-color: #21263c;
-    --bg-side-bar: #21263c;
-    --bg-logo: #181c2e;
+    --theme-color: #1593e5;
+    --bg-side-bar: #ffdb34;
+    --bg-logo: rgb(153, 131, 31);
     --border-table: 1px solid var(--border-color);
     --border-color: rgba(180, 220, 220, 1);
     --table-hover-color: rgba(234, 244, 255, 0.4);
@@ -29,7 +29,7 @@ body {
     padding: 0;
     margin: 0;
     background: var(--bg-side-bar);
-    color: white;
+    color: black;
 }
 
 .header {
@@ -83,15 +83,15 @@ ul li.item:last-child {
 }
 
 ul li.item:hover {
-    background: #181c2e;
+    background: rgb(0, 0, 0, 0.4);
 }
 
 ul li.item:active {
-    background: #a6c2e9;
+    background: rgb(0, 0, 0, 0.6);
 }
 
 ul li.item[active="true"] {
-    background: #408dfb;
+    background: rgb(0, 0, 0, 0.4);
 }
 
 .menu-item {
@@ -100,7 +100,7 @@ ul li.item[active="true"] {
     text-decoration: none;
     font-size: 14px;
     font-weight: 400;
-    color: white;
+    color: black;
     width: 100%;
     height: 100%;
     padding: 0.3rem 0.5rem;
@@ -123,7 +123,7 @@ ul li.item[active="true"] {
 }
 
 .item-parent.active {
-    background: #344272;
+    background: rgb(0, 0, 0, 0.3);
     padding-bottom: 5px;
     border-radius: 4px;
     height: auto;
@@ -276,6 +276,7 @@ table.t-border td {
     word-break: break-all;
     font-size: 14px;
     font-weight: 400;
+    white-space: nowrap;
 }
 
 table.t-border-top td {
@@ -315,11 +316,33 @@ table.t-border tbody tr.selected {
 .vs__selected {
     margin: 0;
     padding: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.vs--multiple {
+    min-height: 25px;
+    height: auto;
+}
+
+.vs--multiple.v-select .vs__dropdown-toggle {
+    height: auto;
+}
+
+.vs--multiple .vs__selected {
+    position: unset;
+    top: unset;
+    left: unset;
+    margin: 2px 5px 5px 0;
+    padding: 1px 4px;
+    float: left;
 }
 
 .vs__selected-options {
     padding: 0;
     overflow: hidden;
+    /* display: inline-block; */
 }
 
 .v-select .vs__dropdown-toggle {
@@ -385,7 +408,7 @@ input::-webkit-inner-spin-button {
 }
 
 .setting {
-    background: #344272;
+    background: rgb(0, 0, 0, 0.4);
     border-radius: 4px;
 }
 
@@ -520,4 +543,78 @@ textarea.form-control {
 }
 .marker.E8495E::after {
     border-top: 10px solid #E8495E;
+}
+
+input.form-control:focus {
+    user-select: all;
+}
+
+.divider {
+    border: 0.5px solid gray;
+    margin: 0 5px;
+}
+
+.group-menu-title {
+    margin: 0 5px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #8d8d8d;
+}
+
+.header-icon {
+    position: relative;
+}
+
+.header-icon-action .icon {
+    color: #877e7e;
+    /* position: absolute;
+    right: 4px;
+    top: 50%; */
+    /* transform: translate(0, -50%); */
+}
+
+.header-icon-action.text {
+    display: flex;
+    justify-content: center;
+}
+
+.header-icon-action.text .icon {
+    position: relative;
+    right: unset;
+    top: unset;
+    transform: unset;
+    color: #FFF;
+}
+
+
+
+.route-item {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.route-item svg {
+    font-size: 30px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    color: #877e7e;
+}
+
+.icon {
+    font-size: 30px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    color: #877e7e;
+}
+
+.icon:focus {
+    outline: none !important;
+}
+
+.icon:hover {
+    color: #ccc !important;
 }

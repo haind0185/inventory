@@ -2,7 +2,7 @@
     <div>
         <ul class="menus">
             <template v-for="menu in dashboard">
-                <li :active="route.name == menu.name">
+                <li :active="route.name == menu.name" class="item">
                     <router-link :to="{name: menu.name}" class="menu-item"><span>{{ menu.label }}</span></router-link>
                 </li>
             </template>
@@ -30,10 +30,147 @@
                 </template>
             </template>
         </ul>
+        
+        <div class="divider"></div>
+        <span class="group-menu-title">Buôn hàng</span>
+
+        <ul class="menus">
+            <template v-for="menu in sale_off_report">
+                <template v-if="menu.children">
+                    <li class="flex flex-col gap-2 item-parent" :class="{'active': menu.open || menu.children.find(item => item.name == route.name)}">
+                        <span class="menu-item" @click="menu.open = !menu.open">
+                            {{ menu.label }}
+                        </span>
+                        <ul v-show="menu.children.find(item => item.name == route.name) || menu.open" style="padding-left: 15px; padding-right: 5px;" class="flex flex-col gap-1">
+                            <template v-for="item in menu.children">
+                                <li :active="route.name == item.name" class="item">
+                                    <router-link :to="{name: item.name}" class="menu-item"><span>{{ item.label }}</span></router-link>
+                                </li>
+                            </template>
+                        </ul>
+                    </li>
+                </template>
+                <template v-else>
+                    <li :active="route.name == menu.name" class="item">
+                        <router-link :to="{name: menu.name}" class="menu-item"><span>{{ menu.label }}</span></router-link>
+                    </li>
+                </template>
+            </template>
+        </ul>
+
+        <ul class="menus">
+            <template v-for="menu in sale_off_order">
+                <template v-if="menu.children">
+                    <li class="flex flex-col gap-2 item-parent" :class="{'active': menu.open || menu.children.find(item => item.name == route.name)}">
+                        <span class="menu-item" @click="menu.open = !menu.open">
+                            {{ menu.label }}
+                        </span>
+                        <ul v-show="menu.children.find(item => item.name == route.name) || menu.open" style="padding-left: 15px; padding-right: 5px;" class="flex flex-col gap-1">
+                            <template v-for="item in menu.children">
+                                <li :active="route.name == item.name" class="item">
+                                    <router-link :to="{name: item.name}" class="menu-item"><span>{{ item.label }}</span></router-link>
+                                </li>
+                            </template>
+                        </ul>
+                    </li>
+                </template>
+                <template v-else>
+                    <li :active="route.name == menu.name" class="item">
+                        <router-link :to="{name: menu.name}" class="menu-item"><span>{{ menu.label }}</span></router-link>
+                    </li>
+                </template>
+            </template>
+        </ul>
+
+        <ul class="menus">
+            <template v-for="menu in sale_off_stock_in">
+                <template v-if="menu.children">
+                    <li class="flex flex-col gap-2 item-parent" :class="{'active': menu.open || menu.children.find(item => item.name == route.name)}">
+                        <span class="menu-item" @click="menu.open = !menu.open">
+                            {{ menu.label }}
+                        </span>
+                        <ul v-show="menu.children.find(item => item.name == route.name) || menu.open" style="padding-left: 15px; padding-right: 5px;" class="flex flex-col gap-1">
+                            <template v-for="item in menu.children">
+                                <li :active="route.name == item.name" class="item">
+                                    <router-link :to="{name: item.name}" class="menu-item"><span>{{ item.label }}</span></router-link>
+                                </li>
+                            </template>
+                        </ul>
+                    </li>
+                </template>
+                <template v-else>
+                    <li :active="route.name == menu.name" class="item">
+                        <router-link :to="{name: menu.name}" class="menu-item"><span>{{ menu.label }}</span></router-link>
+                    </li>
+                </template>
+            </template>
+        </ul>
+
+        <ul class="menus">
+            <template v-for="menu in sale_off_stock">
+                <template v-if="menu.children">
+                    <li class="flex flex-col gap-2 item-parent" :class="{'active': menu.open || menu.children.find(item => item.name == route.name)}">
+                        <span class="menu-item" @click="menu.open = !menu.open">
+                            {{ menu.label }}
+                        </span>
+                        <ul v-show="menu.children.find(item => item.name == route.name) || menu.open" style="padding-left: 15px; padding-right: 5px;" class="flex flex-col gap-1">
+                            <template v-for="item in menu.children">
+                                <li :active="route.name == item.name" class="item">
+                                    <router-link :to="{name: item.name}" class="menu-item"><span>{{ item.label }}</span></router-link>
+                                </li>
+                            </template>
+                        </ul>
+                    </li>
+                </template>
+                <template v-else>
+                    <li :active="route.name == menu.name" class="item">
+                        <router-link :to="{name: menu.name}" class="menu-item"><span>{{ menu.label }}</span></router-link>
+                    </li>
+                </template>
+            </template>
+        </ul>
+
+        <ul class="menus">
+            <template v-for="menu in sale_off">
+                <template v-if="menu.children">
+                    <li class="flex flex-col gap-2 item-parent" :class="{'active': menu.open || menu.children.find(item => item.name == route.name)}">
+                        <span class="menu-item" @click="menu.open = !menu.open">
+                            {{ menu.label }}
+                        </span>
+                        <ul v-show="menu.children.find(item => item.name == route.name) || menu.open" style="padding-left: 15px; padding-right: 5px;" class="flex flex-col gap-1">
+                            <template v-for="item in menu.children">
+                                <li :active="route.name == item.name" class="item">
+                                    <router-link :to="{name: item.name}" class="menu-item"><span>{{ item.label }}</span></router-link>
+                                </li>
+                            </template>
+                        </ul>
+                    </li>
+                </template>
+                <template v-else>
+                    <li :active="route.name == menu.name" class="item">
+                        <router-link :to="{name: menu.name}" class="menu-item"><span>{{ menu.label }}</span></router-link>
+                    </li>
+                </template>
+            </template>
+        </ul>
+
+        <div class="divider"></div>
+
         <ul class="menus">
             <li class="flex flex-col gap-2 p-3 active setting">
                 <ul style="padding-right: 5px;" class="flex flex-col gap-1">
                     <template v-for="item in setting">
+                        <li class="item">
+                            <a href="javascript:void(0)" class="justify-center menu-item" @click="item.action">{{ item.label }}</a>
+                        </li>
+                    </template>
+                </ul>
+            </li>
+        </ul>
+        <ul class="menus" v-if="isUpdateAvailable">
+            <li class="flex flex-col gap-2 p-3 active setting">
+                <ul style="padding-right: 5px;" class="flex flex-col gap-1">
+                    <template v-for="item in update">
                         <li class="item">
                             <a href="javascript:void(0)" class="justify-center menu-item" @click="item.action">{{ item.label }}</a>
                         </li>
@@ -48,9 +185,10 @@
 import { onMounted, onBeforeMount, computed, watch, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { inventoryStore } from '@/store/inventory';
+import { store } from '@/store'
 
 const route = useRoute()
-
+const isUpdateAvailable = computed(() => store.isUpdateAvailable)
 const menus = ref([
     {
         name: 'Inventories',
@@ -145,7 +283,11 @@ const dashboard = ref([
     {
         name: 'Dashboard',
         label: 'Dashboard',
-    }
+    },
+    {
+        name: 'Compare',
+        label: 'So sánh file',
+    },
 ])
 
 const setting = ref([
@@ -157,7 +299,107 @@ const setting = ref([
                 
             })
         }
-    }
+    },
+])
+
+const update = ref([
+    {
+        name: 'UpdateVersion',
+        label: 'Có cập nhật!',
+        action: async () => {
+            await store.setUpdateDownloaded()
+        }
+    },
+])
+
+const sale_off = ref([
+    {
+        name: 'SaleOff',
+        label: 'Quản lý buôn hàng',
+        children: [
+            {
+                name: 'SaleOffProduct',
+                label: 'Sản phẩm',
+            },
+            {
+                name: 'SaleStaff',
+                label: 'NV bán hàng',
+            },
+            {
+                name: 'DeliveryStaff',
+                label: 'NV giao nhận',
+            },
+            {
+                name: 'Customer',
+                label: 'DS khách hàng',
+            },
+        ],
+        open: false
+    },
+])
+
+const sale_off_order = ref([
+    {
+        name: 'SaleOffOrder',
+        label: 'Quản lý đơn hàng',
+        children: [
+            {
+                name: 'OrderList',
+                label: 'DS đơn hàng',
+            },
+        ],
+        open: false
+    },
+])
+
+const sale_off_stock_in = ref([
+    {
+        name: 'SaleOffStockIn',
+        label: 'Quản lý nhập hàng',
+        children: [
+            {
+                name: 'StockInList',
+                label: 'Lịch sử nhập hàng',
+            },
+        ],
+        open: false
+    },
+])
+
+const sale_off_stock = ref([
+    {
+        name: 'SaleOffStockIn',
+        label: 'Quản lý kho hàng',
+        children: [
+            {
+                name: 'StockList',
+                label: 'Danh sách sản phẩm',
+            },
+        ],
+        open: false
+    },
+])
+
+const sale_off_report = ref([
+    {
+        name: 'report',
+        label: 'Thống kê, báo cáo',
+        children: [
+            {
+                name: 'CustomerReport',
+                label: 'Khách hàng',
+            },
+            {
+                name: 'SaleStaffReport',
+                label: 'Nhân viên bán hàng',
+            },
+            {
+                name: 'DeliveryStaffReport',
+                label: 'Nhân viên giao nhận',
+            },
+        ],
+        open: false
+    },
 ])
 
 </script>

@@ -20,10 +20,10 @@
             </div>
 
             <div class="flex justify-end gap-3">
-                <button type="button" class="btn green w-[6rem]" @click="addItem()">{{ t('button.add_item') }}</button>
+                <button type="button" class="btn green w-[6rem]" @click="addItem()" tabindex="-1">{{ t('button.add_item') }}</button>
                 <input id="file" ref="file" type="file" @change="onFileChange($event)" class="hidden">
-                <button type="button" class="btn silver w-[6rem]" @click="openFile()">{{ $t('button.import') }}</button>
-                <button type="button" class="btn silver w-[6rem]" @click="reset()">{{ t('button.reset') }}</button>
+                <button type="button" class="btn silver w-[6rem]" @click="openFile()" tabindex="-1">{{ $t('button.import') }}</button>
+                <button type="button" class="btn silver w-[6rem]" @click="reset()" tabindex="-1">{{ t('button.reset') }}</button>
             </div>
 
             <div class="flex gap-3 p-1 entry-item">
@@ -36,17 +36,20 @@
                 <fieldset class="flex-1 form-input required">
                     <legend>{{ $t("attr.exit.ProductCode") }}</legend>
                 </fieldset>
-                <fieldset class="w-[8rem] form-input">
+                <fieldset class="w-[7rem] form-input">
                     <legend>{{ $t("attr.exit.LargeUnitQty") }}</legend>
                 </fieldset>
-                <fieldset class="w-[8rem] form-input">
+                <fieldset class="w-[7rem] form-input">
                     <legend>{{ $t("attr.exit.SmallUnitQty") }}</legend>
                 </fieldset>
                 <fieldset class="w-[5rem] form-input">
-                    <legend>{{ $t("attr.entry.Price") }}</legend>
+                    <legend>{{ $t("attr.exit.Price") }}</legend>
                 </fieldset>
                 <fieldset class="w-[7rem] form-input">
-                    <legend>{{ $t("attr.entry.PriceQty") }}</legend>
+                    <legend>{{ $t("attr.exit.PriceQty") }}</legend>
+                </fieldset>
+                <fieldset class="w-[11rem] form-input">
+                    <legend>{{ $t("attr.exit.Note") }}</legend>
                 </fieldset>
             </div>
             
@@ -68,12 +71,12 @@
                                 </template>
                             </select2>
                         </fieldset>
-                        <fieldset class="w-[8rem] form-input flex items-center">
-                            <input type="number" class="w-[5rem] text-right form-control" v-model="exit.LargeUnitQty" min="0">
+                        <fieldset class="w-[7rem] form-input flex items-center">
+                            <input type="number" class="w-[4rem] text-right form-control" v-model="exit.LargeUnitQty" min="0" v-select-on-focus>
                             <span class="w-[3rem] text-sm pl-1">{{ getLargeUnit(exit.ProductCode) }}</span>
                         </fieldset>
-                        <fieldset class="w-[8rem] form-input flex items-center">
-                            <input type="number" class="w-[5rem] text-right form-control" v-model="exit.SmallUnitQty" min="0" :disabled="smallUnitDisable(exit.ProductCode)">
+                        <fieldset class="w-[7rem] form-input flex items-center">
+                            <input type="number" class="w-[4rem] text-right form-control" v-model="exit.SmallUnitQty" min="0" :disabled="smallUnitDisable(exit.ProductCode)" v-select-on-focus>
                             <span class="w-[3rem] text-sm pl-1">{{ getSmallUnit(exit.ProductCode) }}</span>
                         </fieldset>
                         <fieldset class="w-[5rem] form-input flex items-center">
@@ -82,6 +85,9 @@
                         <fieldset class="w-[7rem] form-input flex items-center">
                             <input type="text" class="w-[7rem] text-right form-control" v-model="exit.PriceQtyLabel" disabled>
                         </fieldset>
+                        <fieldset class="w-[11rem] form-input flex items-center">
+                            <input type="text" class="w-[11rem] form-control" v-model="exit.Note" maxlength="200">
+                        </fieldset>
                     </div>
                 </template>
             </div>
@@ -89,8 +95,8 @@
             <div class="">
                 <div class="flex justify-end h-6 px-5">Tổng: {{ PriceQtyTotal() }}</div>
                 <div class="flex justify-around w-full">
-                    <button type="button" class="btn silver w-[6rem]" @click="onClose()">{{ $t("button.cancel") }}</button>
-                    <button type="submit" class="btn w-[6rem]" :disabled="exits.length <= 0">{{ $t("button.save") }}</button>
+                    <button type="button" class="btn silver w-[6rem]" @click="onClose()" tabindex="-1">{{ $t("button.cancel") }}</button>
+                    <button type="submit" class="btn w-[6rem]" :disabled="exits.length <= 0" tabindex="-1">{{ $t("button.save") }}</button>
                 </div>
             </div>
         </form>

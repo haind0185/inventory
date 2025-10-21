@@ -1,7 +1,7 @@
 {
     "name": "inventory",
     "productName": "inventory",
-    "version": "1.0.1",
+    "version": "1.0.5",
     "description": "Inventory app by haind0185.",
     "main": ".vite/build/main.js",
     "build": {
@@ -20,6 +20,13 @@
         },
         "files": [
             "app-update.yml"
+        ],
+        "publish": [
+            {
+                "provider": "github",
+                "owner": "haind0185",
+                "repo": "inventory"
+            }
         ]
     },
     "scripts": {
@@ -34,6 +41,10 @@
         "name": "Hai Nguyen",
         "email": "haind1508@gmail.com"
     },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/haind0185/inventory"
+    },
     "license": "MIT",
     "devDependencies": {
         "@electron-forge/cli": "^6.1.1",
@@ -45,17 +56,22 @@
         "@electron-forge/publisher-github": "^7.5.0",
         "@vitejs/plugin-vue": "^4.2.1",
         "electron": "24.2.0",
+        "electron-builder": "^25.1.8",
         "vite": "^4.3.5"
     },
     "dependencies": {
+        "@iconify/iconify": "^3.1.1",
         "@vuepic/vue-datepicker": "^9.0.3",
         "autoprefixer": "^10.4.20",
         "axios": "^1.7.7",
         "cors": "^2.8.5",
-        "electron-log": "^5.2.0",
+        "dotenv": "^16.4.7",
+        "electron-log": "^5.3.0",
         "electron-squirrel-startup": "^1.0.0",
         "electron-updater": "^6.3.9",
+        "exceljs": "^0.2.19",
         "express": "^4.21.0",
+        "floating-vue": "^5.2.2",
         "joi": "^17.13.3",
         "leaflet": "^1.9.4",
         "moment": "^2.30.1",
@@ -68,13 +84,14 @@
         "sqlite3": "^5.1.7",
         "tailwindcss": "^3.4.13",
         "umzug": "^3.8.2",
-        "update-electron-app": "^3.0.0",
+        "update-electron-app": "^3.1.1",
         "vue": "^3.2.47",
         "vue-cookies": "^1.8.4",
         "vue-i18n": "^10.0.4",
         "vue-router": "^4.4.5",
         "vue-select": "^4.0.0-beta.6",
         "vuejs-paginate-next": "^1.0.2",
-        "xlsx": "^0.18.5"
+        "xlsx": "^0.18.5",
+        "xlsx-style": "^0.8.13"
     }
 }

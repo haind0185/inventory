@@ -1,6 +1,22 @@
 <template>
-    <Datepicker :enableTimePicker="false" :class="class" v-model="value" :format="format" locale="en" cancelText=""
-        selectText="" auto-apply keep-action-row :close-on-auto-apply="true" :position="position">
+    <Datepicker
+        :enableTimePicker="false"
+        :class="class"
+        v-model="value"
+        :format="format"
+        locale="en"
+        cancelText=""
+        selectText=""
+        auto-apply
+        keep-action-row
+        :close-on-auto-apply="true"
+        :position="position"
+        @focus="openDatepicker"
+        @keydown.tab.prevent="focusNextInput"
+        @closed="isOpen = false; focusNextInput();"
+        @open="isOpen = true"
+        ref="datepicker"
+        :input-id="id">
     </Datepicker>
 </template>
 <script setup>
@@ -19,7 +35,9 @@ export default {
     emits: ['update:modelValue'],
     data: function () {
         return {
-            value: null
+            value: null,
+            id: Date.now() + '-' + Math.round(Math.random() * 1E9),
+            isOpen: false
         }
     },
     computed: {},
@@ -29,10 +47,53 @@ export default {
         },
         'modelValue': function () {
             this.value = this.modelValue
+            if(this.value) {
+                this.focusNextInput()
+            }
         }
     },
     created: function () {
         this.value = this.modelValue
+    },
+    mounted() {
+        this.setDatepickerId()
+    },
+    methods: {
+        openDatepicker: function () {
+            setTimeout(() => {
+                if (!this.isOpen) {
+                    this.$refs.datepicker.openMenu()
+                }
+            }, 100)
+        },
+        focusNextInput: function (event) {
+            if(event) {
+                event.preventDefault()
+            }
+            if (this.$refs.datepicker) {
+                this.$refs.datepicker.closeMenu()
+            }
+
+            if(this.value) {
+                setTimeout(() => {
+                    let focusableElements = Array.from(document.querySelectorAll("input"))
+                    let currentIndex = focusableElements.findIndex(el => el.id === this.id)
+                    
+                    if (currentIndex !== -1 && currentIndex < focusableElements.length - 1) {
+                        focusableElements[currentIndex + 1].focus()
+                    }
+                }, 100)
+            }
+
+        },
+        setDatepickerId: function () {
+            if (this.$refs.datepicker && this.$refs.datepicker.$el) {
+                let inputElement = this.$refs.datepicker.$el.querySelector("input.dp__input")
+                if (inputElement) {
+                    inputElement.id = this.id
+                }
+            }
+        },
     }
 }
 </script>

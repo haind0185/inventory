@@ -36,6 +36,7 @@ const exitInit = {
     SmallUnitQty: 0,
     Price: 0,
     PriceQty: 0,
+    Note: null,
 }
 const payloadInit = {
     ExitCode: null,

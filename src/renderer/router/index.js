@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router'
+import { store } from '@/store'
 
 const routes = [
     {
@@ -13,6 +14,11 @@ const routes = [
                 path: '/dashboard',
                 name: 'Dashboard',
                 component: () => import("@/views/dashboard/DashboardIndex.vue"),
+            },
+            {
+                path: '/compare',
+                name: 'Compare',
+                component: () => import("@/views/compare/CompareIndex.vue"),
             },
             {
                 path: '/products',
@@ -108,6 +114,87 @@ const routes = [
                 component: () => import("@/views/vrp/VRPIndex.vue"),
             },
             {
+                path: '/',
+                name: 'sale-off',
+                children: [
+                    {
+                        path: 'product',
+                        name: 'SaleOffProduct',
+                        component: () => import("@/views/saleOff/product/SaleOffProductIndex.vue"),
+                    },
+                    {
+                        path: 'sale-staff',
+                        name: 'SaleStaff',
+                        component: () => import("@/views/saleOff/saleStaff/SaleStaffIndex.vue"),
+                    },
+                    {
+                        path: 'delivery-staff',
+                        name: 'DeliveryStaff',
+                        component: () => import("@/views/saleOff/deliveryStaff/DeliveryStaffIndex.vue"),
+                    },
+                    {
+                        path: 'customer',
+                        name: 'Customer',
+                        component: () => import("@/views/saleOff/customer/CustomerIndex.vue"),
+                    },
+                    {
+                        path: 'order',
+                        name: "order",
+                        children: [
+                            {
+                                path: 'list',
+                                name: 'OrderList',
+                                component: () => import("@/views/saleOff/order/OrderIndex.vue")
+                            }
+                        ]
+                    },
+                    {
+                        path: 'stockIn',
+                        name: "stockIn",
+                        children: [
+                            {
+                                path: 'list',
+                                name: 'StockInList',
+                                component: () => import("@/views/saleOff/stockIn/StockInIndex.vue")
+                            }
+                        ]
+                    },
+                    {
+                        path: 'stock',
+                        name: "stock",
+                        children: [
+                            {
+                                path: 'list',
+                                name: 'StockList',
+                                component: () => import("@/views/saleOff/stock/StockIndex.vue")
+                            }
+                        ]
+                    },
+                    {
+                        path: 'report',
+                        name: "report",
+                        children: [
+                            {
+                                path: 'customer',
+                                name: 'CustomerReport',
+                                component: () => import("@/views/saleOff/report/CustomerReport.vue")
+                            },
+                            {
+                                path: 'sale-staff',
+                                name: 'SaleStaffReport',
+                                component: () => import("@/views/saleOff/report/SaleStaffReport.vue")
+                            },
+                            {
+                                path: 'delivery-staff',
+                                name: 'DeliveryStaffReport',
+                                component: () => import("@/views/saleOff/report/DeliveryStaffReport.vue")
+                            }
+                        ]
+                    },
+                    
+                ]
+            },
+            {
                 path: '/errors',
                 children: [
                     {
@@ -133,6 +220,7 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
+    store.closePageSearch()
     next()
 })
 

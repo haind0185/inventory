@@ -19,8 +19,8 @@
                 </div>
             </div>
             <div class="flex items-end gap-3">
-                <button type="submit" class="btn w-[6rem]">{{ $t("button.search") }}</button>
-                <button type="button" class="btn silver w-[6rem]" @click="clear()">{{ $t("button.clear") }}</button>
+                <button type="submit" class="btn w-[6rem]" tabindex="-1">{{ $t("button.search") }}</button>
+                <button type="button" class="btn silver w-[6rem]" @click="clear()" tabindex="-1">{{ $t("button.clear") }}</button>
             </div>
         </form>
 
@@ -35,7 +35,7 @@
                 </span>
             </div>
             <div class="flex justify-end w-[40%] gap-3">
-                <button type="button" class="btn green w-[6rem]" @click="onShowAdd()">{{ $t("button.add") }}</button>
+                <button type="button" class="btn green w-[6rem]" @click="onShowAdd()" tabindex="-1">{{ $t("button.add") }}</button>
             </div>
         </div>
 
@@ -44,29 +44,31 @@
                 <thead>
                     <tr>
                         <th class="" colspan="2">{{ $t("attr.entry.ProductNameLabel") }}</th>
-                        <th class="w-[7rem]">{{ $t("attr.entry.ExpiryDate") }}</th>
-                        <th class="w-[5rem]">{{ $t("attr.entry.LargeUnitQty") }}</th>
-                        <th class="w-[5rem]">{{ $t("attr.entry.SmallUnitQty") }}</th>
-                        <th class="w-[6rem]">{{ $t("attr.entry.Price") }}</th>
-                        <th class="w-[6rem]">{{ $t("attr.entry.Qty") }}</th>
+                        <th class="w-[6rem]">{{ $t("attr.entry.ExpiryDate") }}</th>
+                        <th class="w-[4rem]">{{ $t("attr.entry.LargeUnitQty") }}</th>
+                        <th class="w-[4rem]">{{ $t("attr.entry.SmallUnitQty") }}</th>
+                        <th class="w-[5rem]">{{ $t("attr.entry.Price") }}</th>
+                        <th class="w-[5rem]">{{ $t("attr.entry.Qty") }}</th>
                         <th class="w-[7rem]">{{ $t("attr.entry.PriceQty") }}</th>
+                        <th class="w-[12rem]">{{ $t("attr.entry.Note") }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <template v-for="item in entries.items">
                         <tr style="background: #dfe6f5; cursor: pointer;">
                             <td class="w-[2.5rem] text-center show-list" @click="item.show = !item.show">{{ item.entries.length }}</td>
-                            <td colspan="5" class="text-left" @click="item.show = !item.show">
+                            <td colspan="5" class="text-xs text-left" @click="item.show = !item.show">
                                 [{{ item.show ? '-' : '+' }}] [Mã nhập: {{ item.EntryCode }}] [Ngày nhập: {{ item.EntryDate }}]
                             </td>
                             <td colspan="1" style="cursor: default;">
                                 <div class="flex justify-end w-full">
-                                    <a href="javascript:void(0)" class="link" @click="onShowDetail(item.EntryCode)">Chi tiết</a>
+                                    <a href="javascript:void(0)" class="link" @click="onShowDetail(item.EntryCode)" tabindex="-1">Chi tiết</a>
                                 </div>
                             </td>
-                            <td @click="item.show = !item.show">
+                            <td @click="item.show = !item.show" class="text-right">
                                 {{ format_number(item.PriceQty) }}
                             </td>
+                            <td></td>
                         </tr>
                         <tr v-for="(entry, index) in item.entries" v-show="item.show">
                             <td class="text-center">{{ index+1 }}</td>
@@ -77,6 +79,24 @@
                             <td class="text-right">{{ format_number(entry.Price) }}</td>
                             <td class="text-right">{{ format_number(entry.Qty) }}</td>
                             <td class="text-right">{{ format_number(entry.PriceQty) }}</td>
+                            <td class="!text-xs text-left">{{ entry.Note }}</td>
+                        </tr>
+                        <tr v-show="item.show">
+                            <td colspan="3" class="!font-bold text-right">Tổng cộng: </td>
+                            <td class="!font-bold text-right">
+                                {{ format_number(item.entries.reduce((sum, item) => sum + item.LargeUnitQty, 0)) }}
+                            </td>
+                            <td class="!font-bold text-right">
+                                {{ format_number(item.entries.reduce((sum, item) => sum + item.SmallUnitQty, 0)) }}
+                            </td>
+                            <td></td>
+                            <td class="!font-bold text-right">
+                                {{ format_number(item.entries.reduce((sum, item) => sum + item.Qty, 0)) }}
+                            </td>
+                            <td class="!font-bold text-right">
+                                {{ format_number(item.entries.reduce((sum, item) => sum + item.PriceQty, 0)) }}
+                            </td>
+                            <td></td>
                         </tr>
                     </template>
                 </tbody>

@@ -20,8 +20,8 @@
             </div>
 
             <div class="flex justify-end gap-3">
-                <button type="button" class="btn green w-[6rem]" @click="addItem()">{{ t('button.add_item') }}</button>
-                <button type="button" class="btn silver w-[6rem]" @click="reset()">{{ t('button.reset') }}</button>
+                <button type="button" class="btn green w-[6rem]" @click="addItem()" tabindex="-1">{{ t('button.add_item') }}</button>
+                <button type="button" class="btn silver w-[6rem]" @click="reset()" tabindex="-1">{{ t('button.reset') }}</button>
             </div>
 
             <div class="flex gap-3 p-1 entry-item">
@@ -37,10 +37,10 @@
                 <fieldset class="w-[7.5rem] form-input required">
                     <legend>{{ $t("attr.entry.ExpiryDate") }}</legend>
                 </fieldset>
-                <fieldset class="w-[8rem] form-input">
+                <fieldset class="w-[7rem] form-input">
                     <legend>{{ $t("attr.entry.LargeUnitQty") }}</legend>
                 </fieldset>
-                <fieldset class="w-[8rem] form-input">
+                <fieldset class="w-[7rem] form-input">
                     <legend>{{ $t("attr.entry.SmallUnitQty") }}</legend>
                 </fieldset>
                 <fieldset class="w-[5rem] form-input">
@@ -48,6 +48,9 @@
                 </fieldset>
                 <fieldset class="w-[7rem] form-input">
                     <legend>{{ $t("attr.entry.PriceQty") }}</legend>
+                </fieldset>
+                <fieldset class="w-[11rem] form-input">
+                    <legend>{{ $t("attr.entry.Note") }}</legend>
                 </fieldset>
             </div>
 
@@ -72,12 +75,12 @@
                         <fieldset class="w-[7.5rem] form-input required">
                             <date class="w-full from-control" v-model="entry.ExpiryDate" required></date>
                         </fieldset>
-                        <fieldset class="w-[8rem] form-input flex items-center">
-                            <input type="number" class="w-[5rem] text-center form-control" v-model="entry.LargeUnitQty" min="0" required>
+                        <fieldset class="w-[7rem] form-input flex items-center">
+                            <input type="number" class="w-[4rem] text-center form-control" v-model="entry.LargeUnitQty" min="0" required v-select-on-focus>
                             <span class="w-[3rem] text-sm pl-1">{{ getLargeUnit(entry.ProductCode) }}</span>
                         </fieldset>
-                        <fieldset class="w-[8rem] form-input flex items-center">
-                            <input type="number" class="w-[5rem] text-center form-control" v-model="entry.SmallUnitQty" min="0" :disabled="smallUnitDisable(entry.ProductCode)">
+                        <fieldset class="w-[7rem] form-input flex items-center">
+                            <input type="number" class="w-[4rem] text-center form-control" v-model="entry.SmallUnitQty" min="0" :disabled="smallUnitDisable(entry.ProductCode)" v-select-on-focus>
                             <span class="w-[3rem] text-sm pl-1">{{ getSmallUnit(entry.ProductCode) }}</span>
                         </fieldset>
                         <fieldset class="w-[5rem] form-input flex items-center">
@@ -86,6 +89,9 @@
                         <fieldset class="w-[7rem] form-input flex items-center">
                             <input type="text" class="w-[7rem] text-right form-control" v-model="entry.PriceQtyLabel" disabled>
                         </fieldset>
+                        <fieldset class="w-[11rem] form-input flex items-center">
+                            <input type="text" class="w-[11rem] form-control" v-model="entry.Note" maxlength="200">
+                        </fieldset>
                     </div>
                 </template>
             </div>
@@ -93,9 +99,9 @@
             <div class="">
                 <div class="flex justify-end h-6 px-5">Tổng: {{ PriceQtyTotal() }}</div>
                 <div class="flex justify-around w-full">
-                    <button type="button" class="btn red w-[6rem]" @click="onDelete(payload.EntryCode)">{{ $t("button.delete") }}</button>
-                    <button type="button" class="btn silver w-[6rem]" @click="onClose()">{{ $t("button.cancel") }}</button>
-                    <button type="submit" class="btn yellow w-[6rem]" :disabled="entries.length <= 0">{{ $t("button.update") }}</button>
+                    <button type="button" class="btn red w-[6rem]" @click="onDelete(payload.EntryCode)" tabindex="-1">{{ $t("button.delete") }}</button>
+                    <button type="button" class="btn silver w-[6rem]" @click="onClose()" tabindex="-1">{{ $t("button.cancel") }}</button>
+                    <button type="submit" class="btn yellow w-[6rem]" :disabled="entries.length <= 0" tabindex="-1">{{ $t("button.update") }}</button>
                 </div>
             </div>
         </form>
@@ -137,6 +143,7 @@ const entryInit = {
     SmallUnitQty: 0,
     Price: 0,
     PriceQty: 0,
+    Note: null,
 }
 const payload = ref({...payloadInit})
 const entries = ref([])

@@ -1,87 +1,126 @@
 <template>
-    <div>
-        <button type="button" class="btn silver w-[6rem]" @click="calculate()">
-            {{ 'test' }}
-        </button>
+    <div class="app">
+        <button class="add-btn" @click="addNote">+ Thêm ghi chú</button>
+        
+        <StickyNote v-for="note in notes"
+        :key="note.id"
+        :note="note"
+        :onDelete="deleteNote"
+        :onUpdate="updateNote"
+        :onFocus="bringToFront"
+        />
     </div>
-    <div id="map" style="height: 100%;"></div>
 </template>
-<style scoped>
-#map {
-    width: 100%;
-    height: 500px;
-}
-</style>
+
 <script setup>
-// import { watch, ref, computed } from 'vue';
-// import { store } from '@/store';
-// import Loading from '@/views/component/Loading.vue';
-// import * as turf from '@turf/turf';
-import L from 'leaflet';
-import PolylineUtil from 'polyline-encoded'
+import { ref, onMounted, watch, computed } from "vue";
+import StickyNote from "./StickyNote.vue";
+import { stickyStore } from '@/store/sticky'
 
-// Khởi tạo xe và sức chứa
-const vehicles = [
-    // { "id": 1, "capacity": [80], "start": [106.660172, 10.762622], "end": [106.660172, 10.762622] },
-    // { "id": 2, "capacity": [80], "start": [106.660172, 10.762622], "end": [106.660172, 10.762622] },
-    { "id": 1, "capacity": [60], "start": [106.660172, 10.762622] },
-    { "id": 2, "capacity": [50], "start": [106.660172, 10.762622] },
-];
-
-// Tọa độ đại lý và kho
-const locations = [
-    { id: 0, name: "Warehouse", location: [106.660172, 10.762622], "delivery": [0] }, // Kho
-    { id: 1, name: "Agent 1", location: [106.665820, 10.776220], "delivery": [20] },
-    { id: 2, name: "Agent 2", location: [106.679000, 10.761000], "delivery": [30] },
-    { id: 3, name: "Agent 3", location: [106.678100, 10.762300], "delivery": [15] },
-    { id: 4, name: "Agent 4", location: [106.670000, 10.765000], "delivery": [25] },
-    { id: 5, name: "Agent 5", location: [106.680000, 10.773000], "delivery": [10] },
-];
-
-const calculate = async () => {
-    const vroomData = {
-        "vehicles": vehicles,
-        "jobs": locations.filter(item => item.id != 0),
-    };
+const notes = computed({
+    get: () => stickyStore.notes, // Lấy dữ liệu từ store
+    set: (value) => {
+        stickyStore.notes = value; // Cập nhật store khi component thay đổi
+    },
+});
 
 
-    // Phân phối kết quả
-    await fetch('http://solver.vroom-project.org/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(vroomData),
-    }).then(response => response.json())
-        .then(result => {
-            let geometries = result.routes.map(item => {
-                return item.geometry
-            })
-            drawMap(geometries)
-        })
-        .catch(error => console.error('Error:', error));
+const highestZIndex = ref(1); // Theo dõi z-index cao nhất
+
+// Lấy dữ liệu từ localStorage
+onMounted(async () => {
+    await stickyStore.syncData()
+    const savedNotes = JSON.parse(localStorage.getItem("stickyNotes")) || [];
+    notes.value = savedNotes.map(note => ({
+        ...note,
+        width: note.width || 200,
+        height: note.height || 150,
+        zIndex: note.zIndex || 1 // Đảm bảo có zIndex
+    }));
+
+    // Xác định z-index cao nhất khi khởi động
+    highestZIndex.value = Math.max(1, ...notes.value.map(n => n.zIndex || 1));
+});
+
+// Lưu vào localStorage khi notes thay đổi
+watch(
+    notes,
+    (newNotes) => {
+        localStorage.setItem("stickyNotes", JSON.stringify(newNotes));
+    },
+    { deep: true }
+);
+
+// Thêm một ghi chú mới
+const addNote = async () => {
+    highestZIndex.value++; // Ghi chú mới sẽ có z-index cao nhất
+    let idRand = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+    notes.value.push({
+        id: Date.now()+idRand,
+        title: "Ghi chú",
+        text: "",
+        x: Math.floor(Math.random() * (60 - 50 + 1)) + 50,
+        y: Math.floor(Math.random() * (100 - 50 + 1)) + 90,
+        width: 250,
+        height: 350,
+        color: getRandomColor(),
+        zIndex: highestZIndex.value,
+    });
+
+    localStorage.setItem("stickyNotes", JSON.stringify(notes.value))
+    await stickyStore.syncData()
 };
 
-// -----------------------------------map------------------------------
-const drawMap = (geometries) => {
-    // Khởi tạo bản đồ
-    const position = [10.762622, 106.660172];
-    const map = L.map("map").setView(position, 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-    
-    // Thêm điểm vào bản đồ
-    locations.forEach((loc) => {
-        L.marker([loc.location[1], loc.location[0]]).addTo(map).bindTooltip(`<b>${loc.name}(${loc.delivery[0]})</b>`, { permanent: false, direction: "top" });
-    });
-    
-    // Vẽ tuyến đường cho từng xe
-    geometries.forEach((geometry, index) => {
-        var latlngs = PolylineUtil.decode(geometry); // Giải mã polyline thành các điểm
-        let color = index ? 'blue' : 'red';
-        L.polyline(latlngs, { color: color }).addTo(map);
-    })
+// Xóa ghi chú
+const deleteNote = async (id) => {
+    notes.value = notes.value.filter((note) => note.id !== id);
+    localStorage.setItem("stickyNotes", JSON.stringify(notes.value))
+    await stickyStore.deleteData(id)
+};
+
+// Cập nhật ghi chú
+const updateNote = (updatedNote) => {
+    const index = notes.value.findIndex((note) => note.id === updatedNote.id);
+    if (index !== -1) {
+        notes.value[index] = { ...updatedNote };
+    }
+};
+
+// Khi focus vào một note, đặt nó lên trên cùng
+const bringToFront = (id) => {
+    highestZIndex.value++;
+    const note = notes.value.find(n => n.id === id);
+    if (note) {
+        note.zIndex = highestZIndex.value;
+    }
+};
+
+// Hàm lấy màu ngẫu nhiên
+const getRandomColor = () => {
+    // const colors = ["#FFEB3B", "#FFC107", "#FF9800", "#FF5722", "#4CAF50", "#2196F3", "#9C27B0"];
+    const colors = ["#ffdb34"];
+    return colors[Math.floor(Math.random() * colors.length)];
+};
+</script>
+
+<style>
+.app {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #f0f0f0;
+    overflow: auto;
 }
 
-</script>
+.add-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 10px 10px;
+    background: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+</style>

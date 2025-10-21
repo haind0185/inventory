@@ -52,14 +52,15 @@
                 <thead>
                     <tr>
                         <th class="">{{ 'SL' }}</th>
-                        <th class="">{{ $t("attr.exit.ExitDate") }}</th>
-                        <th class="">{{ $t("attr.exit.ExitCode") }}</th>
+                        <th class="w-[8rem]">{{ $t("attr.exit.ExitDate") }}</th>
+                        <th class="w-[8rem]">{{ $t("attr.exit.ExitCode") }}</th>
 
-                        <th class="">{{ $t("attr.exit.LargeUnitQty") }}</th>
-                        <th class="">{{ $t("attr.exit.SmallUnitQty") }}</th>
-                        <th class="">{{ $t("attr.exit.Qty") }}</th>
-                        <th class="">{{ $t("attr.exit.Price") }}</th>
-                        <th class="">{{ $t("attr.exit.PriceQty") }}</th>
+                        <th class="w-[4rem]">{{ $t("attr.exit.LargeUnitQty") }}</th>
+                        <th class="w-[4rem]">{{ $t("attr.exit.SmallUnitQty") }}</th>
+                        <th class="w-[5rem]">{{ $t("attr.exit.Qty") }}</th>
+                        <th class="w-[6rem]">{{ $t("attr.exit.Price") }}</th>
+                        <th class="w-[7rem]">{{ $t("attr.exit.PriceQty") }}</th>
+                        <th class="w-[12rem]">{{ $t("attr.exit.Note") }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -79,6 +80,24 @@
                             <td class="text-right">{{ format_number(exit.Qty) }}</td>
                             <td class="text-right">{{ format_number(exit.Price) }}</td>
                             <td class="text-right">{{ format_number(exit.PriceQty) }}</td>
+                            <td class="text-left">{{ exit.Note }}</td>
+                        </tr>
+                        <tr v-show="item.show">
+                            <td colspan="3" class="!font-bold text-right">Tổng cộng: </td>
+                            <td class="!font-bold text-right">
+                                {{ format_number(item.products.reduce((sum, item) => sum + item.LargeUnitQty, 0)) }}
+                            </td>
+                            <td class="!font-bold text-right">
+                                {{ format_number(item.products.reduce((sum, item) => sum + item.SmallUnitQty, 0)) }}
+                            </td>
+                            <td></td>
+                            <td class="!font-bold text-right">
+                                {{ format_number(item.products.reduce((sum, item) => sum + item.Qty, 0)) }}
+                            </td>
+                            <td class="!font-bold text-right">
+                                {{ format_number(item.products.reduce((sum, item) => sum + item.PriceQty, 0)) }}
+                            </td>
+                            <td></td>
                         </tr>
                     </template>
                 </tbody>

@@ -18,12 +18,13 @@
                     class="cls-2"></path>
             </g>
         </svg>
-        <span class="top-item font-xlarge lh-100 app-logo-title text-white">Inventory</span>
+        <span class="text-black top-item font-xlarge lh-100 app-logo-title">Inventory</span>
     </div>
 </template>
 
 <style> 
 .logo {
+    position: relative;
     display: flex;
     gap: 1rem;
     align-items: center;
@@ -31,11 +32,11 @@
     height: 3rem;
     background: var(--bg-logo);
     font-size: 20px;
-    color: white;
+    color: black;
 }
 .logo svg {
     width: 2rem;
     height: 2rem;
-    fill: white;
+    fill: black;
 }
 </style>

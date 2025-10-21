@@ -16,8 +16,8 @@ router.get('/safety', InventoryController.safety);
 
 router.get('/download-database', async (req, res) => {
     const databasePath = app.isPackaged
-        ? path.join(process.resourcesPath, '../database.sqlite')
-        : path.join(__dirname, '../../database.sqlite');
+        ? path.join(process.resourcesPath, '../../database.sqlite')
+        : path.join(__dirname, '../../../database.sqlite');
     let filename = moment().format('YYYYMMDD_HHmmss') + '_database.sqlite';
 
     const r = await Service.copy(databasePath, filename);

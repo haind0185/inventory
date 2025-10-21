@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { initPinia } from '@/store/setup'
 import { t } from '@/i18n'
+import api from '@/api'
 
 const createStore = defineStore('app', {
     state: () => {
@@ -12,18 +13,57 @@ const createStore = defineStore('app', {
                 message: '',
                 type: 3,
             },
+            updateModel: {
+                active: false,
+                title: '',
+                message: '',
+                type: 0,
+            },
+            downloadModel: {
+                active: false,
+                title: '',
+                message: '',
+                type: 0,
+            },
+            isUpdateAvailable: false,
+            isUpdateDownloading: false,
             master: {},
-            numberModal: 90
+            numberModal: 90,
+            pageSearch: {
+                isOpen: false,
+                text: '',
+            },
+            progress: {
+                isShow: false,
+                value: 0,
+            },
+            master: {},
         }
     },
     getters: {
         getUser: (state) => {
             return !state.user.data || Object.keys(state.user.data).length === 0 ? null : JSON.parse(state.user.data)
         },
+        findMaster: (state) => {
+            return state.master
+        }
     },
     actions: {
         // api
-        
+        async getMaster() {
+            // if(Object.keys(this.master).length !== 0) return
+            store.setLoading(true)
+            return await api.get(`/master`,)
+                .then((res) => {
+                    store.setLoading(false)
+                    this.master = res.data.data
+                    return res.data
+                })
+                .catch((error) => {
+                    store.setLoading(false)
+                    return false
+                })
+        },
 
         // mutation
         setLoading(value) {
@@ -42,12 +82,71 @@ const createStore = defineStore('app', {
             this.errorModal.message = value
             this.errorModal.active = true
         },
+        initUpdateModel() {
+            this.updateModel = {
+                active: false,
+                title: '',
+                message: '',
+                type: 0,
+            }
+        },
+        initDownloadModel() {
+            this.downloadModel = {
+                active: false,
+                title: '',
+                message: '',
+                type: 0,
+            }
+        },
         addIndex() {
             this.numberModal += 1
         },
         subIndex() {
             this.numberModal -= 1
         },
+        openPageSearch() {
+            this.pageSearch.isOpen = true
+        },
+        closePageSearch() {
+            this.pageSearch.isOpen = false
+        },
+        switchPareSearch() {
+            if(this.pageSearch.isOpen) {
+                this.closePageSearch()
+            } else {
+                this.openPageSearch()
+            }
+        },
+        setProgress(value) {
+            this.progress.isShow = true
+            this.progress.value = value
+        },
+        stopProgress() {
+            this.progress.isShow = false
+            this.progress.value = 0
+        },
+        onUpdateAvailable() {
+            this.isUpdateAvailable = true
+            this.isUpdateDownloading = true
+        },
+        onUpdateDownloaded() {
+            this.isUpdateDownloading = false
+            this.setUpdateDownloaded()
+
+        },
+        setUpdateDownloaded() {
+            if(this.isUpdateAvailable) {
+                this.downloadModel.active = false
+                this.downloadModel.title = 'Cập nhật hoàn tất'
+                this.downloadModel.message = 'Đã tải xong bản cập nhật! Khởi động lại ứng dụng để áp dụng thay đổi?'
+                this.downloadModel.active = true
+            }
+        },
+        quitAndInstall() {
+            this.isUpdateDownloading = false
+            this.isUpdateAvailable = false
+            window.electron.quitAndInstall()
+        }
     },
 })
 

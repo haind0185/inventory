@@ -1,6 +1,6 @@
 <template>
     <Paginate :page-range="3" :margin-pages="0" :prev-text="'<'" :next-text="'>'" :container-class="'pagination'"
-        :page-class="'page-item'" :first-last-button="true" :first-button-text="'<<'" :last-button-text="'>>'">
+        :page-class="'page-item'" :first-last-button="true" :first-button-text="'<<'" :last-button-text="'>>'" tabindex="-1">
     </Paginate>
 </template>
 <script setup>
@@ -54,8 +54,8 @@ import Paginate from "vuejs-paginate-next";
     z-index: 2;
     color: #fff;
     cursor: default;
-    background-color: #21263c;
-    border-color: #21263c;
+    background-color: var(--theme-color);
+    border-color: var(--theme-color);
 }
 
 .pagination a {

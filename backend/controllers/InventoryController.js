@@ -4,7 +4,7 @@ import Inventory from '../models/Inventory';
 import { error, success } from './common/http';
 import { t } from '../../src/renderer/i18n';
 import { Service } from './common/download';
-import moment, { RFC_2822 } from 'moment';
+import moment from 'moment';
 import { helper } from '../../src/renderer/helper';
 const { Op } = require('sequelize');
 const Joi = require('joi');

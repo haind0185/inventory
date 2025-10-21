@@ -11,3 +11,10 @@ export const UNIT = [
     'Chai',
     'Lọ',
 ]
+
+export const ACTIVE_ON = true;
+export const ACTIVE_OFF = false;
+export const ACTIVE_LIST = {
+    true: "Đang làm việc",
+    false: "Đã nghỉ"
+}

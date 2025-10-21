@@ -54,6 +54,11 @@ const Exit = sequelize.define('Exit', {
         allowNull: false,
         default: 0,
     },
+    Note: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        default: null,
+    },
     Qty: {
         type: DataTypes.VIRTUAL,
         get() {
@@ -73,7 +78,7 @@ const Exit = sequelize.define('Exit', {
         type: DataTypes.VIRTUAL,
         get() {
             if(!this.product) return ''
-            return `[${this.product.ProductCode}] ${this.product.ProductName} [${this.product.LargeUnit}]` + (this.product.SmallUnit ? `[x${this.product.ConversionRate}][${this.product.SmallUnit}]` : '') + `[${this.product.Expire} ngày]`;
+            return `[${this.product.ProductCode}] ${this.product.ProductName} ` + `[${this.product.Expire} ngày]`;
         }
     },
 });
