@@ -18,7 +18,7 @@
                         <legend>{{ 'Biển số' }}</legend>
                     </fieldset>
                     <fieldset class="w-[40%] form-input required">
-                        <legend>{{ 'Doanh số' }}</legend>
+                        <legend>{{ 'Doanh số' }}{{ `(${format_number(totalVehicleCapacity())})` }}</legend>
                     </fieldset>
                 </div>
                 <div class="parent-scroll">
@@ -27,10 +27,10 @@
                             <div class="flex gap-3">
                                 <div class="flex items-center text-sm w-[3rem] gap-1" style="margin-bottom: -3px;">
                                     <div class="w-[1rem]">
-                                        <span class="close-item" @click="deleteItem(index)" v-if="vehicles.length > 1">✕</span>
+                                        <span class="close-item" v-if="vehicles.length > 1" @click="deleteItem(index)">✕</span>
                                     </div>
                                     <span class="w-[2rem] text-end">
-                                        {{ index+1  }}
+                                        {{ index + 1 }}
                                     </span>
                                 </div>
                                 <fieldset class="w-[20%] form-input required">
@@ -45,7 +45,7 @@
                 </div>
             </div>
         </fieldset>
-        
+
         <fieldset class="w-full form-input required box parent-scroll" style="height: 98%;">
             <legend>Danh sách đại lý</legend>
             <div class="gap-2 wrapper-scroll">
@@ -53,7 +53,7 @@
                     <fieldset class="w-[40%] form-input required">
                         <legend>{{ "Vị trí kho" }}</legend>
                         <select2 class="form-control" required :options="agentList" v-model="warehouse" label="AgentNameLabel" :reduce="item => item.AgentCode">
-                            <template #search="{attributes, events}">
+                            <template #search="{ attributes, events }">
                                 <input class="vs__search" :required="warehouse == null || warehouse == ''" v-bind="attributes" v-on="events" />
                             </template>
                         </select2>
@@ -75,8 +75,8 @@
                     <fieldset class="w-[40%] form-input required">
                         <legend>{{ 'Đại lý' }}</legend>
                     </fieldset>
-                    <fieldset class="w-[20%] form-input required">
-                        <legend>{{ 'Doanh số' }}</legend>
+                    <fieldset class="w-[20%] form-input required flex items-center">
+                        <legend>{{ 'Doanh số ' }}{{ `(${format_number(totalDelivery())})` }}</legend>
                     </fieldset>
                     <fieldset class="w-[25%] form-input">
                         <legend>{{ 'Chuyển cho xe' }}</legend>
@@ -91,21 +91,27 @@
                                         <span class="close-item" @click="deleteItemAgent(index)" v-if="agents.length > 1">✕</span>
                                     </div>
                                     <span class="w-[2rem] text-end">
-                                        {{ index+1  }}
+                                        {{ index + 1 }}
                                     </span>
                                 </div>
                                 <fieldset class="w-[40%] form-input required">
-                                    <select2 class="form-control" required :options="agentList" v-model="agent.AgentCode" label="AgentNameLabel" :reduce="item => item.AgentCode">
-                                        <template #search="{attributes, events}">
-                                            <input class="vs__search" :required="agent.AgentCode == null || agent.AgentCode == ''" v-bind="attributes" v-on="events" />
+                                    <select2 class="form-control" required :options="agentList"
+                                        v-model="agent.AgentCode" label="AgentNameLabel"
+                                        :reduce="item => item.AgentCode">
+                                        <template #search="{ attributes, events }">
+                                            <input class="vs__search"
+                                                :required="agent.AgentCode == null || agent.AgentCode == ''"
+                                                v-bind="attributes" v-on="events" />
                                         </template>
                                     </select2>
                                 </fieldset>
                                 <fieldset class="w-[20%] form-input required">
-                                    <input type="number" class="w-full text-right form-control" required v-model="agent.AgentDelivery" min="0">
+                                    <input type="number" class="w-full text-right form-control" required
+                                        v-model="agent.AgentDelivery" min="0">
                                 </fieldset>
                                 <fieldset class="w-[15%] form-input required">
-                                    <input type="text" class="w-full text-right form-control" v-model="agent.AgentSkill">
+                                    <input type="text" class="w-full text-right form-control"
+                                        v-model="agent.AgentSkill">
                                 </fieldset>
                             </div>
                         </template>
@@ -119,12 +125,9 @@
         </div>
     </form>
 
-    <VRPResult
-        v-if="showVRP"
-        :show="showVRP"
-        :data="vrpProp"
-        @close="onCloseVRP($event)"
-        @save="onSaveVRP($event)" />
+    <VRPResult v-if="showVRP" :show="showVRP" :data="vrpProp" @close="onCloseVRP($event)" @save="onSaveVRP($event)" />
+
+    <Confirm ref="confirm"></Confirm>
 </template>
 <script setup>
 import { onMounted, ref, watch, computed } from 'vue'
@@ -161,6 +164,14 @@ const reset = () => {
     vrpStore.reset()
 }
 
+const totalDelivery = () => {
+    return agents.value.reduce((sum, item) => sum + item.AgentDelivery, 0)
+}
+
+const totalVehicleCapacity = () => {
+    return vehicles.value.reduce((sum, item) => sum + item.VehicleCapacity, 0)
+}
+
 /**
  * list agent
  */
@@ -183,27 +194,27 @@ const openFile = () => {
 
 const setAgents = (data) => {
     vrpStore.resetAgent()
-    for(const i in data) {
-        let agent = {...vrpStore.initAgent}
+    for (const i in data) {
+        let agent = { ...vrpStore.initAgent }
 
-        if(data[i].AgentCode) {
+        if (data[i].AgentCode) {
             agent.AgentCode = data[i].AgentCode
         }
-        if(data[i].AgentDelivery) {
+        if (data[i].AgentDelivery) {
             agent.AgentDelivery = data[i].AgentDelivery
         }
-        
+
         vrpStore.setAgent(agent)
     }
 }
 
 const onFileChange = async (e) => {
     let file = e.target.files ? e.target.files[0] : null
-    if(file) {
+    if (file) {
         let formData = new FormData();
         formData.append('file', file);
         await vrpStore.import(formData).then((res) => {
-            if(res && res.code == 200) {
+            if (res && res.code == 200) {
                 setAgents(res.data)
             }
         })
@@ -215,43 +226,51 @@ const onFileChange = async (e) => {
  */
 const getAgentList = async () => {
     await agentStore.list().then((res) => {
-        if(res && res.code == 200) {
+        if (res && res.code == 200) {
             agentStore.setAgentList(res.data.items)
         }
     })
 }
 
 const onVRP = () => {
+    if (totalVehicleCapacity() < totalDelivery()) {
+        return confirm.value.show({
+            title: t("title.error"),
+            message: `Tổng doanh số trên các xe phải lớn hơn tổng doanh số ở đại lý mới có thể vận tải được.`,
+            type: 3
+        })
+    }
     vrpProp.value.vehicles = getVehicles()
     vrpProp.value.jobs = getJobs()
     vrpProp.value.warehouse = getWarehouse()
+    console.log(vrpProp.value)
 
     showVRP.value = true
 }
 
 const onCloseVRP = (event) => {
     showVRP.value = false
-    if(event) {
+    if (event) {
         // index()
     }
 }
 const onSaveVRP = (event) => {
     showVRP.value = false
-    if(event) {
+    if (event) {
         // index()
     }
 }
 
 const getWarehouse = () => {
     let wh = agentList.value.find(i => i.AgentCode == warehouse.value)
-    if(wh) {
+    if (wh) {
         return [wh.AgentLocationX, wh.AgentLocationY]
     }
     return []
 }
 
 const getVehicles = () => {
-    
+
     return vehicles.value.map((item, index) => {
         return {
             "id": index,
@@ -265,16 +284,17 @@ const getVehicles = () => {
 const getJobs = () => {
     return agents.value.map((item, index) => {
         let agent = agentList.value.find(i => i.AgentCode == item.AgentCode)
+        // console.log(agent)
         let skills = []
         let skill = null
-        if(item.AgentSkill) {
+        if (item.AgentSkill) {
             skill = vehicles.value.findIndex(veh => veh.VehicleCode == item.AgentSkill);
         }
 
-        if(skill) {
+        if (skill) {
             skills.push(skill)
         }
-        
+
         return {
             "id": index,
             "name": `${agent.AgentNameLabel}`,

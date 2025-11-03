@@ -10,6 +10,12 @@
                 Hiển thị đại lý
             </label>
             <a href="javascript:void(0)" class="underline" @click="showVRP()">Bảng kết quả</a>
+            <div class="flex gap-3">
+                <label class="flex items-center gap-1 text-sm" v-for="vehicle in showVehicle">
+                    <input type="checkbox" v-model="vehicle.isShow" @change="drawMap()">
+                    {{ `${vehicle.code}(${format_number(vehicle.capacity)})` }}
+                </label>
+            </div>
         </div>
         <div class="w-full h-full" style="height: calc(100vh - 8rem);" id="map-container" >
             <div id="map" style="height: 100%; width: 100%;"></div>
@@ -35,6 +41,7 @@
 import { onMounted, ref, watch } from 'vue'
 import { t } from '@/i18n'
 import L from 'leaflet';
+import { helper } from '@/helper'
 import PolylineUtil from 'polyline-encoded'
 import VRPTable from './VRPTable.vue';
 
@@ -46,10 +53,11 @@ const VRPTableData = ref({
     payload: {}
 })
 const showVRPTable = ref(false)
+const showVehicle = ref([])
 console.log(data)
 
 const colors = ['E74C3C', 'A1BC9C', 'F39C12', 'B4595E', 'E8495E', 'F39C12', 'E498DB', 'E2CC71', 'B959B6'];
-const isShowVehicle = ref(false)
+const isShowVehicle = ref(true)
 const isShowAgent = ref(false)
 const routes = ref([])
 const unassigned = ref([])
@@ -110,20 +118,20 @@ const drawMap = () => {
         let color = colors[index] ?? colors[0]
 
         // Bước 1: Vẽ tuyến đường cho từng xe (Vehicle)
-        let vehicle = data.vehicles.find(item => item.id == route.vehicle)
+        let vehicle = showVehicle.value.find(item => item.id == route.vehicle && item.isShow === true)
         if(vehicle) {
-            L.polyline(PolylineUtil.decode(route.geometry), { color: geometryColor(color) }).addTo(map).bindTooltip(`<b>Xe: ${vehicle.code}</b>`, { permanent: isShowVehicle.value, direction: "top" });;
+            L.polyline(PolylineUtil.decode(route.geometry), { color: geometryColor(color) }).addTo(map).bindTooltip(`<b>Xe: ${vehicle.code} (${helper.format_number(route.delivery)})</b>`, { permanent: isShowVehicle.value, direction: "top" });;
+            // Bước 2: Thêm maker Agent vào bản đồ
+            route.steps.forEach((job, index) => {
+                if(job.type == 'job') {
+                    let agent = data.jobs.find(item => item.id == job.id)
+                    if(agent) {
+                        L.marker([agent.location[1], agent.location[0]], { icon: getMaker(color) }).addTo(map).bindTooltip(`<b>${agent.name}(${agent.delivery[0]})</b>`, { permanent: isShowAgent.value, direction: "top" });
+                    }
+                }
+            })
         }
 
-        // Bước 2: Thêm maker Agent vào bản đồ
-        route.steps.forEach((job, index) => {
-            if(job.type == 'job') {
-                let agent = data.jobs.find(item => item.id == job.id)
-                if(agent) {
-                    L.marker([agent.location[1], agent.location[0]], { icon: getMaker(color) }).addTo(map).bindTooltip(`<b>${agent.name}(${agent.delivery[0]})</b>`, { permanent: isShowAgent.value, direction: "top" });
-                }
-            }
-        })
     })
 
     // Vẽ những đại lý không được giao
@@ -147,7 +155,19 @@ const getMaker = (color) => {
     });
 }
 
+const setShowVehicle = () => {
+    data.vehicles.forEach(item => {
+        showVehicle.value.push({
+            code: item.code,
+            id: item.id,
+            capacity: item.capacity[0],
+            isShow: true
+        })
+    })
+}
+
 onMounted(async () => {
+    setShowVehicle()
     await calculate()
 })
 
