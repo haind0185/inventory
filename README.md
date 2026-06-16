@@ -108,7 +108,40 @@ npm version minor    # 1.0.6 → 1.1.0  (thêm tính năng)
 npm version major    # 1.0.6 → 2.0.0  (thay đổi lớn)
 ```
 
-Lệnh này tự sửa `version` trong `package.json`, tạo commit và git tag tương ứng. Sau đó build/publish như bình thường. (Thêm `--no-git-tag-version` nếu chỉ muốn đổi số mà không tự commit/tag.)
+Lệnh này tự sửa `version` trong `package.json`, tạo commit và git tag tương ứng (ví dụ `v1.0.7`). (Thêm `--no-git-tag-version` nếu chỉ muốn đổi số mà không tự commit/tag.)
+
+> Lưu ý: `npm version` yêu cầu cây git phải sạch (đã commit hết thay đổi) trước khi chạy.
+
+### Đẩy lên remote
+
+Sau khi bump version, đẩy cả commit lẫn tag lên GitHub:
+
+```bash
+git push origin route --follow-tags
+```
+
+- `route` là branch hiện tại.
+- `--follow-tags` đẩy kèm các annotated tag (như `v1.0.9`) gắn trên commit được push.
+- Nếu tag chưa được đẩy lên, đẩy riêng: `git push origin v1.0.9`.
+
+### Xử lý lỗi "tag already exists"
+
+Nếu `npm version` báo `fatal: tag 'vX.Y.Z' already exists`, nghĩa là đã có tag trùng tên (thường là tag rác trỏ nhầm commit). Kiểm tra và dọn:
+
+```bash
+git tag -l "v*"                 # xem các tag local
+git ls-remote --tags origin     # xem tag nào đã có trên remote
+git log -1 --oneline <tag>      # xem tag trỏ vào commit nào
+```
+
+Nếu là tag rác (chưa có trên remote, trỏ sai commit), xóa rồi tạo lại đúng HEAD:
+
+```bash
+git tag -d vX.Y.Z               # xóa tag local
+git tag -a vX.Y.Z -m "X.Y.Z"    # tạo lại trỏ vào commit hiện tại
+```
+
+Sau đó build/publish như bình thường.
 
 ## Hướng dẫn sử dụng nhanh
 
