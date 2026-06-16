@@ -88,13 +88,63 @@ npm run make
 
 Sản phẩm build nằm trong thư mục `out/`. Trên Windows, maker Squirrel sẽ tạo file `Setup.exe` (có hỗ trợ auto-update) — quá trình này dùng chứng chỉ `cert.pfx` với mật khẩu lấy từ `CERT_PASSWORD`.
 
+## Ký ứng dụng (code signing)
+
+App được ký bằng chứng chỉ tự ký `cert.pfx` (cấu hình trong `forge.config.js` → maker Squirrel). Maker đọc **thẳng file `cert.pfx`** với mật khẩu `CERT_PASSWORD`, **không cần cài chứng chỉ vào Windows Certificate Store**.
+
+`cert.pfx` đã có sẵn trong repo, nên **bình thường không cần làm gì** — chỉ cần `.env` có `CERT_PASSWORD` đúng.
+
+### Tạo lại cert.pfx
+
+Chỉ cần khi mất file hoặc muốn làm chứng chỉ mới. Chạy script (từ thư mục gốc project):
+
+```bash
+powershell -ExecutionPolicy Bypass -File scripts/generate-cert.ps1
+# hoặc đổi mật khẩu:
+powershell -ExecutionPolicy Bypass -File scripts/generate-cert.ps1 -Password "mat_khau_moi"
+```
+
+Script `scripts/generate-cert.ps1` thực hiện 3 bước:
+
+1. `New-SelfSignedCertificate` — tạo chứng chỉ code-signing trong `Cert:\CurrentUser\My`.
+2. Lấy đúng chứng chỉ vừa tạo (mới nhất nếu trùng tên).
+3. `Export-PfxCertificate` — xuất ra file `cert.pfx` (có đặt mật khẩu).
+
+Nếu muốn làm tay không qua script, đây là các lệnh PowerShell tương đương:
+
+```powershell
+New-SelfSignedCertificate -Type CodeSigning -Subject "CN=Inventory" -KeyUsage DigitalSignature `
+    -FriendlyName "Inventory Certificate" -CertStoreLocation "Cert:\CurrentUser\My"
+
+$cert = Get-ChildItem -Path Cert:\CurrentUser\My\ |
+    Where-Object { $_.FriendlyName -eq "Inventory Certificate" } |
+    Sort-Object NotBefore -Descending | Select-Object -First 1
+
+Export-PfxCertificate -Cert $cert -FilePath "cert.pfx" `
+    -Password (ConvertTo-SecureString -String "inventory_password" -Force -AsPlainText)
+```
+
+Sau khi tạo lại:
+
+- Đặt `CERT_PASSWORD` trong `.env` **khớp** với mật khẩu đã dùng (mặc định `inventory_password`).
+- `cert.pfx` đang được commit trong repo, nên commit lại file mới để máy deploy khác cũng có:
+  ```bash
+  git add cert.pfx && git commit -m "build: regenerate signing cert"
+  ```
+
+> Lưu ý: đây là chứng chỉ **tự ký**, nên Windows SmartScreen vẫn có thể cảnh báo trên máy người dùng khác. Tạo cert mới không ảnh hưởng auto-update (Squirrel không kiểm tra tính liên tục của chữ ký). Muốn hết cảnh báo hoàn toàn cần mua chứng chỉ từ CA được tin cậy.
+
 ## Publish (phát hành + auto-update)
+
+Đảm bảo file `.env` đã có `GITHUB_TOKEN` (Personal Access Token có quyền `repo`) và `CERT_PASSWORD`. Sau đó chỉ cần:
 
 ```bash
 npm run publish
 ```
 
-Lệnh này build và **đẩy bản phát hành lên GitHub Releases** (`haind0185/inventory`) thông qua `@electron-forge/publisher-github`, dùng `GITHUB_TOKEN` trong `.env`.
+`forge.config.js` tự nạp `.env` (qua `dotenv`), nên **không cần** set biến môi trường thủ công như `$env:GITHUB_TOKEN=...` mỗi lần. Lệnh này build, ký app và **đẩy bản phát hành lên GitHub Releases** (`haind0185/inventory`) thông qua `@electron-forge/publisher-github`.
+
+> Muốn xem log chi tiết khi publish: `$env:DEBUG="electron-forge:*"; npm run publish` (chỉ để debug, không bắt buộc).
 
 Ứng dụng đã cài trên máy người dùng sẽ tự kiểm tra và tải bản cập nhật mới từ GitHub Releases (cấu hình `update-electron-app` / `electron-updater` trong `src/main.js`). Khi có bản mới, người dùng được thông báo để cài đặt và khởi động lại.
 
