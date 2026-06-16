@@ -1,29 +1,140 @@
-# electron-forge-vite-vue-template
+# Inventory
 
-Mini template for electron-forge combine with vite and vue3.
+Ứng dụng desktop **quản lý kho hàng** dành cho doanh nghiệp, chạy trên Windows. Ứng dụng hoạt động hoàn toàn offline trên máy người dùng: toàn bộ dữ liệu được lưu trong **SQLite** cục bộ và có cơ chế **tự động cập nhật** qua GitHub Releases.
 
-## How to start
+## Kiến trúc
 
-Start dev:
+Đây là một ứng dụng full-stack được đóng gói trong một desktop app:
+
+- **Electron** — khung desktop. Khi khởi động, tiến trình chính (`src/main.js`) sẽ bật một **server Express ngay trên `localhost:1603`**.
+- **Frontend (Vue 3)** — chạy trong cửa sổ Electron, gọi REST API tới server Express cục bộ.
+- **Backend (Express + Sequelize)** — xử lý nghiệp vụ và truy xuất database SQLite. Migration tự động chạy mỗi khi ứng dụng khởi động để đảm bảo schema luôn cập nhật.
+
+```
+┌─────────────────────── Electron ───────────────────────┐
+│                                                         │
+│  Renderer (Vue 3 + Pinia + Vue Router + Tailwind)       │
+│        │  axios → http://localhost:1603                 │
+│        ▼                                                │
+│  Express server (Sequelize ORM)  ──►  SQLite (local)    │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+## Công nghệ sử dụng
+
+| Lớp | Công nghệ |
+|-----|-----------|
+| Desktop / Build | Electron 24, Electron Forge, Vite 4, electron-builder, electron-updater |
+| Frontend | Vue 3 (`<script setup>`), Pinia, Vue Router 4, Vue I18n, Tailwind CSS 3, Axios |
+| Backend | Express 4, Sequelize 6, sqlite3, Umzug (migration), Joi (validation), Multer (upload) |
+| Excel | xlsx, xlsx-style, exceljs |
+| Khác | moment, electron-log |
+
+## Chức năng
+
+- **Mặt hàng (Products)** — quản lý danh mục sản phẩm (mã, tên, đơn giá, đơn vị, quy cách, HSD), thêm/sửa/xóa và import từ file Excel.
+- **Nhập kho (Entry)** — lập phiếu nhập, theo dõi hạn sử dụng từng lô hàng, xem nhập theo mặt hàng / theo ngày.
+- **Xuất kho (Exit)** — lập phiếu xuất, kiểm tra tồn đủ số lượng, xem xuất theo mặt hàng / theo ngày.
+- **Tồn kho (Inventory)** — xem tồn kho hiện tại, tồn kho theo mặt hàng, tổng hợp tồn kho, **tồn kho an toàn (safety stock)**, và **kiểm kho (stocktaking)** bằng file Excel.
+- **So sánh (Compare)** — đối chiếu dữ liệu.
+- **Đại lý (Agents)** — quản lý đại lý (mã, tên, địa chỉ, tọa độ), import từ Excel.
+- **Bán hàng (Sale-Off)** — phân hệ bán hàng đầy đủ: sản phẩm, nhân viên sale, nhân viên giao hàng, khách hàng, đơn hàng, nhập kho, tồn kho và các báo cáo (theo khách hàng / nhân viên sale / nhân viên giao hàng).
+- **Dashboard** — màn hình tổng quan, sticky note.
+- **Xuất / nhập Excel** — nhiều màn hình hỗ trợ import dữ liệu và xuất báo cáo ra Excel.
+
+Giao diện và dữ liệu hiển thị bằng **tiếng Việt** (Vue I18n).
+
+## Yêu cầu môi trường
+
+- **Node.js** (khuyến nghị bản LTS) và npm
+- Windows (build mặc định nhắm tới Windows; Forge có cấu hình sẵn maker cho macOS/Linux nhưng chưa được dùng chính)
+
+## Cài đặt
+
+```bash
+npm install
+```
+
+Tạo file `.env` ở thư mục gốc (tham khảo `.env.example`):
+
+```env
+VITE_API_BASE_URL=http://localhost:1603   # URL frontend dùng để gọi API
+CERT_PASSWORD=...                          # mật khẩu chứng chỉ ký (cert.pfx) — chỉ cần khi build/publish
+GITHUB_TOKEN=github_pat_...                # token GitHub có quyền repo — chỉ cần khi publish
+```
+
+> `CERT_PASSWORD` và `GITHUB_TOKEN` chỉ cần khi đóng gói/phát hành. Để chạy dev chỉ cần `VITE_API_BASE_URL`.
+
+## Chạy (dev)
 
 ```bash
 npm run start
 ```
 
-Build:
+Lệnh này khởi động Electron Forge ở chế độ dev: bật server Express trên `localhost:1603`, build renderer bằng Vite (hot reload) và mở cửa sổ ứng dụng.
+
+> Lưu ý: ứng dụng yêu cầu port **1603** trống. Nếu port đang bị chiếm, ứng dụng sẽ tự thoát. Có thể nhấn **Ctrl+E** trong app để khởi động lại server.
+
+## Build (đóng gói)
+
+```bash
+# Đóng gói ứng dụng (chưa tạo installer)
+npm run package
+
+# Tạo file cài đặt (installer/zip) cho nền tảng hiện tại
+npm run make
+```
+
+Sản phẩm build nằm trong thư mục `out/`. Trên Windows, maker Squirrel sẽ tạo file `Setup.exe` (có hỗ trợ auto-update) — quá trình này dùng chứng chỉ `cert.pfx` với mật khẩu lấy từ `CERT_PASSWORD`.
+
+## Publish (phát hành + auto-update)
 
 ```bash
 npm run publish
 ```
 
-## Electron Forge
+Lệnh này build và **đẩy bản phát hành lên GitHub Releases** (`haind0185/inventory`) thông qua `@electron-forge/publisher-github`, dùng `GITHUB_TOKEN` trong `.env`.
 
-[Electron Forge](https://www.electronforge.io/) is a complete tool for creating, publishing, and installing modern Electron applications.
+Ứng dụng đã cài trên máy người dùng sẽ tự kiểm tra và tải bản cập nhật mới từ GitHub Releases (cấu hình `update-electron-app` / `electron-updater` trong `src/main.js`). Khi có bản mới, người dùng được thông báo để cài đặt và khởi động lại.
 
-## Vue 3 + Vite
+## Tăng phiên bản
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+`package.json` là **nguồn version duy nhất** — `forge.config.js` (tên file `setupExe`) và `index.html` (tiêu đề cửa sổ) tự lấy theo, không cần sửa tay. Mỗi lần phát hành chỉ cần chạy:
 
-## Recommended IDE Setup
+```bash
+npm version patch    # 1.0.6 → 1.0.7  (sửa lỗi)
+npm version minor    # 1.0.6 → 1.1.0  (thêm tính năng)
+npm version major    # 1.0.6 → 2.0.0  (thay đổi lớn)
+```
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+Lệnh này tự sửa `version` trong `package.json`, tạo commit và git tag tương ứng. Sau đó build/publish như bình thường. (Thêm `--no-git-tag-version` nếu chỉ muốn đổi số mà không tự commit/tag.)
+
+## Hướng dẫn sử dụng nhanh
+
+1. Mở ứng dụng — màn hình mặc định là **Dashboard**.
+2. Vào **Mặt hàng** để khai báo danh mục sản phẩm (nhập tay hoặc import Excel).
+3. Tạo phiếu **Nhập kho** để đưa hàng vào kho (kèm hạn sử dụng).
+4. Tạo phiếu **Xuất kho** khi xuất hàng — hệ thống kiểm tra tồn đủ số lượng.
+5. Theo dõi **Tồn kho** (tồn hiện tại, tồn an toàn) và định kỳ **kiểm kho** bằng file Excel.
+6. Dùng phân hệ **Bán hàng (Sale-Off)** để quản lý đơn hàng, khách hàng, nhân viên và xem báo cáo.
+
+## Cấu trúc thư mục
+
+```
+backend/            # Server Express
+  controllers/      # Xử lý nghiệp vụ từng module
+  models/           # Model Sequelize
+  routes/           # Định nghĩa REST API
+  migrations/       # Migration database (chạy tự động lúc khởi động)
+src/
+  main.js           # Tiến trình chính Electron (bật server, cửa sổ, auto-update)
+  preload.js        # Cầu nối IPC giữa main và renderer
+  renderer/         # Ứng dụng Vue 3
+    api/            # Cấu hình axios
+    store/          # Pinia store theo từng module
+    router/         # Vue Router
+    views/          # Các màn hình (theo nghiệp vụ)
+    i18n/           # Bản dịch (tiếng Việt)
+forge.config.js     # Cấu hình Electron Forge (maker, publisher, vite)
+```

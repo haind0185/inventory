@@ -1,4 +1,5 @@
 require('dotenv').config();
+const { version } = require('./package.json');
 module.exports = {
     packagerConfig: {
         extraResource: [
@@ -15,7 +16,7 @@ module.exports = {
                 certificateFile: './cert.pfx',
                 certificatePassword: process.env.CERT_PASSWORD,
                 // Kích hoạt tính năng auto-update
-                setupExe: 'inventory-1.0.6-Setup.exe',
+                setupExe: `inventory-${version}-Setup.exe`,
             }
         },
         {
